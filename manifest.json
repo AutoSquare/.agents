@@ -2,6 +2,9 @@
   "name": "portable-cursor-agents",
   "description": "可迁移 Cursor 环境与 MCP 包（文献检索、Zotero、PPT、campus-net 等）；安装入口为 Cursor 专用的 setup-cursor-agents.ps1。",
   "skillsRoot": "skills",
+  "rulesRoot": "rules",
+  "rulesCursor": "rules/cursor",
+  "rulesUniversal": "rules/universal/DEVELOPMENT-RULES.md",
   "mcpServers": {
     "academic-research": {
       "source": "https://github.com/alisoroushmd/academic-research-mcp",

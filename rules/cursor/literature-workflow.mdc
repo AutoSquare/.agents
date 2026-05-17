@@ -1,0 +1,19 @@
+---
+description: 查文献、下全文、做 PPT 时的技能与 MCP 选用顺序
+globs: "**/*.{md,mdx}"
+alwaysApply: false
+---
+
+# 文献工作流（与本包 Skills 对齐）
+
+| 用户意图 | 优先 Skill | 常用 MCP |
+|----------|------------|----------|
+| 查文献、检索式、候选池 | `literature-search` | `academic-research`、`zotero` |
+| 筛文献、纳入排除 | `paper-screening` | — |
+| 读论文、文献卡片 | `paper-summary` | — |
+| 参考文献表、BibTeX | `citation-export` | `zotero` |
+| 研究空白、选题 | `research-gap-analysis` | — |
+| 校内/VPN 全文 PDF | `campus-net-onboarding` | `campus-net` |
+| 学术 PPT | `academic-ppt-builder` | `deck-builder`、`ppt-markdown` |
+
+全文下载：优先 `download_papers` / `download_paper`；失败时告知 `manual_download_required.md`，勿要求用户向对话粘贴 Cookie。

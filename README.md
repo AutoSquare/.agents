@@ -1,6 +1,6 @@
 # `.agents` 智能体配置包
 
-可迁移的 **Agent Skills + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT 等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
+可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT 等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
 
 > **给智能体**：进入工作区后先读本文；执行任务时再读 `mcp.md`、`skills.md`、`workflows.md`。
 
@@ -15,12 +15,13 @@
 在仓库根目录打开 PowerShell，执行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills -InstallRules
 ```
 
 脚本会：
 
 - 将 `skills/` 复制到 `%USERPROFILE%\.cursor\skills\`
+- 将 `rules/cursor/*.mdc` 复制到**本项目** `.cursor/rules/`（加 `-InstallRules` 时）
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.cursor\mcp-servers\`
 - 写入或合并 `%USERPROFILE%\.cursor\mcp.json`（已有配置会备份为 `mcp.json.bak-时间戳`）
 
@@ -34,6 +35,9 @@ powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.
 
 # 覆盖已存在的同名 Skill
 powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+
+# 安装 Rules 到项目 .cursor/rules/（可提交进 Git）
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -InstallRules -OverwriteRules
 ```
 
 更细的 Cursor 说明见 [`PORTABLE.md`](PORTABLE.md)。
@@ -53,10 +57,13 @@ powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.
    - 将 [`mcp.template.json`](mcp.template.json) 中的 `{{USERPROFILE}}\.cursor\mcp-servers\` 替换为你的实际安装路径（例如 `%USERPROFILE%\.claude\mcp-servers\`）。  
    - 按 Claude Code 文档把 JSON 合并进其 MCP 配置（项目或用户级，以当前版本为准）。
 
-3. **项目引导**（可选）  
-   - 在仓库根目录 `CLAUDE.md` 或 `AGENTS.md` 中写明：智能体协作规范见 `.agents/README.md`。
+3. **Rules**  
+   - 团队开发规范：`.agents/rules/universal/DEVELOPMENT-RULES.md`（建议写入 `CLAUDE.md` 或设为项目规则源）。
 
-4. **环境变量**  
+4. **项目引导**（可选）  
+   - 在仓库根 `CLAUDE.md` / `AGENTS.md` 中指向 `.agents/README.md` 与上述 Rules 文件。
+
+5. **环境变量**  
    - 见下文 [环境变量](#环境变量)；`campus-net` 凭据可放在 `~/.cursor/campus-net/local.env`（与 Cursor 共用路径）或 Claude 配置中的等价 env。
 
 ---
@@ -67,8 +74,9 @@ OpenCode 各版本对 Skills / MCP 的路径可能不同，通用做法：
 
 1. 克隆本仓库，将 **`.agents` 放在项目根目录**（或只拷贝 `skills/` + `mcp-servers-src/`）。
 2. 在 OpenCode 设置中把 **Skills 目录** 指向本包的 `.agents/skills/`（或复制到 OpenCode 要求的 `skills` 路径）。
-3. MCP：用 [`mcp.template.json`](mcp.template.json) 作模板，把 `command` / `args` 改为本机 Python / Node 可执行文件与 `mcp-servers-src` 构建产物路径后，粘贴到 OpenCode 的 MCP 配置界面。
-4. 需要 Python MCP（`academic-research`、`campus-net`）时，在对应目录执行 `python -m venv .venv` 与 `pip install -r requirements.txt`；`campus-net` 另需 `playwright install chromium`。
+3. **Rules**：将 [`rules/universal/DEVELOPMENT-RULES.md`](rules/universal/DEVELOPMENT-RULES.md) 配置为项目规则/说明文件。
+4. MCP：用 [`mcp.template.json`](mcp.template.json) 作模板，把 `command` / `args` 改为本机路径后粘贴到 OpenCode 的 MCP 配置界面。
+5. 需要 Python MCP 时，在对应目录执行 `python -m venv .venv` 与 `pip install -r requirements.txt`；`campus-net` 另需 `playwright install chromium`。
 
 具体菜单以你安装的 OpenCode 版本文档为准。
 
@@ -80,7 +88,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 
 1. 下载 / 克隆本仓库。  
 2. 将根目录下的 **`.agents` 文件夹重命名为 `.agent`**，并放在 Trea 识别的项目根路径。  
-3. Skills 即 `.agent/skills/` 下各子目录；MCP 需在 Trea 中按界面配置，路径参考 [`mcp.template.json`](mcp.template.json) 与 [`mcp.md`](mcp.md)。
+3. Skills 即 `.agent/skills/`；团队规范即 `.agent/rules/universal/DEVELOPMENT-RULES.md`；MCP 见 [`mcp.template.json`](mcp.template.json) 与 [`mcp.md`](mcp.md)。
 
 ---
 
@@ -98,6 +106,9 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── environment.md            # 环境变量、路径、维护命令
 ├── mcp.template.json         # MCP 配置模板（替换 {{USERPROFILE}} 后使用）
 ├── skills/                   # 全部 Agent Skills（每目录一个 SKILL.md）
+├── rules/
+│   ├── cursor/               # Cursor Rules（.mdc）→ .cursor/rules/
+│   └── universal/            # Claude Code / OpenCode / Trea（DEVELOPMENT-RULES.md）
 ├── mcp-servers-src/          # 需本地构建的 MCP 源码快照
 │   ├── academic-research-mcp/
 │   ├── zotero-mcp/
@@ -110,6 +121,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | 路径 | 说明 |
 |------|------|
 | `skills/` | 智能体技能包；每个子文件夹含 `SKILL.md`，由运行时自动发现。 |
+| `rules/cursor/` | Cursor 规则（`.mdc`）；见 [`rules/README.md`](rules/README.md)。 |
+| `rules/universal/` | 通用团队规范（`.md`）；非 Cursor 平台使用。 |
 | `mcp-servers-src/` | MCP 服务端源码；**不含** `.venv`、`node_modules`（需安装脚本或手动构建）。 |
 | `scripts/setup-cursor-agents.ps1` | **仅 Cursor**：安装 Skills + MCP 到用户目录。 |
 | `mcp.template.json` | 非 Cursor 平台手工配置 MCP 时的 JSON 模板。 |
@@ -153,6 +166,21 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `caveman` | 极简沟通模式（省 token）。 |
 
 分组索引见 [`manifest.json`](manifest.json) 的 `skillGroups`。
+
+---
+
+## Rules 一览
+
+团队规范来自 `自建/AI Rules.md`，已拆为两套：
+
+| 套系 | 路径 | 平台 |
+|------|------|------|
+| Cursor | `rules/cursor/*.mdc` | Cursor（含 `00` 团队规范 + 文献包规则） |
+| 通用 | `rules/universal/DEVELOPMENT-RULES.md` | Claude Code、OpenCode、Trea |
+
+完整文件表见 [`rules/README.md`](rules/README.md)。
+
+**与 Skills 的区别**：Skills 教智能体**如何执行一类任务**；Rules 是**始终或按文件生效的硬约束**。
 
 ---
 

@@ -1,0 +1,20 @@
+---
+description: C#/WPF/WinUI3：public 成员 XML 文档注释与代码格式
+globs: "**/*.{cs,csproj,xaml}"
+alwaysApply: false
+---
+
+# C# 系列开发规范
+
+## XML 文档注释（CS1591）
+
+所有 `public` 类、接口、结构体、枚举及 `public` 方法、属性、事件必须添加完整 XML 文档注释：
+
+- 以 `///` 开头，包含 `<summary>`；方法按需添加 `<param>`、`<returns>`、`<exception>`。
+- 注释语言为简洁准确的中文。
+
+## 代码格式
+
+- 类、方法、属性等成员之间只保留一个空行。
+- 逻辑分组内可保留一个空行；避免连续多个空行。
+- 无行首行尾空白；缩进风格一致。

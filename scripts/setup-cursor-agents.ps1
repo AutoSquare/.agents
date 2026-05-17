@@ -3,15 +3,20 @@
 param(
     [switch]$SkipMcpInstall,
     [switch]$OverwriteSkills,
+    [switch]$InstallRules,
+    [switch]$OverwriteRules,
     [switch]$BackupMcpJson = $true
 )
 
 $ErrorActionPreference = "Stop"
 
 $AgentsRoot = Split-Path -Parent $PSScriptRoot
+$ProjectRoot = Split-Path -Parent $AgentsRoot
 $CursorRoot = Join-Path $env:USERPROFILE ".cursor"
 $SkillsSource = Join-Path $AgentsRoot "skills"
 $SkillsTarget = Join-Path $CursorRoot "skills"
+$RulesSource = Join-Path (Join-Path $AgentsRoot "rules") "cursor"
+$RulesTarget = Join-Path $ProjectRoot ".cursor\rules"
 $McpServersRoot = Join-Path $CursorRoot "mcp-servers"
 $McpJsonPath = Join-Path $CursorRoot "mcp.json"
 
@@ -27,6 +32,30 @@ function Ensure-Directory {
     if (-not (Test-Path $Path)) {
         New-Item -ItemType Directory -Path $Path -Force | Out-Null
     }
+}
+
+function Copy-Rules {
+    if (-not (Test-Path $RulesSource)) {
+        Write-Host "skip rules: source not found ($RulesSource)"
+        return
+    }
+    $mdcFiles = Get-ChildItem -Path $RulesSource -Filter "*.mdc" -File -ErrorAction SilentlyContinue
+    if (-not $mdcFiles -or $mdcFiles.Count -eq 0) {
+        Write-Host "skip rules: no .mdc files in $RulesSource"
+        return
+    }
+    Ensure-Directory (Join-Path $ProjectRoot ".cursor")
+    Ensure-Directory $RulesTarget
+    foreach ($f in $mdcFiles) {
+        $target = Join-Path $RulesTarget $f.Name
+        if ((Test-Path $target) -and -not $OverwriteRules) {
+            Write-Host "skip rule (exists): $($f.Name)"
+            continue
+        }
+        Copy-Item $f.FullName $target -Force
+        Write-Host "installed rule -> project: $($f.Name)"
+    }
+    Write-Host "rules target: $RulesTarget"
 }
 
 function Copy-Skills {
@@ -211,6 +240,10 @@ Ensure-Directory $McpServersRoot
 
 Copy-Skills
 
+if ($InstallRules) {
+    Copy-Rules
+}
+
 if (-not $SkipMcpInstall) {
     Install-AcademicResearchMcp
     Install-ZoteroMcp
@@ -221,4 +254,7 @@ if (-not $SkipMcpInstall) {
 Set-McpJson
 
 Write-Host ""
+if ($InstallRules) {
+    Write-Host "Rules installed under project .cursor/rules/ (commit .cursor/rules to git if desired)."
+}
 Write-Host "Done. Restart Cursor, then enable/check servers in Settings > Tools & MCP."
