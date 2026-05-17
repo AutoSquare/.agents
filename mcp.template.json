@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "academic-research": {
+      "command": "{{USERPROFILE}}\\.cursor\\mcp-servers\\academic-research-mcp\\.venv\\Scripts\\python.exe",
+      "args": [
+        "{{USERPROFILE}}\\.cursor\\mcp-servers\\academic-research-mcp\\server.py"
+      ],
+      "env": {
+        "S2_API_KEY": "${env:S2_API_KEY}",
+        "OPENALEX_EMAIL": "${env:OPENALEX_EMAIL}",
+        "CROSSREF_EMAIL": "${env:CROSSREF_EMAIL}",
+        "NCBI_API_KEY": "${env:NCBI_API_KEY}"
+      }
+    },
+    "zotero": {
+      "command": "node",
+      "args": [
+        "{{USERPROFILE}}\\.cursor\\mcp-servers\\zotero-mcp\\dist\\index.js"
+      ]
+    },
+    "deck-builder": {
+      "command": "node",
+      "args": [
+        "{{USERPROFILE}}\\.cursor\\mcp-servers\\deck-builder\\build\\index.js"
+      ]
+    },
+    "ppt-markdown": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@botrun/mcp-ppt-generator"
+      ]
+    },
+    "campus-net": {
+      "command": "{{USERPROFILE}}\\.cursor\\mcp-servers\\campus-net-mcp\\.venv\\Scripts\\python.exe",
+      "args": [
+        "{{USERPROFILE}}\\.cursor\\mcp-servers\\campus-net-mcp\\server.py"
+      ],
+      "env": {
+        "CAMPUS_USERNAME": "${env:CAMPUS_USERNAME}",
+        "CAMPUS_PASSWORD": "${env:CAMPUS_PASSWORD}",
+        "OPENALEX_EMAIL": "${env:OPENALEX_EMAIL}",
+        "CROSSREF_EMAIL": "${env:CROSSREF_EMAIL}",
+        "CAMPUS_OUTPUT_DIR": "${env:CAMPUS_OUTPUT_DIR}"
+      }
+    }
+  }
+}

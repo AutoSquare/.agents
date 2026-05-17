@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campus-net-mcp"
+version = "0.1.0"
+description = "通用校园网 MCP：Profile 驱动检测、馆藏认证与全文下载"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.2,<2",
+    "httpx[socks]>=0.27,<1",
+    "pip-system-certs>=4.0",
+    "pyyaml>=6.0,<7",
+    "pydantic>=2,<3",
+    "playwright>=1.41,<2",
+]
+
+[tool.setuptools]
+py-modules = ["server"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

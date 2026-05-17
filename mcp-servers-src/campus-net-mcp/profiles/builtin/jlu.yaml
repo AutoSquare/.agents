@@ -1,0 +1,63 @@
+school_id: jlu
+school_name: 吉林大学
+aliases:
+  - 吉大
+credential_env:
+  username: CAMPUS_USERNAME
+  password: CAMPUS_PASSWORD
+access_modes:
+  - campus_ip
+  - vpn
+  - carsi
+auth:
+  type: cas_vpn
+  login_url: https://vpn.jlu.edu.cn/
+  headless: true
+  success_url_contains:
+    - vpn.jlu.edu.cn
+    - lib.jlu.edu.cn
+    - chaxin.jlu.edu.cn
+    - .edu.cn
+  steps:
+    - action: wait
+      milliseconds: 2500
+    - action: click
+      selector: "text=统一身份认证"
+    - action: wait
+      milliseconds: 2200
+    - action: fill
+      selector: "#username"
+      field: username
+    - action: fill
+      selector: "#password"
+      field: password
+    - action: click
+      selector: "button[type=submit], input[type=submit]"
+    - action: wait
+      milliseconds: 4500
+library_probes:
+  - name: lib_portal
+    url: https://lib.jlu.edu.cn/
+    method: HEAD
+    expect_status: [200, 302, 301, 303, 307, 308]
+  - name: chaxin_discovery
+    url: https://chaxin.jlu.edu.cn/
+    method: HEAD
+    expect_status: [200, 302, 301, 303, 307, 308]
+publisher_probe:
+  doi: "10.1038/nature12373"
+  timeout_seconds: 35.0
+doi_resolver_template: null
+publisher_cookie_seeds:
+  - https://www.sciencedirect.com/
+  - https://linkinghub.elsevier.com/
+  - https://www.sciencedirect.com/user/institutionlogin
+cnki:
+  enabled: false
+  entry_url: ""
+  search_by:
+    - doi
+    - title
+    - url
+session_ttl_hours: 6.0
+download_rate_limit_seconds: 3.0

@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "campus-net Profile YAML 根映射",
+  "type": "object",
+  "required": ["school_id", "school_name", "auth", "credential_env"],
+  "additionalProperties": false,
+  "properties": {
+    "school_id": {"type": "string", "pattern": "^[a-z0-9_-]{2,48}$"},
+    "school_name": {"type": "string"},
+    "aliases": {"type": "array", "items": {"type": "string"}},
+    "auth": {"type": "object"},
+    "credential_env": {
+      "type": "object",
+      "properties": {
+        "username": {"type": "string"},
+        "password": {"type": "string"}
+      }
+    },
+    "library_probes": {"type": "array"},
+    "publisher_probe": {"type": ["object", "null"]},
+    "doi_resolver_template": {"type": ["string", "null"]},
+    "cnki": {"type": "object"},
+    "session_ttl_hours": {"type": "number"},
+    "download_rate_limit_seconds": {"type": "number"}
+  }
+}

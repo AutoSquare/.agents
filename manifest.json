@@ -1,0 +1,64 @@
+{
+  "name": "portable-cursor-agents",
+  "description": "可迁移 Cursor 环境与 MCP 包（文献检索、Zotero、PPT、campus-net 等）；安装入口为 Cursor 专用的 setup-cursor-agents.ps1。",
+  "skillsRoot": "skills",
+  "mcpServers": {
+    "academic-research": {
+      "source": "https://github.com/alisoroushmd/academic-research-mcp",
+      "install": "git clone + python venv + pip install -r requirements.txt",
+      "purpose": "multi-source academic search"
+    },
+    "zotero": {
+      "source": "https://github.com/Xpropel/zotero-mcp",
+      "install": "git clone + npm install + npm run build",
+      "purpose": "local Zotero library access"
+    },
+    "deck-builder": {
+      "source": "https://github.com/toontube/deck-builder",
+      "install": "git clone + npm install + npm run build",
+      "purpose": "structured editable PPTX generation"
+    },
+    "ppt-markdown": {
+      "source": "https://www.npmjs.com/package/@botrun/mcp-ppt-generator",
+      "install": "npx -y @botrun/mcp-ppt-generator",
+      "purpose": "Markdown to PPTX"
+    },
+    "campus-net-mcp": {
+      "source": "bundled: .agents/mcp-servers-src/campus-net-mcp",
+      "install": ".agents/scripts/setup-cursor-agents.ps1（Install-CampusNetMcp）",
+      "purpose": "通用学校 Profile：馆藏探测、会话与全文下载链路"
+    }
+  },
+  "skillGroups": {
+    "literatureAndPpt": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder"
+    ],
+    "mattpocockAdapted": [
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor"
+    ]
+  }
+}

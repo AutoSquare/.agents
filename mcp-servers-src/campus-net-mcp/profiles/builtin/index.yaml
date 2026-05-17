@@ -1,0 +1,5 @@
+# builtin school_id → 别名列表（中英文、简称）；供 discover_school_profile 解析。
+aliases:
+  jlu:
+    - 吉林大学
+    - 吉大

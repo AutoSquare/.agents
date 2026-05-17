@@ -1,0 +1,7 @@
+mcp>=1.2,<2
+httpx[socks]>=0.27,<1
+pip-system-certs>=4.0
+pyyaml>=6.0,<7
+pydantic>=2,<3
+playwright>=1.41,<2
+browser-cookie3>=0.19.1; platform_system == "Windows"
