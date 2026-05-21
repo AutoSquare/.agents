@@ -6,9 +6,10 @@
 
 ## 包含内容
 
-- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能和辅助工作流技能。
+- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能、**UI/UX 设计技能族（7 个）** 和辅助工作流技能。
 - `mcp-servers-src/`：本地型 MCP 服务源码快照，包含 `academic-research-mcp`、`zotero-mcp`、`deck-builder`、`campus-net-mcp`；不包含 `.git`、`node_modules`、`.venv` 等机器依赖目录。
-- `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：将 `skills/` 复制到 `%USERPROFILE%\.cursor\skills\`，并写入 `%USERPROFILE%\.cursor\mcp.json`。名称刻意避免使用泛化的 `install`，以免与其他 Agent 运行时混淆。
+- `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：将 `skills/` 复制到 `%USERPROFILE%\.cursor\skills\`，并写入 `%USERPROFILE%\.cursor\mcp.json`。
+- `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `.agents/skills/`（含 Cursor 路径改写）。
 - `mcp.template.json`：MCP 配置模板，使用 `{{USERPROFILE}}` 占位。
 - `manifest.json`：Skills 与 MCP 来源清单。
 - `mcp.md`、`skills.md`、`workflows.md`、`output-templates.md`、`environment.md`：给智能体读取的规范文档。
@@ -21,7 +22,7 @@
    - Python
    - Cursor
 
-2. 将整个 `.agents/` 文件夹复制到任意项目根目录。
+2. 将整个 `.agents/` 文件夹复制到任意项目根目录（UI/UX Skill 已随包附带，**无需** sibling 的 `ui-ux-pro-max-skill` 即可安装）。
 
 3. 在 PowerShell 中执行：
 
@@ -36,9 +37,21 @@ setx S2_API_KEY "你的 Semantic Scholar API Key"
 setx OPENALEX_EMAIL "你的邮箱"
 setx CROSSREF_EMAIL "你的邮箱"
 setx NCBI_API_KEY "你的 NCBI API Key"
+setx GEMINI_API_KEY "你的 Gemini API Key"
 ```
 
+（`GEMINI_API_KEY` 仅在使用 `design` 生成 Logo/CIP/图标时需要；`ui-ux-pro-max` 检索不需要。）
+
 5. 重启 Cursor，在 `Settings > Tools & MCP` 确认 MCP 服务启用。
+
+## 维护 UI/UX 技能（可选）
+
+若本机仍有 `ui-ux-pro-max-skill` 源码并修改汉化，在仓库根执行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\sync-ui-ux-skills.ps1" -Assemble
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+```
 
 ## 安装脚本行为
 

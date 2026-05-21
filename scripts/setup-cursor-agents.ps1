@@ -1,12 +1,16 @@
 #!/usr/bin/env pwsh
-# Cursor 专用：将本迁移包中的 Skills 与用户级 MCP 写入 %USERPROFILE%\.cursor\（非 Claude Desktop / VS Code 通用安装）。
+# Cursor: install Skills and user-level MCP to %USERPROFILE%\.cursor\
 param(
     [switch]$SkipMcpInstall,
     [switch]$OverwriteSkills,
     [switch]$InstallRules,
     [switch]$OverwriteRules,
-    [switch]$BackupMcpJson = $true
+    [switch]$BackupMcpJson
 )
+
+if (-not $PSBoundParameters.ContainsKey('BackupMcpJson')) {
+    $BackupMcpJson = $true
+}
 
 $ErrorActionPreference = "Stop"
 
@@ -238,6 +242,11 @@ function Set-McpJson {
 Ensure-Directory $CursorRoot
 Ensure-Directory $McpServersRoot
 
+Assert-Command "python"
+if (-not (Get-Command "node" -ErrorAction SilentlyContinue)) {
+    Write-Warning "node not found: brand/design-system/ui-styling scripts may not run until Node.js is installed."
+}
+
 Copy-Skills
 
 if ($InstallRules) {
@@ -258,3 +267,9 @@ if ($InstallRules) {
     Write-Host "Rules installed under project .cursor/rules/ (commit .cursor/rules to git if desired)."
 }
 Write-Host "Done. Restart Cursor, then enable/check servers in Settings > Tools & MCP."
+$uiUxSmoke = Join-Path $SkillsTarget "ui-ux-pro-max\scripts\search.py"
+if (Test-Path $uiUxSmoke) {
+    Write-Host ""
+    Write-Host "UI/UX smoke test (optional):"
+    Write-Host ('  python "' + $uiUxSmoke + '" "fintech" --design-system -n 1')
+}

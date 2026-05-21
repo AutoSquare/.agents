@@ -51,3 +51,13 @@
    - Markdown 已成稿时调用 `ppt-markdown`。
 5. PPT 文件名优先使用英文，正文内容优先中文。
 6. 每页标题应是观点句，不只是名词短语。
+
+## UI/UX 设计（React Native）
+
+1. 应用 `ui-ux-pro-max`。
+2. 先运行 `search.py --design-system` 获取 pattern、style、colors、typography 等推荐（命令路径以 `%USERPROFILE%\.cursor\skills\ui-ux-pro-max\` 为准）。
+3. 需要跨会话持久化时，在项目工作目录使用 `--persist`；会在**当前项目**下生成 `design-system/MASTER.md`（与 Skill 包内 `design-system/` 目录不是同一位置）。
+4. 需要品牌层规范时联动 `brand` → `design-system` → `ui-styling`。
+5. Logo/CIP/图标任务应用 `design`；融资或产品路演幻灯片应用 `slides` + design-system scripts。
+6. **与学术 PPT 区分**：学位答辩、文献综述、论文汇报用 `academic-ppt-builder` + deck-builder MCP；商业 Pitch 用 `slides`。
+7. `banner-design` 的 AI 生成步骤依赖未打包 Skill（ai-artist、ai-multimodal、chrome-devtools），无则仅输出规格与 references 指导。

@@ -3,7 +3,7 @@
 用户级 Skills 目录：
 
 ```text
-C:\Users\25705\.cursor\skills
+%USERPROFILE%\.cursor\skills
 ```
 
 ## 文献检索与综述
@@ -18,6 +18,16 @@ C:\Users\25705\.cursor\skills
 ## PPT 与汇报
 
 - `academic-ppt-builder`：将论文检索结果、综述材料或研究报告转换为中文学术 PPT 大纲，并调用 PPT MCP 生成可编辑 `.pptx`。
+
+## UI/UX 设计
+
+- `ui-ux-pro-max`：React Native UI/UX 风格检索与设计系统推荐（`search.py --design-system`）；本地 fork 仅列 react-native 技术栈。
+- `brand`：品牌指南、色彩/字体规范与资产组织。
+- `design-system`：设计令牌与幻灯片文案/布局/策略检索（含 scripts）。
+- `ui-styling`：shadcn/ui 与 Tailwind 配置辅助（需 Node.js）。
+- `design`：Logo、CIP、图标检索与 Gemini 图像生成（需 `GEMINI_API_KEY`）。
+- `slides`：融资/产品路演幻灯片结构（联动 design-system scripts）。
+- `banner-design`：横幅尺寸与风格；完整 AI 生成链需自备 ai-artist / ai-multimodal / chrome-devtools。
 
 ## 工程与工作流
 
@@ -51,4 +61,10 @@ C:\Users\25705\.cursor\skills
 - 用户要求“总结论文、读 PDF、做文献卡片”时，应用 `paper-summary`。
 - 用户要求“参考文献格式、BibTeX、GB/T 7714、APA”时，应用 `citation-export`。
 - 用户要求“研究空白、选题价值、未来方向”时，应用 `research-gap-analysis`。
-- 用户要求“做 PPT、汇报、开题、答辩、文献综述展示”时，应用 `academic-ppt-builder`。
+- 用户要求“做 PPT、汇报、开题、答辩、文献综述展示”时，应用 `academic-ppt-builder`（学术场景 + deck-builder MCP）。
+- 用户要求“融资路演、产品发布、Pitch Deck、商业幻灯片结构”时，应用 `slides`（联动 `design-system` scripts）。
+- 用户要求“RN 界面、App UI、设计系统检索、配色字体 UX”时，应用 `ui-ux-pro-max`。
+- 用户要求“品牌指南、Logo 规范、视觉识别”时，应用 `brand`；Logo/CIP 生成与检索用 `design`。
+- 用户要求“shadcn、Tailwind 组件主题”时，应用 `ui-styling`。
+- 用户要求“设计令牌、幻灯片文案公式、布局模式”时，应用 `design-system`。
+- 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。

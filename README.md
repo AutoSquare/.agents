@@ -1,6 +1,6 @@
 # `.agents` 智能体配置包
 
-可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT 等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
+可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）** 等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
 
 > **给智能体**：进入工作区后先读本文；执行任务时再读 `mcp.md`、`skills.md`、`workflows.md`。
 
@@ -115,7 +115,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 │   ├── deck-builder/
 │   └── campus-net-mcp/       # 校园网馆藏（本仓库附带）
 └── scripts/
-    └── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
+    ├── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
+    └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族
 ```
 
 | 路径 | 说明 |
@@ -144,6 +145,14 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `campus-net-onboarding` | 校园网 Profile 配置、CAS/VPN 会话、全文下载与失败清单 `manual_download_required.md`。 |
 | **汇报与演示** | |
 | `academic-ppt-builder` | 中文学术 PPT 大纲 + 调用 deck-builder / ppt-markdown 生成 pptx。 |
+| **UI/UX 设计**（源自 [`ui-ux-pro-max-skill`](../ui-ux-pro-max-skill/) 汉化，经 `sync-ui-ux-skills.ps1` 同步） | |
+| `ui-ux-pro-max` | React Native UI/UX BM25 检索与设计系统推荐（`search.py --design-system`）。 |
+| `design` | Logo、CIP 企业识别、图标生成与检索（生成脚本需 `GEMINI_API_KEY`）。 |
+| `design-system` | 设计令牌、幻灯片文案/布局/策略检索（含 Python/Node scripts）。 |
+| `ui-styling` | shadcn/ui 与 Tailwind 组件与配置辅助。 |
+| `brand` | 品牌指南、视觉识别与资产校验。 |
+| `slides` | 融资/产品路演幻灯片结构与文案（联动 design-system scripts）。 |
+| `banner-design` | 横幅尺寸与风格规范（完整生成链依赖未打包的 ai-artist 等，见 environment.md）。 |
 | **工程与协作**（多源自 Matt Pocock 技能适配） | |
 | `diagnose` | 有纪律的缺陷/性能诊断循环（重现→缩小→修复→回归）。 |
 | `tdd` | 测试驱动开发（红-绿-重构）。 |
