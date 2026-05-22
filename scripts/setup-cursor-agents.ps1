@@ -76,6 +76,17 @@ function Copy-Skills {
         Copy-Item $_.FullName $target -Recurse -Force
         Write-Host "installed skill: $($_.Name)"
     }
+    $pptMakerTarget = Join-Path $SkillsTarget "ppt-maker"
+    if (Test-Path $pptMakerTarget) {
+        $kitOk = Test-Path (Join-Path $pptMakerTarget "kit-template")
+        $scaffoldOk = Test-Path (Join-Path $pptMakerTarget "scripts\scaffold.mjs")
+        if ($kitOk -and $scaffoldOk) {
+            Write-Host "ppt-maker: kit-template and scaffold.mjs OK"
+        } else {
+            Write-Warning "ppt-maker: missing kit-template or scripts/scaffold.mjs — re-run sync-to-agents from sandbox"
+        }
+        Write-Host "ppt-maker: requires Node.js 18+; style customization requires ui-ux-pro-max + Python 3"
+    }
 }
 
 function Ensure-McpRepo {

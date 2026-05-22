@@ -17,7 +17,8 @@
 
 ## PPT 与汇报
 
-- `academic-ppt-builder`：将论文检索结果、综述材料或研究报告转换为中文学术 PPT 大纲，并调用 PPT MCP 生成可编辑 `.pptx`。
+- `ppt-maker`：默认路径。Vue 16:9 预览 + 浏览器导出 pptx/zip；须联动 `ui-ux-pro-max` 定制风格；任务副本在 `ppt-projects/{slug}/`。
+- `academic-ppt-builder`：学术快出。答辩、开题、文献综述或明确要快出 pptx 时，调用 deck-builder / ppt-markdown MCP。
 
 ## UI/UX 设计
 
@@ -61,8 +62,9 @@
 - 用户要求“总结论文、读 PDF、做文献卡片”时，应用 `paper-summary`。
 - 用户要求“参考文献格式、BibTeX、GB/T 7714、APA”时，应用 `citation-export`。
 - 用户要求“研究空白、选题价值、未来方向”时，应用 `research-gap-analysis`。
-- 用户要求“做 PPT、汇报、开题、答辩、文献综述展示”时，应用 `academic-ppt-builder`（学术场景 + deck-builder MCP）。
-- 用户要求“融资路演、产品发布、Pitch Deck、商业幻灯片结构”时，应用 `slides`（联动 `design-system` scripts）。
+- 用户要求“做 PPT、幻灯片、演示文稿、汇报”（未说明形式）时，**默认**应用 `ppt-maker`（联动 `ui-ux-pro-max`）。
+- 用户明确要求“答辩、开题、文献综述展示、要快出 pptx、deck-builder”时，应用 `academic-ppt-builder`。
+- 用户要求“融资路演、Pitch Deck、商业幻灯片结构”时，应用 `slides`（联动 `design-system` scripts）；「产品发布」若需高保真视觉仍用 `ppt-maker`。
 - 用户要求“RN 界面、App UI、设计系统检索、配色字体 UX”时，应用 `ui-ux-pro-max`。
 - 用户要求“品牌指南、Logo 规范、视觉识别”时，应用 `brand`；Logo/CIP 生成与检索用 `design`。
 - 用户要求“shadcn、Tailwind 组件主题”时，应用 `ui-styling`。

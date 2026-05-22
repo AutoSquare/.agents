@@ -14,6 +14,7 @@ alwaysApply: false
 | 参考文献表、BibTeX | `citation-export` | `zotero` |
 | 研究空白、选题 | `research-gap-analysis` | — |
 | 校内/VPN 全文 PDF | `campus-net-onboarding` | `campus-net` |
-| 学术 PPT | `academic-ppt-builder` | `deck-builder`、`ppt-markdown` |
+| 做 PPT / 幻灯片（默认） | `ppt-maker` | —（联动 `ui-ux-pro-max`） |
+| 学术快出 PPT | `academic-ppt-builder` | `deck-builder`、`ppt-markdown` |
 
 全文下载：优先 `download_papers` / `download_paper`；失败时告知 `manual_download_required.md`，勿要求用户向对话粘贴 Cookie。

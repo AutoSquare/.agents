@@ -46,7 +46,38 @@ powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.
 
 **`banner-design` 限制**：完整生成链引用未打包 Skill `ai-artist`、`ai-multimodal`、`chrome-devtools`；迁入包仅含 SKILL + references。
 
-**Claude Code 手动安装**：若复制到 `~/.claude/skills/`，须将 SKILL 内 `$env:USERPROFILE\.cursor\skills\` 替换为 Claude 用户级路径。
+**Claude Code 手动安装**：若复制到 `~/.claude/skills/`，须将 SKILL 内 `$env:USERPROFILE\.cursor\skills\` 替换为 Claude 用户级路径（含 `ppt-maker`、`ui-ux-pro-max`）。
+
+## ppt-maker 维护
+
+**编辑源**：工作区根 `ppt-maker/`（沙箱）；**发布副本**：`.agents/skills/ppt-maker/`（禁止手改，须 sync）。
+
+```powershell
+# 沙箱 → .agents 发布副本
+node ppt-maker/scripts/sync-to-agents.mjs
+node ppt-maker/scripts/sync-to-agents.mjs --dry-run
+
+# 安装到 Cursor
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+```
+
+**刷新 kit-template**（维护者，可选）：
+
+```powershell
+node ppt-maker/scripts/sync-template.mjs --upstream "D:\path\to\ppt-maker-kit"
+node ppt-maker/scripts/sync-to-agents.mjs
+```
+
+**用户任务副本**：每次任务在工作区 `ppt-projects/{english-slug}/`；勿提交进 Git（根 `.gitignore` 已忽略）。
+
+**前置**：Node.js 18+（`npm install` / `npm run serve`）；Python 3 + `ui-ux-pro-max`（风格 `design-tokens.css`）。
+
+**冒烟**：
+
+```powershell
+node "$env:USERPROFILE\.cursor\skills\ppt-maker\scripts\check-node.mjs"
+node "$env:USERPROFILE\.cursor\skills\ppt-maker\scripts\slug.mjs" --generate
+```
 
 ## 重启要求
 

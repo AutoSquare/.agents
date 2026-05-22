@@ -144,7 +144,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `research-gap-analysis` | 归纳研究脉络、争议与证据缺口，辅助选题。 |
 | `campus-net-onboarding` | 校园网 Profile 配置、CAS/VPN 会话、全文下载与失败清单 `manual_download_required.md`。 |
 | **汇报与演示** | |
-| `academic-ppt-builder` | 中文学术 PPT 大纲 + 调用 deck-builder / ppt-markdown 生成 pptx。 |
+| `ppt-maker` | Vue 高保真幻灯片预览 + 浏览器导出 pptx/zip；默认「做 PPT」路径；联动 `ui-ux-pro-max`。 |
+| `academic-ppt-builder` | 学术快出：中文学术 PPT 大纲 + deck-builder / ppt-markdown 生成 pptx。 |
 | **UI/UX 设计**（源自 [`ui-ux-pro-max-skill`](../ui-ux-pro-max-skill/) 汉化，经 `sync-ui-ux-skills.ps1` 同步） | |
 | `ui-ux-pro-max` | React Native UI/UX BM25 检索与设计系统推荐（`search.py --design-system`）。 |
 | `design` | Logo、CIP 企业识别、图标生成与检索（生成脚本需 `GEMINI_API_KEY`）。 |

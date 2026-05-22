@@ -1,6 +1,6 @@
 {
   "name": "portable-cursor-agents",
-  "description": "可迁移 Cursor 环境与 MCP 包（文献检索、Zotero、PPT、campus-net、UI/UX 设计技能等）；安装入口为 Cursor 专用的 setup-cursor-agents.ps1。",
+  "description": "可迁移 Cursor 环境与 MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能等）；安装入口为 Cursor 专用的 setup-cursor-agents.ps1。",
   "skillsRoot": "skills",
   "rulesRoot": "rules",
   "rulesCursor": "rules/cursor",
@@ -40,7 +40,8 @@
       "paper-summary",
       "citation-export",
       "research-gap-analysis",
-      "academic-ppt-builder"
+      "academic-ppt-builder",
+      "ppt-maker"
     ],
     "mattpocockAdapted": [
       "diagnose",

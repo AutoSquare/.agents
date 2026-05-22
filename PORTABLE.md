@@ -6,7 +6,7 @@
 
 ## 包含内容
 
-- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能、**UI/UX 设计技能族（7 个）** 和辅助工作流技能。
+- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能（`ppt-maker`、`academic-ppt-builder`）、**UI/UX 设计技能族（7 个）** 和辅助工作流技能。
 - `mcp-servers-src/`：本地型 MCP 服务源码快照，包含 `academic-research-mcp`、`zotero-mcp`、`deck-builder`、`campus-net-mcp`；不包含 `.git`、`node_modules`、`.venv` 等机器依赖目录。
 - `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：将 `skills/` 复制到 `%USERPROFILE%\.cursor\skills\`，并写入 `%USERPROFILE%\.cursor\mcp.json`。
 - `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `.agents/skills/`（含 Cursor 路径改写）。
@@ -43,6 +43,12 @@ setx GEMINI_API_KEY "你的 Gemini API Key"
 （`GEMINI_API_KEY` 仅在使用 `design` 生成 Logo/CIP/图标时需要；`ui-ux-pro-max` 检索不需要。）
 
 5. 重启 Cursor，在 `Settings > Tools & MCP` 确认 MCP 服务启用。
+
+6. （可选）验证 `ppt-maker`：
+
+```powershell
+node "$env:USERPROFILE\.cursor\skills\ppt-maker\scripts\check-node.mjs"
+```
 
 ## 维护 UI/UX 技能（可选）
 

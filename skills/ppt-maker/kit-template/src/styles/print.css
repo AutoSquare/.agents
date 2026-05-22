@@ -1,0 +1,53 @@
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .skip-link,
+  .app-header,
+  .storyboard-nav {
+    display: none !important;
+  }
+
+  .storyboard-layout {
+    display: block;
+    max-width: none;
+    padding: 0;
+  }
+
+  .storyboard {
+    gap: 0;
+    padding: 0;
+  }
+
+  .storyboard__item {
+    break-after: page;
+    page-break-after: always;
+    scroll-snap-align: none;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .storyboard__item:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .slide-section-label {
+    display: none;
+  }
+
+  .slide-frame {
+    box-shadow: none;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .slide-frame__canvas {
+    border: 1px solid #ccc;
+  }
+}

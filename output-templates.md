@@ -109,3 +109,19 @@
 - 推荐 MCP：
 - 输出文件名：
 ```
+
+## 大纲 → slides.js 映射（ppt-maker 衔接）
+
+将 `academic-ppt-builder` 产出的大纲转为 `ppt-projects/{slug}/src/data/slides.js` 时使用：
+
+| 大纲字段 | slides.js 字段 |
+|----------|----------------|
+| 页标题（观点句） | `title` |
+| 主题副题 / 章节 | `theme`、`sectionLabel` |
+| 页码 | `sectionIndex`（如 `01`） |
+| 页面要点 / 正文 | `cases[].description` |
+| 双栏对比 | `cases` 长度 2；单栏为 1 |
+| 图表 / 配图建议 | 素材放入 `public/assets/materials/`（英文文件名）→ `cases[].images` |
+| 标签 / 指标 | `cases[].tags`、`cases[].metadata` |
+
+映射完成后按 `ppt-maker` 工作流调用 `ui-ux-pro-max` 并 `npm run serve`。

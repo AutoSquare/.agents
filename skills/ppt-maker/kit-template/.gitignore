@@ -1,0 +1,29 @@
+.DS_Store
+node_modules
+/dist
+/output
+
+# 用户自备素材（保留占位图与目录说明）
+/public/assets/materials/*
+!/public/assets/materials/.gitkeep
+!/public/assets/materials/placeholder.png
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

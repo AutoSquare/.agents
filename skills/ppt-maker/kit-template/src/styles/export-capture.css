@@ -1,0 +1,102 @@
+/**
+ * 像素级导出：离屏排版（宽高由 captureSlides.js 写入 CSS 变量）
+ * 字号以 1024px 预览为基准，经 --capture-scale 同比放大，与预览视觉比例一致。
+ */
+body.export-raster-active {
+  --slide-export-scale: var(--capture-scale, 1.875);
+}
+
+body.export-raster-active .storyboard__item--export-capture {
+  position: fixed !important;
+  left: -9999px !important;
+  top: 0 !important;
+  width: var(--capture-width, 1920px) !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: -1 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+body.export-raster-active .storyboard__item--export-capture .slide-frame-wrap,
+body.export-raster-active .storyboard__item--export-capture .slide-frame {
+  width: var(--capture-width, 1920px) !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+body.export-raster-active .storyboard__item--export-capture .slide-frame__canvas {
+  width: var(--capture-width, 1920px) !important;
+  height: var(--capture-height, 1080px) !important;
+  aspect-ratio: auto !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  font-size: calc(16px * var(--capture-scale, 1.875));
+  --type-display: 1.375em;
+  --type-title: 1em;
+  --type-body: 0.75em;
+  --type-caption: 0.6875em;
+}
+
+body.export-raster-active .storyboard__item--export-capture .slide-frame__header {
+  padding: calc(16px * var(--slide-export-scale)) calc(24px * var(--slide-export-scale))
+    calc(12px * var(--slide-export-scale));
+}
+
+body.export-raster-active .storyboard__item--export-capture .slide-frame__footer {
+  padding: calc(6px * var(--slide-export-scale)) calc(24px * var(--slide-export-scale));
+  font-size: 0.5625em !important;
+}
+
+body.export-raster-active .storyboard__item--export-capture .badge-dot {
+  width: calc(5px * var(--capture-scale, 1.875)) !important;
+  height: calc(5px * var(--capture-scale, 1.875)) !important;
+}
+
+body.export-raster-active .storyboard__item--export-capture .dual-case__item {
+  padding: calc(16px * var(--slide-export-scale)) calc(20px * var(--slide-export-scale))
+    calc(20px * var(--slide-export-scale));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-card__header {
+  margin-bottom: calc(12px * var(--slide-export-scale));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-card__index {
+  font-size: 0.625em !important;
+  padding: calc(3px * var(--capture-scale, 1.875)) calc(6px * var(--capture-scale, 1.875));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-card__media {
+  margin-bottom: calc(12px * var(--slide-export-scale));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-card__specs {
+  gap: calc(6px * var(--slide-export-scale));
+  margin-bottom: calc(12px * var(--slide-export-scale));
+  padding-top: calc(10px * var(--slide-export-scale));
+}
+
+body.export-raster-active .storyboard__item--export-capture .spec-row {
+  font-size: 0.6875em !important;
+}
+
+body.export-raster-active .storyboard__item--export-capture .spec-dot-leader {
+  margin: 0 calc(6px * var(--capture-scale, 1.875));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-tags {
+  gap: calc(6px * var(--capture-scale, 1.875));
+  margin-top: calc(8px * var(--capture-scale, 1.875));
+}
+
+body.export-raster-active .storyboard__item--export-capture .case-tags__item {
+  font-size: 0.625em !important;
+  padding: calc(2px * var(--capture-scale, 1.875)) calc(6px * var(--capture-scale, 1.875));
+  border-radius: calc(2px * var(--capture-scale, 1.875));
+}
