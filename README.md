@@ -12,33 +12,58 @@
 
 **前置**：Windows 上已安装 Git、Python、Node.js、Cursor。
 
-在仓库根目录打开 PowerShell，执行：
+进入 `.agents` 目录，在 PowerShell 中执行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills -InstallRules
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
+
+（若已在 `.agents` 内，直接执行第二行即可。）
+
+脚本结束后会**清屏**并显示**分层着色**的结构化摘要；调试时可加 `-Verbose`（展开详细日志）、`-NoClearScreen`（不清屏）或 `-NoColor`（禁用着色；输出重定向时亦自动禁用）。
 
 脚本会：
 
-- 将 `skills/` 复制到 `%USERPROFILE%\.cursor\skills\`
-- 将 `rules/cursor/*.mdc` 复制到**本项目** `.cursor/rules/`（加 `-InstallRules` 时）
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.cursor\skills\`（仅同名托管项，不删除用户自装 skill）
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.cursor\mcp-servers\`
 - 写入或合并 `%USERPROFILE%\.cursor\mcp.json`（已有配置会备份为 `mcp.json.bak-时间戳`）
+- **默认不安装 Rules**；结束时提醒按 [`rules/universal/AGENTS.md`](rules/universal/AGENTS.md) 各节**手动录入** Cursor Settings → Rules → **User**
 
-完成后 **重启 Cursor**，在 **Settings → Tools & MCP** 确认服务已启用。
+完成后 **重启 Cursor**，在 **Settings → Tools & MCP** 确认服务已启用，并按终端提醒录入 User Rules。
 
-常用参数：
+常用参数（均在 `.agents` 目录内执行）：
 
 ```powershell
-# 只装 Skills，不构建 MCP
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -SkipMcpInstall
+# 只装 Skills/MCP，不构建 MCP 服务
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipMcpInstall
 
-# 覆盖已存在的同名 Skill
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+# 预览将更新的托管 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -WhatIf
 
-# 安装 Rules 到项目 .cursor/rules/（可提交进 Git）
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -InstallRules -OverwriteRules
+# 跳过 Skills 更新
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipSkillUpdate
+
+# 可选：将 rules/cursor/*.mdc 安装到指定工程的 .cursor/rules/
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
+
+# 调试：不清屏，末尾展开全部安装细节
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Verbose -SkipMcpInstall
+
+# CI/重定向：保留进度输出，摘要追加在末尾
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -NoClearScreen -SkipMcpInstall
+
+# 禁用摘要着色（重定向到文件时亦自动禁用）
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -NoColor -SkipMcpInstall
 ```
+
+**Rules 说明**：
+
+| 通道 | 方式 |
+|------|------|
+| **User Rules（跨项目）** | 默认：手动按 [`AGENTS.md`](rules/universal/AGENTS.md) 各 `##` 节逐条录入 Settings → User |
+| **Project Rules（单工程）** | 可选：`-ProjectPath "工程根"`，安装 14 个 `.mdc` 到该工程 `.cursor/rules/` |
+| **勿用** | Include third-party 整份导入 AGENTS.md；`~/.cursor/rules/`（Cursor 不加载） |
 
 更细的 Cursor 说明见 [`PORTABLE.md`](PORTABLE.md)。
 

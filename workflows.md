@@ -87,4 +87,4 @@
 2. 按四原则执行：编码前思考 → 简洁优先 → 精准修改 → 目标驱动执行。
 3. 多步骤任务列出「步骤 → 验证」计划；bug 修复优先写重现测试。
 4. 需要代码对比示例时读取 Skill 包内 [examples.md](../skills/karpathy-guidelines/examples.md)。
-5. Cursor 项目已通过 `-InstallRules` 安装 `karpathy-guidelines.mdc` 时，规则为 alwaysApply 基线；Skill 用于显式深度应用与示例引用。
+5. Cursor 已通过 setup 脚本安装 `karpathy-guidelines.mdc`（Global file rules）时，规则为 alwaysApply 基线；Skill 用于显式深度应用与示例引用。

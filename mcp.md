@@ -4,7 +4,7 @@
 
 - `mcp.template.json`：可迁移 MCP 配置模板。
 - `mcp-servers-src/`：`academic-research`、`zotero`、`deck-builder`、`campus-net-mcp` 等的源码或可安装副本。
-- **Cursor**：将 Skills 与用户级 MCP 写入 `~\.cursor\` 时，请在仓库中使用 **`.agents/scripts/setup-cursor-agents.ps1`**（非 Claude Desktop / 其他 IDE 的通用安装名）。
+- **Cursor**：将 Skills 与用户级 MCP 写入 `~\.cursor\` 时，请进入 **`.agents` 目录** 执行 **`scripts/setup-cursor-agents.ps1`**（非 Claude Desktop / 其他 IDE 的通用安装名）。
 
 安装到当前账号后，全局 MCP 配置文件为：
 

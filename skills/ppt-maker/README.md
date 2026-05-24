@@ -4,7 +4,7 @@
 
 ## 使用方式（终端用户）
 
-1. 在项目根执行 `.agents/scripts/setup-cursor-agents.ps1 -OverwriteSkills`
+1. 进入 `.agents` 目录，执行 `powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"`
 2. 重启 Cursor；说「做 PPT」或 `@ppt-maker/SKILL.md`
 3. Agent 在 `ppt-projects/{english-slug}/` 创建副本并编写内容
 4. 副本内 `npm run serve` 预览，浏览器顶栏导出 PPT
@@ -14,7 +14,7 @@
 ```text
 编辑 ppt-maker/（本目录，沙箱）
   → node ppt-maker/scripts/sync-to-agents.mjs
-  → powershell -File .\.agents\scripts\setup-cursor-agents.ps1 -OverwriteSkills
+  → cd .agents 后 powershell -File .\scripts\setup-cursor-agents.ps1
   → （可选）e2e 冒烟
 ```
 

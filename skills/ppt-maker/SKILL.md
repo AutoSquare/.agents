@@ -65,7 +65,7 @@ description: 将素材与结构化幻灯片数据生成为 Vue 16:9 预览页，
    - 将 `design-system/MASTER.md` 映射到 `src/styles/design-tokens.css`（主色、背景、强调色、字体变量）；**不改** `SlideFrame` / `CaseCard` 的 DOM 结构。
    - 调用后向用户摘要：采用的 pattern / 主色 / 字体气质（一两句话）。
    - 更新 `.ppt-maker-project.json` 的 `designSystemQuery`。
-5. **ui-ux-pro-max 未安装**：提示运行 `.agents/scripts/setup-cursor-agents.ps1 -OverwriteSkills`；若继续，须说明「将使用套件默认 Editorial 风格」，**获用户确认**后才可保留默认 token。
+5. **ui-ux-pro-max 未安装**：提示进入 `.agents` 运行 `powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"`；若继续，须说明「将使用套件默认 Editorial 风格」，**获用户确认**后才可保留默认 token。
 6. **跳过 ui-ux-pro-max**：须写明风险 + 用户确认；禁止未调用却声称已按用户风格定制。
 
 ## 工作流

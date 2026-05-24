@@ -76,5 +76,66 @@
     "codingGuidelines": [
       "karpathy-guidelines"
     ]
+  },
+  "installManifest": {
+    "packageId": "portable-cursor-agents",
+    "managedSkills": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder",
+      "ppt-maker",
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor",
+      "ui-ux-pro-max",
+      "design",
+      "banner-design",
+      "ui-styling",
+      "slides",
+      "design-system",
+      "brand",
+      "karpathy-guidelines"
+    ],
+    "managedRules": [
+      "00-cursor-ide.mdc",
+      "01-language-and-naming.mdc",
+      "02-doc-linkage-and-delivery.mdc",
+      "03-pre-development-requirements.mdc",
+      "04-comment-and-writing-quality.mdc",
+      "05-code-organization-and-architecture.mdc",
+      "06-pre-submit-checklist.mdc",
+      "07-skills-authoring.mdc",
+      "08-csharp-xml-docs.mdc",
+      "09-git-commit-message.mdc",
+      "agents-entry.mdc",
+      "literature-integrity.mdc",
+      "literature-workflow.mdc",
+      "karpathy-guidelines.mdc"
+    ],
+    "legacyRuleFilesToRemove": [
+      "AGENTS.md",
+      "AGENTS.mdc"
+    ],
+    "rulesInstallMode": "manual_user_default, optional_project_path"
   }
 }

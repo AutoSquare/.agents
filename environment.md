@@ -4,11 +4,13 @@
 
 - 全局 MCP 配置：`%USERPROFILE%\.cursor\mcp.json`
 - 用户级 Skills：`%USERPROFILE%\.cursor\skills`
+- **Cursor User Rules**：手动录入，源文件 `.agents/rules/universal/AGENTS.md`（setup 默认不装 rules）
+- **Cursor Project Rules（可选）**：`-ProjectPath` 安装到 `{工程根}/.cursor/rules`
 - 本地 MCP 服务：`%USERPROFILE%\.cursor\mcp-servers`
 - 迁移包 Skills 副本：`.agents/skills`
 - 迁移包 MCP 源码快照：`.agents/mcp-servers-src`
-- **Cursor** 写入脚本（非通用 IDE 安装名）：`.agents/scripts/setup-cursor-agents.ps1`
-- **UI/UX 技能同步**（维护者）：`.agents/scripts/sync-ui-ux-skills.ps1`
+- **Cursor** 写入脚本（非通用 IDE 安装名）：`scripts/setup-cursor-agents.ps1`（在 `.agents` 目录内执行）
+- **UI/UX 技能同步**（维护者）：`scripts/sync-ui-ux-skills.ps1`（在 `.agents` 目录内执行）
 - 安装记录：`MCP与Skills配置记录.md`（若存在）
 
 ## 环境变量
@@ -29,17 +31,20 @@ setx NCBI_API_KEY "你的 NCBI API Key"
 
 ## UI/UX 技能维护
 
-真相源为同仓库或 sibling 路径下的 `ui-ux-pro-max-skill/`。更新汉化或模板后：
+真相源为同仓库或 sibling 路径下的 `ui-ux-pro-max-skill/`。更新汉化或模板后，进入 `.agents` 执行：
 
 ```powershell
-# 在 AI规则 仓库根（.agents 与 ui-ux-pro-max-skill 为 sibling 时）
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\sync-ui-ux-skills.ps1" -Assemble
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -Assemble
 
 # 仅复制 .agents 到新机器、无 sibling 仓库时
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\sync-ui-ux-skills.ps1" -UpstreamPath "D:\path\to\ui-ux-pro-max-skill"
+powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -UpstreamPath "D:\path\to\ui-ux-pro-max-skill"
 
-# 安装到 Cursor
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+# 安装到 Cursor（Skills + MCP；Rules 见终端提醒手动录入 AGENTS.md）
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
+
+# 可选：Project Rules 到指定工程
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
 ```
 
 **前置**：Python 3（`ui-ux-pro-max`、`design-system` search-slides）；Node.js 18+（`brand`、`design-system`、`ui-styling` 的 `.cjs` 与 shadcn CLI）。
@@ -58,7 +63,8 @@ node andrej-karpathy-skills/scripts/sync-to-agents.mjs
 node andrej-karpathy-skills/scripts/sync-to-agents.mjs --dry-run
 
 # 安装到 Cursor
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills -InstallRules
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
 修改四原则时须同步源仓库内 `SKILL.md`、`CLAUDE.md`、`.cursor/rules/karpathy-guidelines.mdc`，再运行上述 sync。
@@ -73,7 +79,8 @@ node ppt-maker/scripts/sync-to-agents.mjs
 node ppt-maker/scripts/sync-to-agents.mjs --dry-run
 
 # 安装到 Cursor
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
 **刷新 kit-template**（维护者，可选）：
@@ -102,10 +109,11 @@ node "$env:USERPROFILE\.cursor\skills\ppt-maker\scripts\slug.mjs" --generate
 
 ## 迁移安装
 
-将 `.agents/` 复制到新电脑任意项目根目录后执行：
+将 `.agents/` 复制到新电脑任意项目根目录后，进入 `.agents` 执行 setup；按终端提醒手动录入 User Rules。
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
 安装脚本会优先使用 `.agents/mcp-servers-src/` 内的源码快照；如果源码快照缺失，才从对应 GitHub 仓库克隆。
