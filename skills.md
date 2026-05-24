@@ -32,6 +32,7 @@
 
 ## 工程与工作流
 
+- `karpathy-guidelines`：Karpathy 四原则（编码前思考、简洁优先、精准修改、目标驱动执行）；编写/审查/重构代码时使用。
 - `diagnose`：面向缺陷与性能回退的诊断循环。
 - `tdd`：以红-绿-重构循环做测试驱动开发。
 - `prototype`：在敲定设计前搭建一次性原型。
@@ -70,3 +71,4 @@
 - 用户要求“shadcn、Tailwind 组件主题”时，应用 `ui-styling`。
 - 用户要求“设计令牌、幻灯片文案公式、布局模式”时，应用 `design-system`。
 - 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。
+- 用户要求编写、审查、重构代码，或需减少过度复杂、精准修改、定义可验证成功标准时，应用 `karpathy-guidelines`。

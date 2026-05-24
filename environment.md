@@ -48,6 +48,21 @@ powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.
 
 **Claude Code 手动安装**：若复制到 `~/.claude/skills/`，须将 SKILL 内 `$env:USERPROFILE\.cursor\skills\` 替换为 Claude 用户级路径（含 `ppt-maker`、`ui-ux-pro-max`）。
 
+## karpathy-guidelines 维护
+
+**编辑源**：工作区 sibling `andrej-karpathy-skills/`；**发布副本**：`.agents/skills/karpathy-guidelines/`、`.agents/rules/cursor/karpathy-guidelines.mdc`、`AGENTS.md` §11（禁止手改副本，须 sync）。
+
+```powershell
+# andrej-karpathy-skills → .agents（四路同步）
+node andrej-karpathy-skills/scripts/sync-to-agents.mjs
+node andrej-karpathy-skills/scripts/sync-to-agents.mjs --dry-run
+
+# 安装到 Cursor
+powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.ps1" -OverwriteSkills -InstallRules
+```
+
+修改四原则时须同步源仓库内 `SKILL.md`、`CLAUDE.md`、`.cursor/rules/karpathy-guidelines.mdc`，再运行上述 sync。
+
 ## ppt-maker 维护
 
 **编辑源**：工作区根 `ppt-maker/`（沙箱）；**发布副本**：`.agents/skills/ppt-maker/`（禁止手改，须 sync）。

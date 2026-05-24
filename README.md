@@ -155,6 +155,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `slides` | 融资/产品路演幻灯片结构与文案（联动 design-system scripts）。 |
 | `banner-design` | 横幅尺寸与风格规范（完整生成链依赖未打包的 ai-artist 等，见 environment.md）。 |
 | **工程与协作**（多源自 Matt Pocock 技能适配） | |
+| `karpathy-guidelines` | Karpathy 四原则：减少 LLM 编码错误（编码前思考、简洁优先、精准修改、目标驱动执行）。 |
 | `diagnose` | 有纪律的缺陷/性能诊断循环（重现→缩小→修复→回归）。 |
 | `tdd` | 测试驱动开发（红-绿-重构）。 |
 | `prototype` | 终端或 UI 一次性原型验证。 |

@@ -31,6 +31,7 @@ powershell -ExecutionPolicy Bypass -File ".\.agents\scripts\setup-cursor-agents.
 | `agents-entry.mdc` | 始终 | `.agents` 包入口与 MCP |
 | `literature-integrity.mdc` | 始终 | 文献诚信 |
 | `literature-workflow.mdc` | `**/*.{md,mdx}` | 文献 Skill/MCP 选用 |
+| `karpathy-guidelines.mdc` | 始终 | Karpathy 四原则（编码前思考、简洁优先、精准修改、目标驱动执行） |
 
 ## 通用：Claude Code / OpenCode / Trea
 

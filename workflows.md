@@ -80,3 +80,11 @@
 5. Logo/CIP/图标任务应用 `design`；融资或产品路演幻灯片应用 `slides` + design-system scripts。
 6. **PPT 路径区分**：泛称「做 PPT」→ `ppt-maker` + `ui-ux-pro-max`；学术快出 → `academic-ppt-builder` + deck-builder MCP；商业 Pitch → `slides`。
 7. `banner-design` 的 AI 生成步骤依赖未打包 Skill（ai-artist、ai-multimodal、chrome-devtools），无则仅输出规格与 references 指导。
+
+## 编码、审查与重构
+
+1. 应用 `karpathy-guidelines`（编写、审查、重构、减少过度复杂或定义可验证成功标准时）。
+2. 按四原则执行：编码前思考 → 简洁优先 → 精准修改 → 目标驱动执行。
+3. 多步骤任务列出「步骤 → 验证」计划；bug 修复优先写重现测试。
+4. 需要代码对比示例时读取 Skill 包内 [examples.md](../skills/karpathy-guidelines/examples.md)。
+5. Cursor 项目已通过 `-InstallRules` 安装 `karpathy-guidelines.mdc` 时，规则为 alwaysApply 基线；Skill 用于显式深度应用与示例引用。
