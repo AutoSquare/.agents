@@ -1,5 +1,5 @@
 <template>
-  <article class="case-card">
+  <article class="case-card export-layer-fg">
     <!-- Title Meta Stack (Always at the top) -->
     <header class="case-card__header">
       <div class="case-card__meta">

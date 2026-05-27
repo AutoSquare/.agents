@@ -1,6 +1,9 @@
 /** 预览基准宽度（px），用于计算离屏排版缩放 */
 export const PREVIEW_BASE_WIDTH = 1024
 
+/** 预览基准高度（px），16:9 */
+export const PREVIEW_BASE_HEIGHT = Math.round((PREVIEW_BASE_WIDTH * 9) / 16)
+
 /** 默认导出分辨率档位 */
 export const DEFAULT_CAPTURE_PRESET = 'uhd'
 

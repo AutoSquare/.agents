@@ -1,16 +1,12 @@
 /**
  * 像素级导出：离屏排版（宽高由 captureSlides.js 写入 CSS 变量）
- * 字号以 1024px 预览为基准，经 --capture-scale 同比放大，与预览视觉比例一致。
+ * 在 1024×576 基准画布上按预览排版，captureSlides.js 以 pixelRatio 放大至目标分辨率。
  */
-body.export-raster-active {
-  --slide-export-scale: var(--capture-scale, 1.875);
-}
-
 body.export-raster-active .storyboard__item--export-capture {
   position: fixed !important;
   left: -9999px !important;
   top: 0 !important;
-  width: var(--capture-width, 1920px) !important;
+  width: var(--preview-capture-width, 1024px) !important;
   max-width: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -22,81 +18,52 @@ body.export-raster-active .storyboard__item--export-capture {
 
 body.export-raster-active .storyboard__item--export-capture .slide-frame-wrap,
 body.export-raster-active .storyboard__item--export-capture .slide-frame {
-  width: var(--capture-width, 1920px) !important;
+  width: var(--preview-capture-width, 1024px) !important;
   max-width: none !important;
   margin: 0 !important;
 }
 
 body.export-raster-active .storyboard__item--export-capture .slide-frame__canvas {
-  width: var(--capture-width, 1920px) !important;
-  height: var(--capture-height, 1080px) !important;
+  width: var(--preview-capture-width, 1024px) !important;
+  height: var(--preview-capture-height, 576px) !important;
   aspect-ratio: auto !important;
   max-width: none !important;
   border-radius: 0 !important;
+  border: 0 !important;
   box-shadow: none !important;
   transform: none !important;
   transition: none !important;
-  font-size: calc(16px * var(--capture-scale, 1.875));
-  --type-display: 1.375em;
-  --type-title: 1em;
-  --type-body: 0.75em;
-  --type-caption: 0.6875em;
+  background: transparent !important;
 }
 
-body.export-raster-active .storyboard__item--export-capture .slide-frame__header {
-  padding: calc(16px * var(--slide-export-scale)) calc(24px * var(--slide-export-scale))
-    calc(12px * var(--slide-export-scale));
+body.export-raster-active .storyboard__item--export-capture .slide-canvas-backdrop::after {
+  display: block !important;
+  inset: 12px !important;
+  border: 1px solid rgba(37, 99, 235, 0.18) !important;
+  border-radius: calc(var(--slide-radius) - 8px) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62) !important;
+  z-index: 20 !important;
 }
 
-body.export-raster-active .storyboard__item--export-capture .slide-frame__footer {
-  padding: calc(6px * var(--slide-export-scale)) calc(24px * var(--slide-export-scale));
-  font-size: 0.5625em !important;
+/**
+ * 可编辑导出 · Pass 1 背景：隐藏全部前景内容块。
+ */
+body.export-bg-capture.export-raster-active .storyboard__item--export-capture .export-layer-fg {
+  display: none !important;
 }
 
-body.export-raster-active .storyboard__item--export-capture .badge-dot {
-  width: calc(5px * var(--capture-scale, 1.875)) !important;
-  height: calc(5px * var(--capture-scale, 1.875)) !important;
+/**
+ * 可编辑导出 · Pass 2 前景：隐藏纯装饰 sibling（mesh 底板、cover 光晕等）。
+ */
+body.export-fg-capture.export-raster-active .storyboard__item--export-capture .export-layer-bg {
+  display: none !important;
 }
 
-body.export-raster-active .storyboard__item--export-capture .dual-case__item {
-  padding: calc(16px * var(--slide-export-scale)) calc(20px * var(--slide-export-scale))
-    calc(20px * var(--slide-export-scale));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-card__header {
-  margin-bottom: calc(12px * var(--slide-export-scale));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-card__index {
-  font-size: 0.625em !important;
-  padding: calc(3px * var(--capture-scale, 1.875)) calc(6px * var(--capture-scale, 1.875));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-card__media {
-  margin-bottom: calc(12px * var(--slide-export-scale));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-card__specs {
-  gap: calc(6px * var(--slide-export-scale));
-  margin-bottom: calc(12px * var(--slide-export-scale));
-  padding-top: calc(10px * var(--slide-export-scale));
-}
-
-body.export-raster-active .storyboard__item--export-capture .spec-row {
-  font-size: 0.6875em !important;
-}
-
-body.export-raster-active .storyboard__item--export-capture .spec-dot-leader {
-  margin: 0 calc(6px * var(--capture-scale, 1.875));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-tags {
-  gap: calc(6px * var(--capture-scale, 1.875));
-  margin-top: calc(8px * var(--capture-scale, 1.875));
-}
-
-body.export-raster-active .storyboard__item--export-capture .case-tags__item {
-  font-size: 0.625em !important;
-  padding: calc(2px * var(--capture-scale, 1.875)) calc(6px * var(--capture-scale, 1.875));
-  border-radius: calc(2px * var(--capture-scale, 1.875));
+body.export-fg-capture.export-raster-active .storyboard__item--export-capture .text-gradient,
+body.export-fg-capture.export-raster-active .storyboard__item--export-capture .cover-title {
+  -webkit-text-fill-color: currentColor !important;
+  background: none !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+  color: #312e81 !important;
 }

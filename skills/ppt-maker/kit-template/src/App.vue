@@ -51,6 +51,21 @@
         </button>
 
         <button
+          class="ctrl-btn ctrl-btn--export-editable-images"
+          :disabled="isExportBusy"
+          aria-label="导出可编辑分层 PNG 压缩包"
+          :title="`离屏渲染 ${slides.length} 页背景 + 透明前景 PNG 并打包为 ZIP`"
+          @click="exportEditableImagesZip"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ctrl-btn__icon">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          {{ exportEditableImagesLabel }}
+        </button>
+
+        <button
           class="ctrl-btn ctrl-btn--export-raster"
           :disabled="isExportBusy"
           aria-label="导出像素级 PowerPoint，按所选分辨率离屏高清渲染"
@@ -242,6 +257,9 @@ export default {
       showToast: false,
       toastMessage: '',
       exportingPptx: false,
+      editableProgress: '',
+      exportingEditableImages: false,
+      editableImagesProgress: '',
       exportingRaster: false,
       rasterProgress: '',
       exportingImages: false,
@@ -263,11 +281,24 @@ export default {
       }
     },
     isExportBusy() {
-      return this.exportingPptx || this.exportingRaster || this.exportingImages
+      return (
+        this.exportingPptx ||
+        this.exportingEditableImages ||
+        this.exportingRaster ||
+        this.exportingImages
+      )
     },
     exportPptxLabel() {
-      if (this.exportingPptx) return '正在生成可编辑 PPT…'
+      if (this.exportingPptx) {
+        return this.editableProgress || '正在生成可编辑 PPT…'
+      }
       return '导出 PowerPoint（可编辑）'
+    },
+    exportEditableImagesLabel() {
+      if (this.exportingEditableImages) {
+        return this.editableImagesProgress || '正在打包可编辑图片…'
+      }
+      return '导出可编辑图片 (ZIP)'
     },
     exportRasterLabel() {
       if (this.exportingRaster) {
@@ -371,24 +402,82 @@ export default {
     },
     async exportPptx() {
       if (this.isExportBusy) return
+      if (this.lightbox.isOpen) {
+        this.closeLightbox()
+      }
       this.exportingPptx = true
+      this.editableProgress = '正在准备…'
       try {
-        const { exportStoryboardToPptx } = await import('./utils/exportPptx')
-        const { missingImages } = await exportStoryboardToPptx(this.slides)
-        if (missingImages.length > 0) {
-          this.triggerToast(
-            `PPT 已下载；${missingImages.length} 个素材缺失：${missingImages.slice(0, 2).join('、')}${missingImages.length > 2 ? '…' : ''}`,
-          )
-        } else {
-          this.triggerToast(
-            `可编辑 PPT 已生成并下载（${this.projectConfig.exports.editableFileName}）`,
-          )
-        }
+        const { exportStoryboardToPptx } = await import(
+          /* webpackChunkName: "pptx-editable-export" */
+          './utils/exportPptx'
+        )
+        const preset = this.activeCapturePreset
+        await exportStoryboardToPptx(
+          this.slides,
+          { gridState: this.gridState },
+          {
+            capturePreset: this.exportCapturePreset,
+            onProgress: (current, total, phase) => {
+              if (phase === 'write') {
+                this.editableProgress = '正在写入 PPT…'
+              } else {
+                this.editableProgress = `正在渲染 ${current}/${total} 页…`
+              }
+            },
+          },
+        )
+        this.triggerToast(
+          `可编辑 PPT 已生成并下载（${this.projectConfig.exports.editableFileName}）。${preset.shortLabel} ${preset.width}×${preset.height} 背景+前景两层，前景可整体移动。`,
+        )
       } catch (err) {
         console.error(err)
-        this.triggerToast(`导出失败：${err.message || '请确认开发服务器已启动且素材可访问'}`)
+        this.triggerToast(
+          `导出失败：${err.message || '请确认素材已加载完成，刷新页面后重试'}`,
+        )
       } finally {
         this.exportingPptx = false
+        this.editableProgress = ''
+      }
+    },
+    async exportEditableImagesZip() {
+      if (this.isExportBusy) return
+      if (this.lightbox.isOpen) {
+        this.closeLightbox()
+      }
+      this.exportingEditableImages = true
+      this.editableImagesProgress = '正在准备…'
+      try {
+        const { exportStoryboardToEditableImageZip } = await import(
+          /* webpackChunkName: "editable-images-export" */
+          './utils/exportEditableImages'
+        )
+        const preset = this.activeCapturePreset
+        await exportStoryboardToEditableImageZip(
+          this.slides,
+          { gridState: this.gridState },
+          {
+            capturePreset: this.exportCapturePreset,
+            onProgress: (current, total, phase) => {
+              if (phase === 'zip') {
+                this.editableImagesProgress = '正在打包 ZIP…'
+              } else {
+                this.editableImagesProgress = `正在渲染 ${current}/${total} 页…`
+              }
+            },
+          },
+        )
+        this.triggerToast(
+          `可编辑图片已下载（${this.projectConfig.exports.editableZipFileName}）。每页含 background + foreground 各一张 ${preset.width}×${preset.height} PNG（${preset.shortLabel}）。`,
+        )
+      } catch (err) {
+        console.error(err)
+        this.triggerToast(
+          `可编辑图片导出失败：${err.message || '请确认素材已加载完成，刷新页面后重试'}`,
+        )
+      } finally {
+        this.exportingEditableImages = false
+        this.editableImagesProgress = ''
       }
     },
     async exportPptxRaster() {
@@ -701,6 +790,7 @@ body {
 
 .ctrl-btn--export:disabled,
 .ctrl-btn--export-raster:disabled,
+.ctrl-btn--export-editable-images:disabled,
 .ctrl-btn--export-images:disabled {
   opacity: 0.65;
   cursor: wait;
@@ -713,6 +803,18 @@ body {
 }
 
 .ctrl-btn--export-raster:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-foreground);
+  background: var(--color-accent-light);
+}
+
+.ctrl-btn--export-editable-images {
+  color: var(--color-secondary);
+  border-color: var(--color-border);
+  background: var(--color-background);
+}
+
+.ctrl-btn--export-editable-images:hover:not(:disabled) {
   border-color: var(--color-accent);
   color: var(--color-foreground);
   background: var(--color-accent-light);

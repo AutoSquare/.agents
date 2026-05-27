@@ -5,66 +5,34 @@
   >
     <article class="slide-frame">
       <div class="slide-frame__canvas">
-        <header class="slide-frame__header">
+        <div
+          class="export-layer-bg slide-canvas-backdrop mesh-bg"
+          aria-hidden="true"
+        ></div>
+        <header
+          class="slide-frame__header export-layer-fg"
+          v-if="!['cover', 'catalog', 'statement'].includes(slide.layout)"
+        >
           <div class="slide-frame__header-top">
             <span class="slide-frame__section-badge">
               <span class="badge-dot"></span>
-              {{ slide.sectionLabel }}
+              {{ sectionBadge }}
             </span>
-            <span class="slide-frame__counter">{{ slide.sectionIndex }} // {{ slideTotalPadded }}</span>
-          </div>
-          <div class="slide-frame__header-main">
-            <h2 :id="`slide-title-${slide.id}`" class="slide-frame__title">
-              {{ slide.title }}
-            </h2>
-            <div class="slide-frame__divider"></div>
-            <p class="slide-frame__theme">{{ slide.theme }}</p>
           </div>
         </header>
-
-        <DualCaseLayout
-          :cases="slide.cases"
-          :layout-ratio="slide.layoutRatio"
-          :lazy-load="slide.id > 1"
+        <component
+          :is="layoutComponent"
+          :slide="slide"
+          :lazy-load="slide.layout !== 'cover'"
         />
-
-        <footer class="slide-frame__footer" aria-hidden="true">
+        <footer
+          class="slide-frame__footer export-layer-fg"
+          aria-hidden="true"
+          v-if="!['cover', 'catalog'].includes(slide.layout)"
+        >
           <span class="footer-left">{{ footerLeftText }}</span>
           <span class="footer-right">{{ footerText }}</span>
         </footer>
-
-        <!-- Draft Alignment Grid Helper -->
-        <div v-if="gridState && gridState.active" class="alignment-grid" aria-hidden="true">
-          <!-- 12 Columns -->
-          <div
-            v-for="c in 11"
-            :key="'col-' + c"
-            class="grid-line grid-line--col"
-            :style="{ left: (c * 100 / 12) + '%' }"
-            :class="{ 'grid-line--thirds': c === 4 || c === 8 }"
-          ></div>
-          
-          <!-- 8 Rows -->
-          <div
-            v-for="r in 7"
-            :key="'row-' + r"
-            class="grid-line grid-line--row"
-            :style="{ top: (r * 100 / 8) + '%' }"
-            :class="{ 'grid-line--thirds': r === 3 || r === 5 }"
-          ></div>
-
-          <!-- Exact Rule of Thirds Overlays (33.33% and 66.66%) -->
-          <div class="grid-line grid-line--col grid-line--thirds-exact" style="left: 33.333%;"></div>
-          <div class="grid-line grid-line--col grid-line--thirds-exact" style="left: 66.666%;"></div>
-          <div class="grid-line grid-line--row grid-line--thirds-exact" style="top: 33.333%;"></div>
-          <div class="grid-line grid-line--row grid-line--thirds-exact" style="top: 66.666%;"></div>
-
-          <!-- 5% Safe Area Box -->
-          <div class="grid-safe-area"></div>
-
-          <!-- Micro specs labels -->
-          <div class="grid-watermark">12x8 ALIGNMENT GRID / 5% SAFE ACTIVE</div>
-        </div>
       </div>
     </article>
   </section>
@@ -72,38 +40,52 @@
 
 <script>
 import { projectConfig } from '../config/project.js'
+import CoverLayout from './layouts/CoverLayout.vue'
+import CatalogLayout from './layouts/CatalogLayout.vue'
+import StatementLayout from './layouts/StatementLayout.vue'
+import FeaturesLayout from './layouts/FeaturesLayout.vue'
+import SplitLayout from './layouts/SplitLayout.vue'
 import DualCaseLayout from './layouts/DualCaseLayout.vue'
+import EvidenceLayout from './layouts/EvidenceLayout.vue'
 
 export default {
   name: 'SlideFrame',
   components: {
+    CoverLayout,
+    CatalogLayout,
+    StatementLayout,
+    FeaturesLayout,
+    SplitLayout,
     DualCaseLayout,
+    EvidenceLayout,
   },
   props: {
     slide: {
       type: Object,
       required: true,
     },
-    slideTotal: {
-      type: Number,
-      default: 1,
-    },
-  },
-  inject: {
-    gridState: {
-      from: 'gridState',
-      default: () => ({ active: false }),
-    },
   },
   computed: {
+    layoutComponent() {
+      const map = {
+        cover: 'CoverLayout',
+        catalog: 'CatalogLayout',
+        statement: 'StatementLayout',
+        features: 'FeaturesLayout',
+        split: 'SplitLayout',
+        dual: 'DualCaseLayout',
+        evidence: 'EvidenceLayout',
+      }
+      return map[this.slide.layout] || 'DualCaseLayout'
+    },
     footerText() {
       return projectConfig.footerText
     },
     footerLeftText() {
       return projectConfig.footerLeftText
     },
-    slideTotalPadded() {
-      return String(this.slideTotal).padStart(2, '0')
+    sectionBadge() {
+      return projectConfig.sectionBadge || projectConfig.appSubtitle
     },
   },
 }
@@ -121,188 +103,88 @@ export default {
 }
 
 .slide-frame__canvas {
-  position: relative; /* Necessary for absolute grid overlay */
+  position: relative;
   aspect-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
-  background: var(--color-background);
   border-radius: var(--slide-radius);
   box-shadow: var(--slide-shadow);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(37, 99, 235, 0.14);
   overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .slide-frame__canvas:hover {
-  box-shadow: 0 40px 80px -20px rgba(27, 25, 24, 0.14), 0 0 0 1px rgba(27, 25, 24, 0.04);
+  box-shadow: 0 40px 100px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(37, 99, 235, 0.18);
+}
+
+.slide-canvas-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.slide-canvas-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: calc(var(--slide-radius) - 8px);
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.05);
+  pointer-events: none;
+}
+
+.slide-frame__canvas > :not(.slide-canvas-backdrop) {
+  position: relative;
+  z-index: 1;
 }
 
 .slide-frame__header {
   flex-shrink: 0;
-  padding: 16px 24px 12px;
-  background: var(--color-background);
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 24px 40px 0;
+  background: transparent;
 }
 
 .slide-frame__header-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
 }
 
 .slide-frame__section-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: var(--type-caption);
+  gap: 8px;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-accent);
   letter-spacing: 0.15em;
-  text-transform: uppercase;
 }
 
 .badge-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: var(--color-accent);
-}
-
-.slide-frame__counter {
-  font-family: var(--font-heading);
-  font-size: var(--type-caption);
-  font-weight: 600;
-  color: var(--color-secondary);
-  letter-spacing: 0.05em;
-}
-
-.slide-frame__header-main {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.slide-frame__title {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: var(--type-display);
-  font-weight: 700;
-  color: var(--color-primary);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
-
-.slide-frame__divider {
-  width: 1px;
-  height: 14px;
-  background-color: var(--color-border);
-  align-self: center;
-}
-
-.slide-frame__theme {
-  margin: 0;
-  font-size: var(--type-body);
-  color: var(--color-secondary);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  box-shadow: 0 0 8px var(--color-accent);
 }
 
 .slide-frame__footer {
   flex-shrink: 0;
-  padding: 6px 24px;
+  padding: 16px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.5625rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   color: var(--color-muted-text);
-  background: var(--color-background);
-  border-top: 1px solid var(--color-border-light);
+  background: transparent;
 }
 
-.footer-left {
-  font-family: var(--font-body);
-  opacity: 0.8;
-}
-
+.footer-left,
 .footer-right {
   font-family: var(--font-body);
-}
-
-/* Alignment Grid Styles */
-.alignment-grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.grid-line {
-  position: absolute;
-  background: none;
-}
-
-.grid-line--col {
-  top: 0;
-  bottom: 0;
-  border-left: 1px dashed rgba(90, 103, 110, 0.15);
-}
-
-.grid-line--row {
-  left: 0;
-  right: 0;
-  border-top: 1px dashed rgba(90, 103, 110, 0.15);
-}
-
-/* Rule of Thirds Overlays (Copper Gold Highlight) */
-.grid-line--thirds {
-  border-color: rgba(184, 144, 71, 0.25) !important;
-}
-
-.grid-line--thirds-exact {
-  border-color: rgba(194, 65, 12, 0.22) !important;
-}
-
-.grid-line--col.grid-line--thirds-exact {
-  top: 0;
-  bottom: 0;
-  border-left-style: dashed;
-}
-
-.grid-line--row.grid-line--thirds-exact {
-  left: 0;
-  right: 0;
-  border-top-style: dashed;
-}
-
-/* 5% Safe Area Frame */
-.grid-safe-area {
-  position: absolute;
-  top: 5%;
-  left: 5%;
-  right: 5%;
-  bottom: 5%;
-  border: 1px dashed rgba(184, 144, 71, 0.3);
-  border-radius: 2px;
-}
-
-.grid-watermark {
-  position: absolute;
-  bottom: 3%;
-  right: 6%;
-  font-size: 8px;
-  font-family: var(--font-body);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(184, 144, 71, 0.6);
-  background: rgba(252, 251, 249, 0.85);
-  padding: 1px 4px;
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
 }
 </style>

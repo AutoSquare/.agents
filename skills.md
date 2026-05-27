@@ -17,7 +17,7 @@
 
 ## PPT 与汇报
 
-- `ppt-maker`：默认路径。Vue 16:9 预览 + 浏览器导出 pptx/zip；须联动 `ui-ux-pro-max` 定制风格；任务副本在 `ppt-projects/{slug}/`。
+- `ppt-maker`：默认路径。Vue 16:9 预览 + 浏览器导出 pptx/zip；须 **grill-me 顺序 intake** + `ui-ux-pro-max`；任务副本在 `ppt-projects/{slug}/`。详见 `skills/ppt-maker/发布说明.md`。
 - `academic-ppt-builder`：学术快出。答辩、开题、文献综述或明确要快出 pptx 时，调用 deck-builder / ppt-markdown MCP。
 
 ## UI/UX 设计

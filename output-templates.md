@@ -116,12 +116,17 @@
 
 | 大纲字段 | slides.js 字段 |
 |----------|----------------|
-| 页标题（观点句） | `title` |
+| 页标题 | `title` 或 cover 的 `subtitle` |
 | 主题副题 / 章节 | `theme`、`sectionLabel` |
 | 页码 | `sectionIndex`（如 `01`） |
-| 页面要点 / 正文 | `cases[].description` |
-| 双栏对比 | `cases` 长度 2；单栏为 1 |
-| 图表 / 配图建议 | 素材放入 `public/assets/materials/`（英文文件名）→ `cases[].images` |
-| 标签 / 指标 | `cases[].tags`、`cases[].metadata` |
+| 页面要点 / 正文 | `description` 或 `cases[].description` |
+| 封面 | `layout: 'cover'` + `partnerLogo` / `image` |
+| 目录 | `layout: 'catalog'` + `catalogPreview` |
+| 多要点卡片 | `layout: 'features'` + `features[]` |
+| 图文页 | `layout: 'split'` + `image` / `imageFrame` |
+| 成果/证书 | `layout: 'evidence'` + `images` / `table` |
+| 总结/封底 | `layout: 'statement'` |
+| 双栏对比（可选） | `layout: 'dual'` + `cases` 长度 2 |
+| 配图 | `public/assets/materials/`（英文名）→ `image` / `images` |
 
-映射完成后按 `ppt-maker` 工作流调用 `ui-ux-pro-max` 并 `npm run serve`。
+映射完成后：`ui-ux-pro-max` → `map-design-system.mjs` → `validate-project.mjs` → `npm run serve`。

@@ -7,6 +7,7 @@ const PLACEHOLDER = 'placeholder.png'
 export const slides = [
   {
     id: 1,
+    layout: 'dual',
     sectionLabel: '幻灯片 一',
     sectionIndex: '01',
     title: '案例主题 A · 案例主题 B',
@@ -45,6 +46,7 @@ export const slides = [
   },
   {
     id: 2,
+    layout: 'dual',
     sectionLabel: '幻灯片 二',
     sectionIndex: '02',
     title: '案例主题 C · 案例主题 D',
@@ -77,6 +79,7 @@ export const slides = [
   },
   {
     id: 3,
+    layout: 'dual',
     sectionLabel: '幻灯片 三',
     sectionIndex: '03',
     title: '案例主题 E · 案例主题 F',

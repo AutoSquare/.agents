@@ -4,65 +4,66 @@
     :class="{
       'asset-image--multi': images.length > 1,
       'asset-image--contain': fit === 'contain',
+      'asset-image--hero-logo': heroLogo,
     }"
   >
-    <div
-      v-for="(src, i) in images"
-      :key="src"
-      class="asset-image__frame"
-      :class="[
-        `asset-image__frame--${frameType}`,
-        { 'asset-image__frame--clickable': openLightbox }
-      ]"
-      @click="handleImageClick(src)"
-    >
-      <img
-        :src="src"
-        :alt="`${altBase}${images.length > 1 ? ` 图${i + 1}` : ''}`"
-        class="asset-image__img"
-        :loading="lazy ? 'lazy' : 'eager'"
-        @error="$emit('error')"
-      />
+    <template v-if="!showFallback">
+      <div
+        v-for="(src, i) in images"
+        :key="`${src}-${i}`"
+        class="asset-image__frame"
+        :class="[
+          `asset-image__frame--${frameType}`,
+          { 'asset-image__frame--clickable': openLightbox }
+        ]"
+        @click="handleImageClick(src)"
+      >
+        <img
+          :src="src"
+          :alt="`${altBase}${images.length > 1 ? ` 图${i + 1}` : ''}`"
+          class="asset-image__img"
+          :style="imgStyle"
+          :loading="lazy ? 'lazy' : 'eager'"
+          @error="handleImageError"
+        />
 
-      <!-- Hover interactive glass overlay -->
-      <div v-if="openLightbox" class="asset-image__overlay">
-        <span class="overlay-text">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="overlay-icon">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            <line x1="11" y1="8" x2="11" y2="14"></line>
-            <line x1="8" y1="11" x2="14" y2="11"></line>
-          </svg>
-          点击查阅细节解译
-        </span>
+        <div v-if="openLightbox" class="asset-image__overlay">
+          <span class="overlay-text">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="overlay-icon">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="11" y1="8" x2="11" y2="14"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+            点击查阅细节解译
+          </span>
+        </div>
+
+        <template v-if="frameType === 'hud'">
+          <div class="hud-corner hud-corner--tl"></div>
+          <div class="hud-corner hud-corner--tr"></div>
+          <div class="hud-corner hud-corner--bl"></div>
+          <div class="hud-corner hud-corner--br"></div>
+          <div class="hud-crosshair"></div>
+        </template>
+
+        <template v-else-if="frameType === 'paper'">
+          <div class="crop-mark crop-mark--tl"></div>
+          <div class="crop-mark crop-mark--tr"></div>
+          <div class="crop-mark crop-mark--bl"></div>
+          <div class="crop-mark crop-mark--br"></div>
+        </template>
       </div>
+    </template>
 
-      <!-- Heterogeneous HUD Corner indicators -->
-      <template v-if="frameType === 'hud'">
-        <div class="hud-corner hud-corner--tl"></div>
-        <div class="hud-corner hud-corner--tr"></div>
-        <div class="hud-corner hud-corner--bl"></div>
-        <div class="hud-corner hud-corner--br"></div>
-        <div class="hud-crosshair"></div>
-      </template>
-
-      <!-- Heterogeneous Paper Gold Crop corner marks -->
-      <template v-else-if="frameType === 'paper'">
-        <div class="crop-mark crop-mark--tl"></div>
-        <div class="crop-mark crop-mark--tr"></div>
-        <div class="crop-mark crop-mark--bl"></div>
-        <div class="crop-mark crop-mark--br"></div>
-      </template>
-    </div>
-
-    <!-- Loading failure fallback -->
-    <div v-if="failed" class="asset-image__fallback">
+    <div v-else class="asset-image__fallback">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fallback-icon">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
         <circle cx="8.5" cy="8.5" r="1.5"></circle>
         <polyline points="21 15 16 10 5 21"></polyline>
       </svg>
-      <span>参考素材暂未就绪 / 勘测底图占位</span>
+      <span>素材加载失败</span>
+      <span v-if="altBase" class="fallback-alt">{{ altBase }}</span>
     </div>
   </div>
 </template>
@@ -94,14 +95,35 @@ export default {
     frameType: {
       type: String,
       default: 'paper',
-      validator: (v) => ['paper', 'hud'].includes(v),
+      validator: (v) => ['none', 'paper', 'hud'].includes(v),
+    },
+    objectPosition: {
+      type: String,
+      default: 'center',
+    },
+    heroLogo: {
+      type: Boolean,
+      default: false,
     },
   },
   emits: ['error'],
+  data() {
+    return {
+      loadFailed: false,
+    }
+  },
   inject: {
     openLightbox: {
       from: 'openLightbox',
       default: null,
+    },
+  },
+  computed: {
+    showFallback() {
+      return this.failed || this.loadFailed
+    },
+    imgStyle() {
+      return { objectPosition: this.objectPosition }
     },
   },
   methods: {
@@ -109,6 +131,10 @@ export default {
       if (this.openLightbox) {
         this.openLightbox(src, this.altBase)
       }
+    },
+    handleImageError() {
+      this.loadFailed = true
+      this.$emit('error')
     },
   },
 }
@@ -128,8 +154,22 @@ export default {
   grid-template-columns: 1fr 1fr;
 }
 
+.asset-image--hero-logo {
+  flex: 0 0 auto;
+}
+
+.asset-image--hero-logo .asset-image__frame {
+  overflow: visible;
+}
+
+.asset-image--hero-logo .asset-image__img {
+  min-height: 0;
+  height: auto;
+  max-height: 8.75em;
+}
+
 .asset-image__frame {
-  position: relative; /* Anchor for corners and overlays */
+  position: relative;
   margin: 0;
   flex: 1;
   min-height: 0;
@@ -142,30 +182,35 @@ export default {
   transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-/* IMAGE FRAME STYLE 1: HUD Sci-Tech Dark Terminal */
+.asset-image__frame--none {
+  background: transparent;
+}
+
+.asset-image__frame--none .asset-image__img {
+  padding: 0;
+}
+
 .asset-image__frame--hud {
-  background: #090D16;
-  border: 1px solid rgba(14, 116, 144, 0.25);
-  box-shadow: inset 0 0 16px rgba(14, 116, 144, 0.08);
+  background: #FFFFFF;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  box-shadow: inset 0 0 24px rgba(37, 99, 235, 0.04), 0 20px 50px rgba(15, 23, 42, 0.12);
 }
 
 .asset-image__frame--hud .asset-image__img {
-  filter: saturate(1.1) contrast(1.02);
+  filter: saturate(1.08) contrast(1.05);
   padding: 2px;
 }
 
-/* IMAGE FRAME STYLE 2: Premium Editorial Paper with Copper Brackets */
 .asset-image__frame--paper {
-  background: #FDFDFB;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 4px 16px rgba(27, 25, 24, 0.03);
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.32);
 }
 
 .asset-image__frame--paper .asset-image__img {
   padding: 4px;
 }
 
-/* Clickable hover states */
 .asset-image__frame--clickable {
   cursor: pointer;
 }
@@ -184,7 +229,6 @@ export default {
   box-shadow: 0 12px 28px -4px rgba(184, 144, 71, 0.08), 0 0 0 1px rgba(184, 144, 71, 0.1);
 }
 
-/* Crop marks for Paper Frame */
 .crop-mark {
   position: absolute;
   width: 6px;
@@ -199,12 +243,11 @@ export default {
 .crop-mark--bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
 .crop-mark--br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
 
-/* HUD Corner markers for HUD Frame */
 .hud-corner {
   position: absolute;
   width: 5px;
   height: 5px;
-  border: 1.5px solid #06B6D4; /* Bright cyan */
+  border: 1.5px solid #2563EB;
   pointer-events: none;
   opacity: 0.9;
 }
@@ -232,7 +275,6 @@ export default {
 .hud-crosshair::before { top: 4px; left: 0; width: 10px; height: 2px; }
 .hud-crosshair::after { top: 0; left: 4px; width: 2px; height: 10px; }
 
-/* Image positioning styles */
 .asset-image__img {
   width: 100%;
   height: 100%;
@@ -246,7 +288,6 @@ export default {
   object-fit: contain;
 }
 
-/* Elegant glassmorphism hover overlay */
 .asset-image__overlay {
   position: absolute;
   top: 0;
@@ -261,7 +302,7 @@ export default {
   justify-content: center;
   opacity: 0;
   transition: opacity var(--transition-fast);
-  pointer-events: none; /* Let click pass through to the frame */
+  pointer-events: none;
 }
 
 .asset-image__frame:hover .asset-image__overlay {
@@ -277,7 +318,7 @@ export default {
   font-weight: 700;
   color: #FCFBF9;
   letter-spacing: 0.08em;
-  background: rgba(184, 144, 71, 0.85); /* Accent gold banner */
+  background: rgba(184, 144, 71, 0.85);
   padding: 6px 12px;
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(15, 30, 36, 0.15);
@@ -287,7 +328,6 @@ export default {
   stroke-width: 3px;
 }
 
-/* Loading error fallback styling */
 .asset-image__fallback {
   flex: 1;
   display: flex;
@@ -304,6 +344,12 @@ export default {
   border-radius: var(--card-radius);
   padding: 12px;
   text-align: center;
+}
+
+.fallback-alt {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-secondary);
 }
 
 .fallback-icon {

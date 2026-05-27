@@ -37,7 +37,7 @@ export function resolveKitSourceDir(argv = process.argv.slice(2)) {
 /** 开发基座目录（sync-template 源；无上游时可能不存在） */
 export const KIT_SOURCE_DIR = resolveKitSourceDir()
 
-export const TEMPLATE_VERSION = 'ppt-maker-kit@0.1.0'
+export const TEMPLATE_VERSION = 'ppt-maker-kit@0.2.0'
 
 const SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,46}[a-z0-9])?$/
 

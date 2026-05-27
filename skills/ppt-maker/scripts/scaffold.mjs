@@ -13,6 +13,7 @@ import {
   normalizeSlug,
   projectDir,
 } from './_paths.mjs'
+import { writeExportCoreManifest } from './export-core.mjs'
 
 const EXCLUDE_DIRS = new Set(['node_modules', 'dist', 'output', '.cache', '.git'])
 
@@ -107,6 +108,8 @@ function main() {
     `${JSON.stringify(meta, null, 2)}\n`,
     'utf8',
   )
+
+  writeExportCoreManifest(dest, TEMPLATE_VERSION)
 
   console.log(JSON.stringify({ ok: true, slug, projectPath: dest }, null, 2))
 }

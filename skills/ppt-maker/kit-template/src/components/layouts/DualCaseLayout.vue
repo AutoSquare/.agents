@@ -1,5 +1,5 @@
 <template>
-  <div class="dual-case" :style="gridStyle">
+  <div class="dual-case export-layer-fg" :style="gridStyle">
     <div
       v-for="(caseItem, index) in cases"
       :key="caseItem.name"
@@ -23,13 +23,9 @@ export default {
     CaseCard,
   },
   props: {
-    cases: {
-      type: Array,
+    slide: {
+      type: Object,
       required: true,
-    },
-    layoutRatio: {
-      type: String,
-      default: '50-50',
     },
     lazyLoad: {
       type: Boolean,
@@ -37,6 +33,12 @@ export default {
     },
   },
   computed: {
+    cases() {
+      return this.slide.cases || []
+    },
+    layoutRatio() {
+      return this.slide.layoutRatio || '50-50'
+    },
     gridStyle() {
       if (this.layoutRatio === '60-40') {
         return { gridTemplateColumns: '60fr 40fr' }
@@ -72,7 +74,7 @@ export default {
   .dual-case {
     grid-template-columns: 1fr !important;
   }
-  
+
   .dual-case__item--divider {
     border-right: none;
     border-bottom: 1px solid var(--color-border-light);

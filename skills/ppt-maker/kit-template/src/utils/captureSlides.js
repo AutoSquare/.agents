@@ -3,6 +3,8 @@ import {
   DEFAULT_CAPTURE_PRESET,
   getCapturePreset,
   getCaptureScale,
+  PREVIEW_BASE_HEIGHT,
+  PREVIEW_BASE_WIDTH,
 } from './capturePresets'
 
 export { CAPTURE_HEIGHT, CAPTURE_WIDTH } from './capturePresets'
@@ -15,19 +17,54 @@ const CAPTURE_CSS_VARS = [
   '--capture-height',
   '--capture-scale',
   '--slide-export-scale',
+  '--preview-capture-width',
+  '--preview-capture-height',
 ]
+
+/** @type {{ width: number, height: number } | null} */
+let activePreviewCaptureSize = null
+
+/**
+ * 预览基准画布尺寸（导出离屏排版用）。
+ * @returns {{ width: number, height: number }}
+ */
+export function getPreviewCaptureSize() {
+  if (activePreviewCaptureSize) {
+    return activePreviewCaptureSize
+  }
+  return { width: PREVIEW_BASE_WIDTH, height: PREVIEW_BASE_HEIGHT }
+}
+
+/**
+ * 读取当前预览态幻灯片画布的实际 DOM 尺寸。
+ * @param {number} slideId
+ * @returns {{ width: number, height: number }}
+ */
+export function measurePreviewCanvasSize(slideId) {
+  const canvas = getSlideCanvas(slideId)
+  const width = canvas.offsetWidth
+  const height = canvas.offsetHeight
+  if (!width || !height) {
+    return { width: PREVIEW_BASE_WIDTH, height: PREVIEW_BASE_HEIGHT }
+  }
+  return { width, height }
+}
 
 /**
  * 将分辨率档位写入根节点 CSS 变量，供 export-capture.css 使用。
  * @param {{ width: number, height: number }} preset
+ * @param {{ width: number, height: number }} [previewSize]
  */
-export function applyCaptureCssVars(preset) {
+export function applyCaptureCssVars(preset, previewSize = getPreviewCaptureSize()) {
   const scale = getCaptureScale(preset.width)
+  activePreviewCaptureSize = previewSize
   const root = document.documentElement
   root.style.setProperty('--capture-width', `${preset.width}px`)
   root.style.setProperty('--capture-height', `${preset.height}px`)
   root.style.setProperty('--capture-scale', String(scale))
   root.style.setProperty('--slide-export-scale', String(scale))
+  root.style.setProperty('--preview-capture-width', `${previewSize.width}px`)
+  root.style.setProperty('--preview-capture-height', `${previewSize.height}px`)
 }
 
 /**
@@ -36,6 +73,7 @@ export function applyCaptureCssVars(preset) {
 export function clearCaptureCssVars() {
   const root = document.documentElement
   CAPTURE_CSS_VARS.forEach((name) => root.style.removeProperty(name))
+  activePreviewCaptureSize = null
 }
 
 /**
@@ -108,7 +146,7 @@ function getSlideCanvas(slideId) {
  * @param {number} slideId
  * @returns {Promise<void>}
  */
-async function scrollSlideIntoView(slideId) {
+export async function scrollSlideIntoView(slideId) {
   const root = document.getElementById(slideHash(slideId))
   if (!root) return
   root.scrollIntoView({ behavior: 'auto', block: 'center' })
@@ -119,7 +157,7 @@ async function scrollSlideIntoView(slideId) {
  * 等待布局绘制完成。
  * @returns {Promise<void>}
  */
-async function waitForLayoutPaint() {
+export async function waitForLayoutPaint() {
   await new Promise((resolve) =>
     requestAnimationFrame(() => requestAnimationFrame(resolve)),
   )
@@ -130,7 +168,7 @@ async function waitForLayoutPaint() {
  * @param {HTMLElement} canvas
  * @returns {Promise<void>}
  */
-async function waitForCanvasReady(canvas) {
+export async function waitForCanvasReady(canvas) {
   const imgs = [...canvas.querySelectorAll('img')]
   await Promise.all(
     imgs.map(
@@ -208,27 +246,63 @@ function verifyPngDimensions(dataUrl, size) {
 }
 
 /**
- * 将画布离屏渲染为 PNG data URL（尺寸与 DOM 一致）。
- * @param {HTMLElement} canvas
+ * 将 PNG data URL 归一化到目标像素尺寸。
+ * @param {string} dataUrl
  * @param {{ width: number, height: number }} size
  * @returns {Promise<string>}
  */
-async function renderCanvasToPng(canvas, size) {
-  assertCanvasDimensions(canvas, size)
-  const w = canvas.offsetWidth
-  const h = canvas.offsetHeight
+function normalizePngDimensions(dataUrl, size) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => {
+      if (img.naturalWidth === size.width && img.naturalHeight === size.height) {
+        resolve(dataUrl)
+        return
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = size.width
+      canvas.height = size.height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('无法创建 PNG 尺寸归一化画布'))
+        return
+      }
+      ctx.drawImage(img, 0, 0, size.width, size.height)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => reject(new Error('PNG 解码失败'))
+    img.src = dataUrl
+  })
+}
+
+/**
+ * 将画布离屏渲染为 PNG data URL（尺寸与 DOM 一致）。
+ * @param {HTMLElement} canvas
+ * @param {{ width: number, height: number }} presetSize
+ * @param {{ backgroundColor?: string | null }} [options]
+ * @returns {Promise<string>}
+ */
+export async function renderCanvasToPng(canvas, presetSize, options = {}) {
+  const previewSize = getPreviewCaptureSize()
+  assertCanvasDimensions(canvas, previewSize)
+  const pixelRatio = presetSize.width / previewSize.width
   const { toPng } = await import(
     /* webpackChunkName: "html-to-image" */
     'html-to-image'
   )
-  const dataUrl = await toPng(canvas, {
-    width: w,
-    height: h,
-    pixelRatio: 1,
+  const toPngOptions = {
+    width: previewSize.width,
+    height: previewSize.height,
+    pixelRatio,
     cacheBust: true,
-  })
-  await verifyPngDimensions(dataUrl, size)
-  return dataUrl
+  }
+  if (options.backgroundColor !== undefined) {
+    toPngOptions.backgroundColor = options.backgroundColor
+  }
+  const dataUrl = await toPng(canvas, toPngOptions)
+  const normalizedDataUrl = await normalizePngDimensions(dataUrl, presetSize)
+  await verifyPngDimensions(normalizedDataUrl, presetSize)
+  return normalizedDataUrl
 }
 
 /**
@@ -241,7 +315,8 @@ export async function captureAllSlideCanvases(slides, options = {}) {
   const { capturePreset = DEFAULT_CAPTURE_PRESET, onProgress } = options
   const preset = getCapturePreset(capturePreset)
   const size = { width: preset.width, height: preset.height }
-  applyCaptureCssVars(preset)
+  const previewSize = measurePreviewCanvasSize(slides[0].id)
+  applyCaptureCssVars(preset, previewSize)
 
   const total = slides.length
   const results = []
