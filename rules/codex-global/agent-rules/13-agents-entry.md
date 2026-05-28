@@ -1,14 +1,15 @@
----
-description: 进入本仓库时优先读取 .agents 协作规范与 Skills/MCP 索引
-alwaysApply: true
----
-
 # 智能体协作入口
+
+## 触发条件
+
+当前项目含 `.agents/` 或 `.agent/` 配置包，或任务涉及 MCP、skills、文献工作流、PPT 工作流时读取。
+
+## 执行要求
 
 本仓库（或已安装本配置包的项目）中，智能体应：
 
 1. 先读 `.agents/README.md`（安装方式、Skills/MCP 总表）。
-2. 团队工程规范见本目录规则 `01`–`08`；非 Cursor 平台见 `.agents/rules/universal/AGENTS.md`。
+2. 团队工程规范见本目录规则 `01`-`08`；非 Cursor 平台见 `.agents/rules/universal/AGENTS.md`。
 3. 涉及外部工具时读 `.agents/mcp.md`；选技能时读 `.agents/skills.md`。
 4. 文献检索、筛选、引用、PPT 任务读 `.agents/workflows.md`。
 5. 执行 `campus-net` 的下载类工具前调用 `get_active_profile`；失败时向用户说明 `manual_download_required.md` 路径。

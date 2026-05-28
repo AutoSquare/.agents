@@ -8,6 +8,42 @@
 
 ## 快速开始（按平台）
 
+### Codex（一键安装）
+
+**前置**：Windows 上已安装 Git、Python、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。
+
+进入 `.agents` 目录，在 PowerShell 中执行：
+
+```powershell
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
+```
+
+脚本会：
+
+- 将托管 `skills/` **增量覆盖**到 `%USERPROFILE%\.codex\skills\`（只覆盖 manifest 中同名托管项，不删除用户自装 skill）
+- 将 Codex 全局入口安装到 `%USERPROFILE%\.codex\AGENTS.md`，并备份已有文件
+- 将按需规则安装到 `%USERPROFILE%\.codex\agent-rules\`
+- 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.codex\mcp-servers\`
+- 用 `codex mcp remove/add` 刷新本包托管的 MCP 注册，不卸载用户自己添加的其他 MCP
+
+常用参数：
+
+```powershell
+# 预览将更新的托管项，不写入磁盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -WhatIf -NoClearScreen
+
+# 只安装 Rules 与 Skills，不构建或注册 MCP
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipMcpInstall
+
+# 指定 Codex 用户目录（测试或多环境时使用）
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -CodexHome "D:\tmp\codex-home"
+```
+
+更细的 Codex 说明见 [`CODEX.md`](CODEX.md)。
+
+---
+
 ### Cursor（推荐，一键安装）
 
 **前置**：Windows 上已安装 Git、Python、Node.js、Cursor。
@@ -83,13 +119,13 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -No
    - 按 Claude Code 文档把 JSON 合并进其 MCP 配置（项目或用户级，以当前版本为准）。
 
 3. **Rules**  
-   - 团队开发规范：`.agents/rules/universal/DEVELOPMENT-RULES.md`（建议写入 `CLAUDE.md` 或设为项目规则源）。
+   - 团队开发规范：`.agents/rules/universal/AGENTS.md`（建议写入 `CLAUDE.md` 或设为项目规则源）。
 
 4. **项目引导**（可选）  
    - 在仓库根 `CLAUDE.md` / `AGENTS.md` 中指向 `.agents/README.md` 与上述 Rules 文件。
 
 5. **环境变量**  
-   - 见下文 [环境变量](#环境变量)；`campus-net` 凭据可放在 `~/.cursor/campus-net/local.env`（与 Cursor 共用路径）或 Claude 配置中的等价 env。
+   - 见下文 [环境变量](#环境变量)；`campus-net` 凭据可放在 Claude 配置中的等价 env 或手动指定的 `CAMPNET_USER_ROOT/local.env`。
 
 ---
 
@@ -99,7 +135,7 @@ OpenCode 各版本对 Skills / MCP 的路径可能不同，通用做法：
 
 1. 克隆本仓库，将 **`.agents` 放在项目根目录**（或只拷贝 `skills/` + `mcp-servers-src/`）。
 2. 在 OpenCode 设置中把 **Skills 目录** 指向本包的 `.agents/skills/`（或复制到 OpenCode 要求的 `skills` 路径）。
-3. **Rules**：将 [`rules/universal/DEVELOPMENT-RULES.md`](rules/universal/DEVELOPMENT-RULES.md) 配置为项目规则/说明文件。
+3. **Rules**：将 [`rules/universal/AGENTS.md`](rules/universal/AGENTS.md) 配置为项目规则/说明文件。
 4. MCP：用 [`mcp.template.json`](mcp.template.json) 作模板，把 `command` / `args` 改为本机路径后粘贴到 OpenCode 的 MCP 配置界面。
 5. 需要 Python MCP 时，在对应目录执行 `python -m venv .venv` 与 `pip install -r requirements.txt`；`campus-net` 另需 `playwright install chromium`。
 
@@ -113,7 +149,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 
 1. 下载 / 克隆本仓库。  
 2. 将根目录下的 **`.agents` 文件夹重命名为 `.agent`**，并放在 Trea 识别的项目根路径。  
-3. Skills 即 `.agent/skills/`；团队规范即 `.agent/rules/universal/DEVELOPMENT-RULES.md`；MCP 见 [`mcp.template.json`](mcp.template.json) 与 [`mcp.md`](mcp.md)。
+3. Skills 即 `.agent/skills/`；团队规范即 `.agent/rules/universal/AGENTS.md`；MCP 见 [`mcp.template.json`](mcp.template.json) 与 [`mcp.md`](mcp.md)。
 
 ---
 
@@ -123,6 +159,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 .agents/
 ├── README.md                 # 本文：平台安装、目录索引、Skills/MCP 总表
 ├── PORTABLE.md               # Cursor 迁移与脚本细节
+├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
 ├── manifest.json             # Skills / MCP 来源清单（机器可读）
 ├── mcp.md                    # MCP 调用规范（给智能体）
 ├── skills.md                 # Skills 选择规则（给智能体）
@@ -133,7 +170,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── skills/                   # 全部 Agent Skills（每目录一个 SKILL.md）
 ├── rules/
 │   ├── cursor/               # Cursor Rules（.mdc）→ .cursor/rules/
-│   └── universal/            # Claude Code / OpenCode / Trea（DEVELOPMENT-RULES.md）
+│   ├── codex-global/         # Codex 全局 AGENTS.md 与按需 agent-rules/
+│   └── universal/            # Claude Code / OpenCode / Trea（AGENTS.md）
 ├── mcp-servers-src/          # 需本地构建的 MCP 源码快照
 │   ├── academic-research-mcp/
 │   ├── zotero-mcp/
@@ -141,6 +179,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 │   └── campus-net-mcp/       # 校园网馆藏（本仓库附带）
 └── scripts/
     ├── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
+    ├── setup-codex-agents.ps1    # 仅 Codex：写入 ~/.codex/
     └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族
 ```
 
@@ -148,9 +187,11 @@ Trea 使用 **`.agent`** 目录名（单数）：
 |------|------|
 | `skills/` | 智能体技能包；每个子文件夹含 `SKILL.md`，由运行时自动发现。 |
 | `rules/cursor/` | Cursor 规则（`.mdc`）；见 [`rules/README.md`](rules/README.md)。 |
+| `rules/codex-global/` | Codex 全局入口与按需规则；由 `setup-codex-agents.ps1` 安装到 `%USERPROFILE%\.codex\`。 |
 | `rules/universal/` | 通用团队规范（`.md`）；非 Cursor 平台使用。 |
 | `mcp-servers-src/` | MCP 服务端源码；**不含** `.venv`、`node_modules`（需安装脚本或手动构建）。 |
 | `scripts/setup-cursor-agents.ps1` | **仅 Cursor**：安装 Skills + MCP 到用户目录。 |
+| `scripts/setup-codex-agents.ps1` | **仅 Codex**：安装 Rules + Skills + MCP 到用户目录，增量覆盖托管项。 |
 | `mcp.template.json` | 非 Cursor 平台手工配置 MCP 时的 JSON 模板。 |
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
 | `output-templates.md` | 统一交付格式（表格、大纲、筛选日志）。 |
@@ -212,7 +253,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | 套系 | 路径 | 平台 |
 |------|------|------|
 | Cursor | `rules/cursor/*.mdc` | Cursor（含 `00` 团队规范 + 文献包规则） |
-| 通用 | `rules/universal/DEVELOPMENT-RULES.md` | Claude Code、OpenCode、Trea |
+| Codex | `rules/codex-global/AGENTS.md` + `rules/codex-global/agent-rules/*.md` | Codex 全局规则与按需规则 |
+| 通用 | `rules/universal/AGENTS.md` | Claude Code、OpenCode、Trea |
 
 完整文件表见 [`rules/README.md`](rules/README.md)。
 
@@ -228,11 +270,11 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `zotero` | 本地 Node | 读写本地 Zotero 库、附件、集合、BibTeX | Zotero Desktop 运行；需构建 `dist/index.js` |
 | `deck-builder` | 本地 Node | 结构化生成可编辑 `.pptx` | `npm install` + `npm run build` |
 | `ppt-markdown` | npx 远程包 | Markdown 转 PowerPoint | Node.js；`npx -y @botrun/mcp-ppt-generator` |
-| `campus-net` | 本地 Python（本仓库附带） | 学校 Profile、馆藏探测、CAS/VPN 会话、DOI 全文下载；失败写入 `manual_download_required.md` | Python venv + Playwright Chromium；可选 `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` 或 `~/.cursor/campus-net/local.env` |
+| `campus-net` | 本地 Python（本仓库附带） | 学校 Profile、馆藏探测、CAS/VPN 会话、DOI 全文下载；失败写入 `manual_download_required.md` | Python venv + Playwright Chromium；Codex 下可选 `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` 或 `~/.codex/campus-net/local.env` |
 
 **常用工具（campus-net）**：`get_active_profile`、`onboard_school`、`ensure_auth`、`download_paper`、`download_papers`、`download_cnki`、`detect_network`。
 
-源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`。
+源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`。
 
 详细能力与调用约束见 [`mcp.md`](mcp.md)。
 
@@ -249,7 +291,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` | campus-net | 学校统一身份 / VPN（可选，亦可写 `local.env`） |
 | `CAMPUS_OUTPUT_DIR` | campus-net | PDF 默认输出目录 |
 
-`campus-net` 用户配置目录（与 Cursor 共用）：`~/.cursor/campus-net/`（含 `local.env`、`sessions/`、`active.json`）。
+`campus-net` 用户配置目录：Cursor 为 `~/.cursor/campus-net/`，Codex 为 `~/.codex/campus-net/`（含 `local.env`、`sessions/`、`active.json`）。
 
 ---
 
@@ -261,4 +303,3 @@ Trea 使用 **`.agent`** 目录名（单数）：
 4. [`workflows.md`](workflows.md) — 文献/PPT 类任务  
 5. [`output-templates.md`](output-templates.md) — 需要统一交付格式时  
 6. [`environment.md`](environment.md) — 排错与更新  
-

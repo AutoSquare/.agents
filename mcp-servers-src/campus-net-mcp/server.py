@@ -234,7 +234,7 @@ async def save_school_profile(
     set_active: bool = False,
     overwrite_existing: bool = True,
 ) -> dict[str, Any]:
-    """将用户确认的 YAML Profile 写入用户目录 `%USERPROFILE%\\.cursor\\campus-net\\profiles\\`。"""
+    """将用户确认的 YAML Profile 写入当前运行时的 campus-net 用户目录。"""
     prof, err = validate_profile_yaml_text(yaml_text)
     if prof is None:
         return {"success": False, "message": err or "YAML 校验失败"}

@@ -6,7 +6,7 @@
 2. 明确主题、学科、时间范围、语言、文献类型与排除条件；信息不足时先给出默认假设。
 3. 拆分概念：核心变量、对象、方法、场景、同义词、中英文关键词。
 4. 优先调用 `academic-research` MCP 进行多源检索。
-5. 需要补充网页证据时，由用户使用浏览器校验，或由用户在本机 Cursor 另行配置的其他 MCP（本迁移包不包含网页搜索 MCP）。
+5. 需要补充网页证据时，由用户使用浏览器校验，或由用户在本机 Agent 运行时另行配置的其他 MCP（本迁移包不包含网页搜索 MCP）。
 6. 需要与已有文献库比对时调用 `zotero`。
 7. 使用 DOI、PMID、arXiv ID、标题规范化结果去重。
 8. 输出候选文献池，并标注检索来源、相关性理由、唯一标识与全文状态。
@@ -74,7 +74,7 @@
 ## UI/UX 设计（React Native）
 
 1. 应用 `ui-ux-pro-max`。
-2. 先运行 `search.py --design-system` 获取 pattern、style、colors、typography 等推荐（命令路径以 `%USERPROFILE%\.cursor\skills\ui-ux-pro-max\` 为准）。
+2. 先运行 `search.py --design-system` 获取 pattern、style、colors、typography 等推荐（Cursor 命令路径以 `%USERPROFILE%\.cursor\skills\ui-ux-pro-max\` 为准；Codex 命令路径以 `%USERPROFILE%\.codex\skills\ui-ux-pro-max\` 为准）。
 3. 需要跨会话持久化时，在项目工作目录使用 `--persist`；会在**当前项目**下生成 `design-system/MASTER.md`（与 Skill 包内 `design-system/` 目录不是同一位置）。
 4. 需要品牌层规范时联动 `brand` → `design-system` → `ui-styling`。
 5. Logo/CIP/图标任务应用 `design`；融资或产品路演幻灯片应用 `slides` + design-system scripts。
@@ -87,4 +87,4 @@
 2. 按四原则执行：编码前思考 → 简洁优先 → 精准修改 → 目标驱动执行。
 3. 多步骤任务列出「步骤 → 验证」计划；bug 修复优先写重现测试。
 4. 需要代码对比示例时读取 Skill 包内 [examples.md](../skills/karpathy-guidelines/examples.md)。
-5. Cursor 已通过 setup 脚本安装 `karpathy-guidelines.mdc`（Global file rules）时，规则为 alwaysApply 基线；Skill 用于显式深度应用与示例引用。
+5. Cursor 已通过 setup 脚本安装 `karpathy-guidelines.mdc` 时，规则为 alwaysApply 基线；Codex 已通过 `setup-codex-agents.ps1` 安装 `10-karpathy-guidelines.md` 时，按需读取该规则；Skill 用于显式深度应用与示例引用。

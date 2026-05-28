@@ -69,7 +69,7 @@ def load_builtin_profile(school_id: str) -> CampusProfile:
 
 
 def load_user_profile(school_id: str) -> CampusProfile:
-    """加载用户目录 ~/.cursor/campus-net/profiles/{school_id}.yaml"""
+    """加载用户目录 ~/.codex/campus-net/profiles/{school_id}.yaml"""
 
     path = user_profiles_dir() / f"{school_id}.yaml"
     if not path.is_file():

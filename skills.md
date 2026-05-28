@@ -3,7 +3,8 @@
 用户级 Skills 目录：
 
 ```text
-%USERPROFILE%\.cursor\skills
+Cursor: %USERPROFILE%\.cursor\skills
+Codex:  %USERPROFILE%\.codex\skills
 ```
 
 ## 文献检索与综述

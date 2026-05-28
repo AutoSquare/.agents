@@ -10,7 +10,7 @@ _APPLIED = False
 
 
 def apply_local_secrets() -> dict[str, object]:
-    """读取 ~/.cursor/campus-net/local.env 并合并进 os.environ（不覆盖已有变量）。"""
+    """读取 ~/.codex/campus-net/local.env 并合并进 os.environ（不覆盖已有变量）。"""
     global _APPLIED
     path = campus_net_root() / "local.env"
     loaded: list[str] = []

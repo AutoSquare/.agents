@@ -7,12 +7,12 @@ from pathlib import Path
 
 
 def campus_net_root() -> Path:
-    """返回 ~/.cursor/campus-net（可由 CAMPNET_USER_ROOT 覆盖，用于测试）。"""
+    """返回 ~/.codex/campus-net（可由 CAMPNET_USER_ROOT 覆盖，用于测试）。"""
 
     override = os.environ.get("CAMPNET_USER_ROOT", "").strip()
     if override:
         return Path(override).expanduser().resolve()
-    return Path.home() / ".cursor" / "campus-net"
+    return Path.home() / ".codex" / "campus-net"
 
 
 def user_profiles_dir() -> Path:

@@ -175,7 +175,7 @@ def _build_summary_intro(failures: list[dict[str, Any]], school_id: str | None) 
 
     parts.append(
         "常见处理：在校内网或网页 VPN 下用浏览器打开下列链接下载 VoR；"
-        "或在 `~/.cursor/campus-net/local.env` 配置 `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` 后重试自动下载。"
+        "或在 `~/.codex/campus-net/local.env` 配置 `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` 后重试自动下载。"
     )
     return "\n\n".join(parts)
 

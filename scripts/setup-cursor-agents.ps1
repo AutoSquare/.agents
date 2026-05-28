@@ -693,6 +693,7 @@ function Set-McpJson {
     $deckBuilderServer = Join-Path $McpServersRoot "deck-builder\build\index.js"
     $campusPython = Join-Path $McpServersRoot "campus-net-mcp\.venv\Scripts\python.exe"
     $campusServer = Join-Path $McpServersRoot "campus-net-mcp\server.py"
+    $campusUserRoot = Join-Path $CursorRoot "campus-net"
 
     $existing.mcpServers["academic-research"] = [ordered]@{
         command = $academicPython
@@ -720,6 +721,7 @@ function Set-McpJson {
         command = $campusPython
         args = @($campusServer)
         env = [ordered]@{
+            CAMPNET_USER_ROOT = $campusUserRoot
             CAMPUS_USERNAME = '${env:CAMPUS_USERNAME}'
             CAMPUS_PASSWORD = '${env:CAMPUS_PASSWORD}'
             OPENALEX_EMAIL = '${env:OPENALEX_EMAIL}'

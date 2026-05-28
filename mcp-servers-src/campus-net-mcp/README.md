@@ -13,6 +13,6 @@ python server.py
 
 ## 配置
 
-在用户目录 `%USERPROFILE%\.cursor\campus-net\` 下写入激活学校与自建 Profile。
+在用户目录 `%USERPROFILE%\.codex\campus-net\` 下写入激活学校与自建 Profile。可通过 `CAMPNET_USER_ROOT` 覆盖默认目录。
 
 环境变量（默认）：`CAMPUS_USERNAME`、`CAMPUS_PASSWORD`；可选用 `OPENALEX_EMAIL` 作为 Unpaywall 礼貌池邮箱（与 academic-research 一致时可复用）。
