@@ -31,6 +31,10 @@ Codex:  %USERPROFILE%\.codex\skills
 - `slides`：融资/产品路演幻灯片结构（联动 design-system scripts）。
 - `banner-design`：横幅尺寸与风格；完整 AI 生成链需自备 ai-artist / ai-multimodal / chrome-devtools。
 
+## CAD 工程出图
+
+- `cad-structure-layout-debug`：从零搭建或调试工程 CAD 出图组件，覆盖 Python/ezdxf、DXF 排版、布局引擎、明细表锚点、预览与外部 CAD 一致性、烟测和视觉验收；Cursor 与 Codex 安装脚本均托管该 Skill。
+
 ## 工程与工作流
 
 - `karpathy-guidelines`：Karpathy 四原则（编码前思考、简洁优先、精准修改、目标驱动执行）；编写/审查/重构代码时使用。
@@ -72,4 +76,5 @@ Codex:  %USERPROFILE%\.codex\skills
 - 用户要求“shadcn、Tailwind 组件主题”时，应用 `ui-styling`。
 - 用户要求“设计令牌、幻灯片文案公式、布局模式”时，应用 `design-system`。
 - 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。
+- 用户要求“CAD 出图、DXF 排版、工程图布局、视图重叠、比例误跳、表格飞出、预览和 AutoCAD 不一致”时，应用 `cad-structure-layout-debug`。
 - 用户要求编写、审查、重构代码，或需减少过度复杂、精准修改、定义可验证成功标准时，应用 `karpathy-guidelines`。

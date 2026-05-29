@@ -73,6 +73,33 @@ function Write-DetailLog {
     [void]$script:DetailLog.Add($Message)
 }
 
+function Invoke-LoggedNativeCommand {
+    param(
+        [string]$FilePath,
+        [string[]]$ArgumentList,
+        [string]$FailureMessage
+    )
+    $display = "$FilePath $($ArgumentList -join ' ')"
+    Write-Host ('  -> ' + $display)
+    Write-DetailLog "running: $display"
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $FilePath @ArgumentList 2>&1 | ForEach-Object {
+            $line = [string]$_
+            Write-DetailLog $line
+            Write-Host ('     ' + $line)
+        }
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($exitCode -ne 0) {
+        throw "$FailureMessage (exit code $exitCode)"
+    }
+}
+
 function Write-PhaseProgress {
     param(
         [string]$Phase,
@@ -111,6 +138,139 @@ function Assert-Command {
     param([string]$Name)
     if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
         throw "Required command not found: $Name"
+    }
+}
+
+function Test-PythonVersionAtLeast {
+    param(
+        [string]$FilePath,
+        [string[]]$ArgumentPrefix = @(),
+        [int]$Major = 3,
+        [int]$Minor = 10
+    )
+    $args = @($ArgumentPrefix)
+    $args += @("-c", "import sys; raise SystemExit(0 if sys.version_info >= ($Major, $Minor) else 1)")
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $FilePath @args *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+}
+
+function Resolve-PythonRuntime {
+    $candidates = @(
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.13"); Label = "py -3.13" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.12"); Label = "py -3.12" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.11"); Label = "py -3.11" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.10"); Label = "py -3.10" },
+        [PSCustomObject]@{ FilePath = "python"; Args = @(); Label = "python" }
+    )
+    foreach ($candidate in $candidates) {
+        if (-not (Get-Command $candidate.FilePath -ErrorAction SilentlyContinue)) {
+            continue
+        }
+        if (Test-PythonVersionAtLeast -FilePath $candidate.FilePath -ArgumentPrefix $candidate.Args) {
+            Write-DetailLog "selected Python runtime: $($candidate.Label)"
+            return $candidate
+        }
+        Write-DetailLog "skip Python runtime below 3.10: $($candidate.Label)"
+    }
+    throw "Required Python 3.10+ not found. Install Python 3.10+ or make it available via the Windows py launcher."
+}
+
+function Invoke-PythonRuntime {
+    param(
+        [string[]]$ArgumentList,
+        [string]$FailureMessage
+    )
+    $args = @($script:PythonRuntime.Args)
+    $args += $ArgumentList
+    Invoke-LoggedNativeCommand -FilePath $script:PythonRuntime.FilePath -ArgumentList $args -FailureMessage $FailureMessage
+}
+
+function Test-VenvPythonVersion {
+    param([string]$PythonPath)
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+    return Test-PythonVersionAtLeast -FilePath $PythonPath
+}
+
+function Get-DependencyInputHash {
+    param([string[]]$Paths)
+    $parts = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in $Paths) {
+        if (Test-Path $path) {
+            $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+            [void]$parts.Add("$path=$hash")
+        }
+    }
+    $joined = [string]::Join("`n", $parts)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($joined)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return [System.BitConverter]::ToString($sha.ComputeHash($bytes)).Replace("-", "")
+    }
+    finally {
+        $sha.Dispose()
+    }
+}
+
+function Test-DependencyMarker {
+    param(
+        [string]$MarkerPath,
+        [string]$ExpectedHash,
+        [string[]]$RequiredPaths
+    )
+    if (-not (Test-Path $MarkerPath)) {
+        return $false
+    }
+    foreach ($path in $RequiredPaths) {
+        if (-not (Test-Path $path)) {
+            return $false
+        }
+    }
+    $actual = (Get-Content -LiteralPath $MarkerPath -Raw -ErrorAction SilentlyContinue).Trim()
+    return $actual -eq $ExpectedHash
+}
+
+function Set-DependencyMarker {
+    param(
+        [string]$MarkerPath,
+        [string]$Hash
+    )
+    Set-Content -LiteralPath $MarkerPath -Value $Hash -Encoding UTF8
+}
+
+function Test-PythonModulesAvailable {
+    param(
+        [string]$PythonPath,
+        [string[]]$Modules
+    )
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+    if ($Modules.Count -eq 0) {
+        return $true
+    }
+    $script = @"
+import importlib.util
+import sys
+missing = [m for m in sys.argv[1:] if importlib.util.find_spec(m) is None]
+raise SystemExit(1 if missing else 0)
+"@
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $PythonPath -c $script @Modules *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
     }
 }
 
@@ -231,6 +391,17 @@ function Install-ManagedSkills {
                 Register-InstallWarning "ppt-maker: missing kit-template or scripts/scaffold.mjs — re-run sync-to-agents from sandbox"
             }
             Write-DetailLog "ppt-maker: requires Node.js 18+; style customization requires ui-ux-pro-max + Python 3"
+        }
+        $cadSkillTarget = Join-Path $SkillsTarget "cad-structure-layout-debug"
+        if (Test-Path $cadSkillTarget) {
+            $smokeOk = Test-Path (Join-Path $cadSkillTarget "scripts\dxf_smoke_check.py")
+            $reqOk = Test-Path (Join-Path $cadSkillTarget "requirements.txt")
+            if ($smokeOk -and $reqOk) {
+                Write-DetailLog "cad-structure-layout-debug: scripts and requirements.txt OK"
+            } else {
+                Register-InstallWarning "cad-structure-layout-debug: missing scripts or requirements.txt — re-run sync-to-agents from edit source"
+            }
+            Write-DetailLog "cad-structure-layout-debug: requires Python 3.10+; pip install ezdxf matplotlib pillow (see requirements.txt)"
         }
     }
     return $count
@@ -578,16 +749,33 @@ function Ensure-McpRepo {
 
 function Install-AcademicResearchMcp {
     Write-PhaseProgress -Phase 'MCP academic-research'
-    Assert-Command "python"
     $repo = Ensure-McpRepo "academic-research-mcp" "https://github.com/alisoroushmd/academic-research-mcp.git"
     Push-Location $repo
     try {
+        $venvPython = ".\.venv\Scripts\python.exe"
+        $requirements = Join-Path $repo "requirements.txt"
+        $marker = Join-Path $repo ".agents-python-deps.sha256"
+        $inputHash = Get-DependencyInputHash -Paths @($requirements)
+        if ((Test-Path ".venv") -and -not (Test-VenvPythonVersion -PythonPath $venvPython)) {
+            Remove-Item -LiteralPath ".venv" -Recurse -Force
+            Write-DetailLog "removed incompatible venv: academic-research-mcp"
+        }
         if (-not (Test-Path ".venv")) {
-            python -m venv ".venv"
+            Invoke-PythonRuntime -ArgumentList @("-m", "venv", ".venv") -FailureMessage "python venv creation failed: academic-research-mcp"
             Write-DetailLog "created venv: academic-research-mcp"
         }
-        & ".\.venv\Scripts\python.exe" -m pip install --upgrade pip 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        & ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        if ((Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($venvPython)) -and (Test-PythonModulesAvailable -PythonPath $venvPython -Modules @("mcp"))) {
+            Write-DetailLog "python dependencies unchanged, skipped pip install: academic-research-mcp"
+            Complete-PhaseProgress
+            return
+        }
+        Write-Host "  -> MCP academic-research-mcp: installing Python dependencies"
+        Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--upgrade", "pip") -FailureMessage "pip upgrade failed: academic-research-mcp"
+        Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--prefer-binary", "-r", "requirements.txt") -FailureMessage "pip requirements install failed: academic-research-mcp"
+        if (-not (Test-PythonModulesAvailable -PythonPath $venvPython -Modules @("mcp"))) {
+            throw "python dependency health check failed: academic-research-mcp (missing module: mcp)"
+        }
+        Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
     }
     finally {
         Pop-Location
@@ -601,8 +789,21 @@ function Install-ZoteroMcp {
     $repo = Ensure-McpRepo "zotero-mcp" "https://github.com/Xpropel/zotero-mcp.git"
     Push-Location $repo
     try {
-        npm install 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        npm run build 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        $packageJson = Join-Path $repo "package.json"
+        $packageLock = Join-Path $repo "package-lock.json"
+        $marker = Join-Path $repo ".agents-node-deps.sha256"
+        $inputHash = Get-DependencyInputHash -Paths @($packageJson, $packageLock)
+        $entry = Join-Path $repo "dist\index.js"
+        if (Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($entry)) {
+            Write-DetailLog "node dependencies unchanged, skipped npm install/build: zotero-mcp"
+            Complete-PhaseProgress
+            return
+        }
+        Write-Host "  -> MCP zotero-mcp: installing Node dependencies"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("install") -FailureMessage "npm install failed: zotero-mcp"
+        Write-Host "  -> MCP zotero-mcp: building"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("run", "build") -FailureMessage "npm build failed: zotero-mcp"
+        Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
     }
     finally {
         Pop-Location
@@ -612,7 +813,6 @@ function Install-ZoteroMcp {
 
 function Install-CampusNetMcp {
     Write-PhaseProgress -Phase 'MCP campus-net'
-    Assert-Command "python"
     $bundled = Join-Path (Join-Path $AgentsRoot "mcp-servers-src") "campus-net-mcp"
     if (-not (Test-Path $bundled)) {
         throw "Bundled MCP not found: $bundled"
@@ -624,14 +824,39 @@ function Install-CampusNetMcp {
     }
     Push-Location $dest
     try {
+        $venvPython = ".\.venv\Scripts\python.exe"
+        $requirements = Join-Path $dest "requirements.txt"
+        $marker = Join-Path $dest ".agents-python-deps.sha256"
+        $playwrightMarker = Join-Path $dest ".agents-playwright-chromium.done"
+        $inputHash = Get-DependencyInputHash -Paths @($requirements)
+        if ((Test-Path ".venv") -and -not (Test-VenvPythonVersion -PythonPath $venvPython)) {
+            Remove-Item -LiteralPath ".venv" -Recurse -Force
+            Write-DetailLog "removed incompatible venv: campus-net-mcp"
+        }
         if (-not (Test-Path ".venv")) {
-            python -m venv ".venv"
+            Invoke-PythonRuntime -ArgumentList @("-m", "venv", ".venv") -FailureMessage "python venv creation failed: campus-net-mcp"
             Write-DetailLog "created venv: campus-net-mcp"
         }
-        & ".\.venv\Scripts\python.exe" -m pip install --upgrade pip 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        & ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        Write-DetailLog "Installing Chromium for Playwright (first run may download binaries) ..."
-        & ".\.venv\Scripts\python.exe" -m playwright install chromium 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        $depsReady = (Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($venvPython)) -and (Test-PythonModulesAvailable -PythonPath $venvPython -Modules @("mcp"))
+        if (-not $depsReady) {
+            Write-Host "  -> MCP campus-net-mcp: installing Python dependencies"
+            Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--upgrade", "pip") -FailureMessage "pip upgrade failed: campus-net-mcp"
+            Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--prefer-binary", "-r", "requirements.txt") -FailureMessage "pip requirements install failed: campus-net-mcp"
+            if (-not (Test-PythonModulesAvailable -PythonPath $venvPython -Modules @("mcp"))) {
+                throw "python dependency health check failed: campus-net-mcp (missing module: mcp)"
+            }
+            Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
+        } else {
+            Write-DetailLog "python dependencies unchanged, skipped pip install: campus-net-mcp"
+        }
+        if (-not (Test-Path $playwrightMarker)) {
+            Write-Host "  -> MCP campus-net-mcp: installing Playwright Chromium"
+            Write-DetailLog "Installing Chromium for Playwright (first run may download binaries) ..."
+            Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "playwright", "install", "chromium") -FailureMessage "playwright chromium install failed: campus-net-mcp"
+            Set-Content -LiteralPath $playwrightMarker -Value (Get-Date -Format o) -Encoding UTF8
+        } else {
+            Write-DetailLog "playwright chromium marker exists, skipped install: campus-net-mcp"
+        }
     }
     finally {
         Pop-Location
@@ -645,8 +870,21 @@ function Install-DeckBuilderMcp {
     $repo = Ensure-McpRepo "deck-builder" "https://github.com/toontube/deck-builder.git"
     Push-Location $repo
     try {
-        npm install 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        npm run build 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        $packageJson = Join-Path $repo "package.json"
+        $packageLock = Join-Path $repo "package-lock.json"
+        $marker = Join-Path $repo ".agents-node-deps.sha256"
+        $inputHash = Get-DependencyInputHash -Paths @($packageJson, $packageLock)
+        $entry = Join-Path $repo "build\index.js"
+        if (Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($entry)) {
+            Write-DetailLog "node dependencies unchanged, skipped npm install/build: deck-builder"
+            Complete-PhaseProgress
+            return
+        }
+        Write-Host "  -> MCP deck-builder: installing Node dependencies"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("install") -FailureMessage "npm install failed: deck-builder"
+        Write-Host "  -> MCP deck-builder: building"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("run", "build") -FailureMessage "npm build failed: deck-builder"
+        Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
     }
     finally {
         Pop-Location
@@ -749,7 +987,7 @@ try {
     Ensure-Directory $McpServersRoot
 
     if (-not $WhatIf) {
-        Assert-Command "python"
+        $script:PythonRuntime = Resolve-PythonRuntime
         if (-not (Get-Command "node" -ErrorAction SilentlyContinue)) {
             Register-InstallWarning "node not found: brand/design-system/ui-styling scripts may not run until Node.js is installed."
         }

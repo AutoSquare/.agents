@@ -4,6 +4,8 @@
 [CmdletBinding()]
 param(
     [string]$CodexHome,
+    [string]$PipIndexUrl,
+    [switch]$UseOfficialPipIndex,
     [switch]$SkipMcpInstall,
     [switch]$SkipSkillUpdate,
     [switch]$SkipRulesUpdate,
@@ -13,6 +15,15 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+$script:DefaultPipIndexUrl = "https://pypi.tuna.tsinghua.edu.cn/simple"
+if ($UseOfficialPipIndex) {
+    $script:PipIndexUrl = $null
+} elseif ([string]::IsNullOrWhiteSpace($PipIndexUrl)) {
+    $script:PipIndexUrl = $script:DefaultPipIndexUrl
+} else {
+    $script:PipIndexUrl = $PipIndexUrl.Trim()
+}
 
 if ([string]::IsNullOrWhiteSpace($CodexHome)) {
     $CodexHome = Join-Path $env:USERPROFILE ".codex"
@@ -39,6 +50,7 @@ $script:InstallResult = [PSCustomObject]@{
     McpSourceCount = 0
     McpRegisteredCount = 0
     McpSkipped = [bool]$SkipMcpInstall
+    PipIndexLabel = ""
     Warnings = [System.Collections.Generic.List[string]]::new()
     WhatIf = [bool]$WhatIf
 }
@@ -46,6 +58,33 @@ $script:InstallResult = [PSCustomObject]@{
 function Write-DetailLog {
     param([string]$Message)
     [void]$script:DetailLog.Add($Message)
+}
+
+function Invoke-LoggedNativeCommand {
+    param(
+        [string]$FilePath,
+        [string[]]$ArgumentList,
+        [string]$FailureMessage
+    )
+    $display = "$FilePath $($ArgumentList -join ' ')"
+    Write-Host ("  -> " + $display)
+    Write-DetailLog "running: $display"
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $FilePath @ArgumentList 2>&1 | ForEach-Object {
+            $line = [string]$_
+            Write-DetailLog $line
+            Write-Host ("     " + $line)
+        }
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    if ($exitCode -ne 0) {
+        throw "$FailureMessage (exit code $exitCode)"
+    }
 }
 
 function Register-InstallWarning {
@@ -108,6 +147,87 @@ function Assert-Command {
     }
 }
 
+function Test-PythonVersionAtLeast {
+    param(
+        [string]$FilePath,
+        [string[]]$ArgumentPrefix = @(),
+        [int]$Major = 3,
+        [int]$Minor = 10
+    )
+    $args = @($ArgumentPrefix)
+    $args += @("-c", "import sys; raise SystemExit(0 if sys.version_info >= ($Major, $Minor) else 1)")
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $FilePath @args *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+}
+
+function Resolve-PythonRuntime {
+    $candidates = @(
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.13"); Label = "py -3.13" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.12"); Label = "py -3.12" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.11"); Label = "py -3.11" },
+        [PSCustomObject]@{ FilePath = "py"; Args = @("-3.10"); Label = "py -3.10" },
+        [PSCustomObject]@{ FilePath = "python"; Args = @(); Label = "python" }
+    )
+    foreach ($candidate in $candidates) {
+        if (-not (Get-Command $candidate.FilePath -ErrorAction SilentlyContinue)) {
+            continue
+        }
+        if (Test-PythonVersionAtLeast -FilePath $candidate.FilePath -ArgumentPrefix $candidate.Args) {
+            Write-DetailLog "selected Python runtime: $($candidate.Label)"
+            return $candidate
+        }
+        Write-DetailLog "skip Python runtime below 3.10: $($candidate.Label)"
+    }
+    throw "Required Python 3.10+ not found. Install Python 3.10+ or make it available via the Windows py launcher."
+}
+
+function Invoke-PythonRuntime {
+    param(
+        [string[]]$ArgumentList,
+        [string]$FailureMessage
+    )
+    $args = @($script:PythonRuntime.Args)
+    $args += $ArgumentList
+    Invoke-LoggedNativeCommand -FilePath $script:PythonRuntime.FilePath -ArgumentList $args -FailureMessage $FailureMessage
+}
+
+function Get-PipIndexLabel {
+    if ($UseOfficialPipIndex) {
+        return "official PyPI"
+    }
+    if ($script:PipIndexUrl -eq $script:DefaultPipIndexUrl) {
+        return "tuna (Tsinghua)"
+    }
+    return [string]$script:PipIndexUrl
+}
+
+function Get-PipInstallExtraArgs {
+    if ($UseOfficialPipIndex -or [string]::IsNullOrWhiteSpace($script:PipIndexUrl)) {
+        return @()
+    }
+    $normalized = $script:PipIndexUrl.Trim().TrimEnd("/").ToLowerInvariant()
+    if ($normalized -eq "https://pypi.org/simple" -or $normalized -eq "http://pypi.org/simple") {
+        return @()
+    }
+    $trustedHost = ([Uri]$script:PipIndexUrl).Host
+    return @("-i", $script:PipIndexUrl, "--trusted-host", $trustedHost)
+}
+
+function Test-VenvPythonVersion {
+    param([string]$PythonPath)
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+    return Test-PythonVersionAtLeast -FilePath $PythonPath
+}
+
 function Ensure-Directory {
     param([string]$Path)
     if (Test-Path $Path) {
@@ -168,6 +288,46 @@ function Copy-ManagedDirectory {
     return $true
 }
 
+function Sync-ManagedDirectoryPreservingChildren {
+    param(
+        [string]$Source,
+        [string]$Target,
+        [string]$ManagedRoot,
+        [string]$Label,
+        [string[]]$PreserveNames = @()
+    )
+    if (-not (Test-Path $Source)) {
+        Register-InstallWarning "managed source missing: $Label ($Source)"
+        return $false
+    }
+    Assert-PathInside -Path $Target -Parent $ManagedRoot
+    if ($WhatIf) {
+        Write-DetailLog "[WhatIf] would sync managed directory preserving dependencies: $Label -> $Target"
+        return $true
+    }
+    if (-not (Test-Path $Target)) {
+        Copy-Item -LiteralPath $Source -Destination $Target -Recurse -Force
+        Write-DetailLog "copied managed directory: $Label"
+        return $true
+    }
+
+    $preserve = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($name in $PreserveNames) {
+        [void]$preserve.Add($name)
+    }
+
+    Get-ChildItem -LiteralPath $Target -Force | ForEach-Object {
+        if (-not $preserve.Contains($_.Name)) {
+            Remove-Item -LiteralPath $_.FullName -Recurse -Force
+        }
+    }
+    Get-ChildItem -LiteralPath $Source -Force | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination $Target -Recurse -Force
+    }
+    Write-DetailLog "synced managed directory preserving dependencies: $Label"
+    return $true
+}
+
 function Remove-Utf8BomIfPresent {
     param([string]$Path)
     if (-not (Test-Path $Path)) {
@@ -184,6 +344,80 @@ function Remove-Utf8BomIfPresent {
         [System.IO.File]::WriteAllBytes($Path, $normalized)
         Write-DetailLog "removed UTF-8 BOM: $Path"
     }
+}
+
+function Get-DependencyInputHash {
+    param([string[]]$Paths)
+    $parts = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in $Paths) {
+        if (Test-Path $path) {
+            $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+            [void]$parts.Add("$path=$hash")
+        }
+    }
+    $joined = [string]::Join("`n", $parts)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($joined)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return [System.BitConverter]::ToString($sha.ComputeHash($bytes)).Replace("-", "")
+    }
+    finally {
+        $sha.Dispose()
+    }
+}
+
+function Test-DependencyMarker {
+    param(
+        [string]$MarkerPath,
+        [string]$ExpectedHash,
+        [string[]]$RequiredPaths
+    )
+    if (-not (Test-Path $MarkerPath)) {
+        return $false
+    }
+    foreach ($path in $RequiredPaths) {
+        if (-not (Test-Path $path)) {
+            return $false
+        }
+    }
+    $actual = (Get-Content -LiteralPath $MarkerPath -Raw -ErrorAction SilentlyContinue).Trim()
+    return $actual -eq $ExpectedHash
+}
+
+function Test-PythonModulesAvailable {
+    param(
+        [string]$PythonPath,
+        [string[]]$Modules
+    )
+    if (-not (Test-Path $PythonPath)) {
+        return $false
+    }
+    if ($Modules.Count -eq 0) {
+        return $true
+    }
+    $script = @"
+import importlib.util
+import sys
+missing = [m for m in sys.argv[1:] if importlib.util.find_spec(m) is None]
+raise SystemExit(1 if missing else 0)
+"@
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $PythonPath -c $script @Modules *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+}
+
+function Set-DependencyMarker {
+    param(
+        [string]$MarkerPath,
+        [string]$Hash
+    )
+    Set-Content -LiteralPath $MarkerPath -Value $Hash -Encoding UTF8
 }
 
 function Get-CodexInstallManifest {
@@ -282,14 +516,45 @@ function Install-PythonMcp {
     )
     Push-Location $RepoPath
     try {
+        $venvPython = ".\.venv\Scripts\python.exe"
+        $requirements = Join-Path $RepoPath "requirements.txt"
+        $marker = Join-Path $RepoPath ".agents-python-deps.sha256"
+        $playwrightMarker = Join-Path $RepoPath ".agents-playwright-chromium.done"
+        $inputHash = Get-DependencyInputHash -Paths @($requirements)
+        Write-Host "  -> MCP ${Name}: checking venv"
+        if ((Test-Path ".venv") -and -not (Test-VenvPythonVersion -PythonPath $venvPython)) {
+            Remove-Item -LiteralPath ".venv" -Recurse -Force
+            Write-DetailLog "removed incompatible venv: $Name"
+        }
         if (-not (Test-Path ".venv")) {
-            python -m venv ".venv"
+            Write-Host "  -> MCP ${Name}: creating venv"
+            Invoke-PythonRuntime -ArgumentList @("-m", "venv", ".venv") -FailureMessage "python venv creation failed: $Name"
             Write-DetailLog "created venv: $Name"
         }
-        & ".\.venv\Scripts\python.exe" -m pip install --upgrade pip 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        & ".\.venv\Scripts\python.exe" -m pip install -r requirements.txt 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        $requiredModules = @("mcp")
+        $pipExtra = Get-PipInstallExtraArgs
+        $depsReady = (Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($venvPython)) -and (Test-PythonModulesAvailable -PythonPath $venvPython -Modules $requiredModules)
+        if (-not $depsReady) {
+            Write-Host "  -> MCP ${Name}: installing Python dependencies (pip index: $(Get-PipIndexLabel))"
+            Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList (@("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--upgrade", "pip") + $pipExtra) -FailureMessage "pip upgrade failed: $Name"
+            Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList (@("-m", "pip", "install", "--no-cache-dir", "--timeout", "30", "--retries", "3", "--prefer-binary", "-r", "requirements.txt") + $pipExtra) -FailureMessage "pip requirements install failed: $Name"
+            if (-not (Test-PythonModulesAvailable -PythonPath $venvPython -Modules $requiredModules)) {
+                throw "python dependency health check failed: $Name (missing module: mcp)"
+            }
+            Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
+        } else {
+            Write-Host "  -> MCP ${Name}: dependencies up to date, skipped"
+            Write-DetailLog "python dependencies unchanged, skipped pip install: $Name"
+        }
         if ($Name -eq "campus-net-mcp") {
-            & ".\.venv\Scripts\python.exe" -m playwright install chromium 2>&1 | ForEach-Object { Write-DetailLog $_ }
+            if (-not (Test-Path $playwrightMarker)) {
+                Write-Host "  -> MCP ${Name}: installing Playwright Chromium"
+                Write-DetailLog "Installing Chromium for Playwright (first run may download binaries) ..."
+                Invoke-LoggedNativeCommand -FilePath $venvPython -ArgumentList @("-m", "playwright", "install", "chromium") -FailureMessage "playwright chromium install failed: $Name"
+                Set-Content -LiteralPath $playwrightMarker -Value (Get-Date -Format o) -Encoding UTF8
+            } else {
+                Write-DetailLog "playwright chromium marker exists, skipped install: $Name"
+            }
         }
     }
     finally {
@@ -304,8 +569,25 @@ function Install-NodeMcp {
     )
     Push-Location $RepoPath
     try {
-        npm install 2>&1 | ForEach-Object { Write-DetailLog $_ }
-        npm run build 2>&1 | ForEach-Object { Write-DetailLog $_ }
+        $packageJson = Join-Path $RepoPath "package.json"
+        $packageLock = Join-Path $RepoPath "package-lock.json"
+        $marker = Join-Path $RepoPath ".agents-node-deps.sha256"
+        $inputHash = Get-DependencyInputHash -Paths @($packageJson, $packageLock)
+        $entry = if ($Name -eq "deck-builder") {
+            Join-Path $RepoPath "build\index.js"
+        } else {
+            Join-Path $RepoPath "dist\index.js"
+        }
+        if (Test-DependencyMarker -MarkerPath $marker -ExpectedHash $inputHash -RequiredPaths @($entry)) {
+            Write-Host "  -> MCP ${Name}: dependencies up to date, skipped"
+            Write-DetailLog "node dependencies unchanged, skipped npm install/build: $Name"
+            return
+        }
+        Write-Host "  -> MCP ${Name}: installing Node dependencies"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("install") -FailureMessage "npm install failed: $Name"
+        Write-Host "  -> MCP ${Name}: building"
+        Invoke-LoggedNativeCommand -FilePath "npm" -ArgumentList @("run", "build") -FailureMessage "npm build failed: $Name"
+        Set-DependencyMarker -MarkerPath $marker -Hash $inputHash
     }
     finally {
         Pop-Location
@@ -319,16 +601,18 @@ function Install-CodexMcpSources {
         return 0
     }
     if (-not $WhatIf) {
-        Assert-Command "python"
+        $script:PythonRuntime = Resolve-PythonRuntime
         Assert-Command "node"
         Assert-Command "npm"
     }
     Ensure-Directory $McpTargetRoot
+    $localServers = @($ManagedMcpServers | Where-Object {
+        [string]$_.kind -ne "npx" -and -not [string]::IsNullOrWhiteSpace([string]$_.sourceDir)
+    })
     $count = 0
-    $total = $ManagedMcpServers.Count
+    $total = $localServers.Count
     $index = 0
     foreach ($server in $ManagedMcpServers) {
-        $index++
         $name = [string]$server.sourceDir
         if ([string]$server.kind -eq "npx") {
             Write-DetailLog "skip local source install for npx MCP: $($server.name)"
@@ -338,10 +622,13 @@ function Install-CodexMcpSources {
             Register-InstallWarning "managed MCP missing sourceDir"
             continue
         }
-        Write-PhaseProgress -Phase "MCP source" -Current $index -Total $total
+        $index++
+        Write-PhaseProgress -Phase "MCP $name" -Current $index -Total $total
+        Write-Host "  -> MCP ${name}: syncing bundled source"
         $src = Resolve-ChildPath -Parent $McpSourceRoot -Child $name
         $dst = Resolve-ChildPath -Parent $McpTargetRoot -Child $name
-        if (-not (Copy-ManagedDirectory -Source $src -Target $dst -ManagedRoot $McpTargetRoot -Label "mcp:$name")) {
+        if (-not (Sync-ManagedDirectoryPreservingChildren -Source $src -Target $dst -ManagedRoot $McpTargetRoot -Label "mcp:$name" -PreserveNames @(".venv", "node_modules", ".agents-python-deps.sha256", ".agents-node-deps.sha256", ".agents-playwright-chromium.done"))) {
+            Complete-PhaseProgress
             continue
         }
         if (-not $WhatIf) {
@@ -353,8 +640,8 @@ function Install-CodexMcpSources {
             }
         }
         $count++
+        Complete-PhaseProgress
     }
-    Complete-PhaseProgress
     return $count
 }
 
@@ -402,6 +689,7 @@ function Register-CodexMcpServers {
             $count++
             continue
         }
+        Write-Host "  -> Registering MCP: $mcpName"
         Invoke-CodexMcpRemove -Name $mcpName
         switch ($mcpName) {
             "academic-research" {
@@ -455,6 +743,7 @@ function Show-InstallSummary {
         Write-SummaryLine -Label "MCP" -Value "skipped (-SkipMcpInstall)"
     } else {
         Write-SummaryLine -Label "MCP" -Value ("$($r.McpSourceCount) sources refreshed, $($r.McpRegisteredCount) registrations refreshed  ->  `$CODEX_HOME/mcp-servers/")
+        Write-SummaryLine -Label "Pip index" -Value $r.PipIndexLabel
     }
     Write-SummaryText ""
     Write-SummaryText "  Incremental boundary" "Yellow"
@@ -487,6 +776,8 @@ function Dump-DetailLog {
 try {
     $installManifest = Get-CodexInstallManifest
     $script:InstallResult.PackageId = $installManifest.PackageId
+    $script:InstallResult.PipIndexLabel = Get-PipIndexLabel
+    Write-DetailLog "pip index: $($script:InstallResult.PipIndexLabel)"
 
     $script:InstallResult.RuleCount = Install-CodexRules -InstallManifest $installManifest
     $script:InstallResult.SkillCount = Install-CodexSkills -ManagedSkills $installManifest.ManagedSkills

@@ -1,6 +1,6 @@
 # `.agents` 智能体配置包
 
-可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）** 等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
+可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）**、CAD 工程出图调试等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
 
 > **给智能体**：进入工作区后先读本文；执行任务时再读 `mcp.md`、`skills.md`、`workflows.md`。
 
@@ -10,7 +10,7 @@
 
 ### Codex（一键安装）
 
-**前置**：Windows 上已安装 Git、Python、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。
+**前置**：Windows 上已安装 Git、Python 3.10+、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
 进入 `.agents` 目录，在 PowerShell 中执行：
 
@@ -25,6 +25,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 - 将 Codex 全局入口安装到 `%USERPROFILE%\.codex\AGENTS.md`，并备份已有文件
 - 将按需规则安装到 `%USERPROFILE%\.codex\agent-rules\`
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.codex\mcp-servers\`
+- 重复安装时保留 Codex MCP 的 `.venv` / `node_modules`，依赖清单未变化则跳过重复依赖安装
 - 用 `codex mcp remove/add` 刷新本包托管的 MCP 注册，不卸载用户自己添加的其他 MCP
 
 常用参数：
@@ -44,9 +45,9 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Cod
 
 ---
 
-### Cursor（推荐，一键安装）
+### Cursor（一键安装）
 
-**前置**：Windows 上已安装 Git、Python、Node.js、Cursor。
+**前置**：Windows 上已安装 Git、Python 3.10+、Node.js、Cursor。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
 进入 `.agents` 目录，在 PowerShell 中执行：
 
@@ -196,6 +197,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
 | `output-templates.md` | 统一交付格式（表格、大纲、筛选日志）。 |
 
+工作区根目录另有 `cad-structure-layout-debug/`（CAD Skill 编辑源）。维护者用 `cad-structure-layout-debug/scripts/sync-to-agents.ps1` 同步到 `skills/cad-structure-layout-debug/` 后再运行 setup。
+
 ---
 
 ## Skills 一览
@@ -220,6 +223,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `brand` | 品牌指南、视觉识别与资产校验。 |
 | `slides` | 融资/产品路演幻灯片结构与文案（联动 design-system scripts）。 |
 | `banner-design` | 横幅尺寸与风格规范（完整生成链依赖未打包的 ai-artist 等，见 environment.md）。 |
+| **CAD 工程出图**（Cursor + Codex 托管） | |
+| `cad-structure-layout-debug` | 从零搭建或调试 CAD 出图组件，覆盖 DXF 排版、布局引擎、明细表锚点、预览一致性、烟测与视觉验收；编辑源在工作区根 `cad-structure-layout-debug/`，经 sync 发布到 `.agents/skills/`。 |
 | **工程与协作**（多源自 Matt Pocock 技能适配） | |
 | `karpathy-guidelines` | Karpathy 四原则：减少 LLM 编码错误（编码前思考、简洁优先、精准修改、目标驱动执行）。 |
 | `diagnose` | 有纪律的缺陷/性能诊断循环（重现→缩小→修复→回归）。 |

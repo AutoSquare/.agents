@@ -56,7 +56,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
 ```
 
-**前置**：Python 3（`ui-ux-pro-max`、`design-system` search-slides）；Node.js 18+（`brand`、`design-system`、`ui-styling` 的 `.cjs` 与 shadcn CLI）。
+**前置**：Python 3.10+（Python MCP、`ui-ux-pro-max`、`design-system` search-slides）；Node.js 18+（`brand`、`design-system`、`ui-styling` 的 `.cjs` 与 shadcn CLI）。安装脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本，避免 PATH 中旧版 `python` 误建虚拟环境。
 
 **`banner-design` 限制**：完整生成链引用未打包 Skill `ai-artist`、`ai-multimodal`、`chrome-devtools`；迁入包仅含 SKILL + references。
 
@@ -83,6 +83,36 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 ```
 
 修改四原则时须同步源仓库内 `SKILL.md`、`CLAUDE.md`、`.cursor/rules/karpathy-guidelines.mdc`，再运行上述 sync。
+
+## cad-structure-layout-debug 维护
+
+**编辑源**：工作区根 `cad-structure-layout-debug/`（沙箱）；**发布副本**：`.agents/skills/cad-structure-layout-debug/`（禁止手改，须 sync）。
+
+```powershell
+# 编辑源 → .agents 发布副本
+powershell -ExecutionPolicy Bypass -File "cad-structure-layout-debug\scripts\sync-to-agents.ps1"
+powershell -ExecutionPolicy Bypass -File "cad-structure-layout-debug\scripts\sync-to-agents.ps1" -DryRun
+
+# 安装到 Cursor
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
+
+# 安装到 Codex
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
+```
+
+**前置**：Python 3.10+；验证脚本依赖 `ezdxf`、`matplotlib`、`pillow`（见 `requirements.txt`）。
+
+**冒烟**：
+
+```powershell
+$skill = "$env:USERPROFILE\.cursor\skills\cad-structure-layout-debug"
+py -3.10 "$skill\examples\minimal_engineering_drawing\generate.py" --out "$skill\out\minimal.dxf"
+py -3.10 "$skill\scripts\dxf_smoke_check.py" --dxf "$skill\out\minimal.dxf" --min-entities 10
+py -3.10 "$skill\scripts\render_dxf_preview.py" --dxf "$skill\out\minimal.dxf" --png "$skill\out\minimal.png"
+```
+
+Codex 路径将 `$env:USERPROFILE\.cursor\skills\` 替换为 `$env:USERPROFILE\.codex\skills\` 即可。
 
 ## ppt-maker 维护
 
@@ -186,5 +216,12 @@ npm run build
    - `%USERPROFILE%\.codex\mcp-servers\academic-research-mcp\server.py`
    - `%USERPROFILE%\.codex\mcp-servers\zotero-mcp\dist\index.js`
    - `%USERPROFILE%\.codex\mcp-servers\deck-builder\build\index.js`
-5. 使用 Zotero MCP 前确认 Zotero Desktop 已启动。
-6. UI/UX：`python "%USERPROFILE%\.cursor\skills\ui-ux-pro-max\scripts\search.py" "test" --design-system -n 1` 应能输出结果（终端文案可能仍为英文）。
+5. 如果卡在第一个 Python MCP，检查依赖是否真实可导入：
+
+```powershell
+& "$env:USERPROFILE\.codex\mcp-servers\academic-research-mcp\.venv\Scripts\python.exe" -c "import mcp; print('ok')"
+& "$env:USERPROFILE\.cursor\mcp-servers\academic-research-mcp\.venv\Scripts\python.exe" -c "import mcp; print('ok')"
+```
+
+6. 使用 Zotero MCP 前确认 Zotero Desktop 已启动。
+7. UI/UX：`python "%USERPROFILE%\.cursor\skills\ui-ux-pro-max\scripts\search.py" "test" --design-system -n 1` 应能输出结果（终端文案可能仍为英文）。

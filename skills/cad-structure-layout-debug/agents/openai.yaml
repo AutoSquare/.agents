@@ -1,0 +1,5 @@
+# Codex-only: Cursor 忽略本文件
+interface:
+  display_name: "CAD Structure Layout Debug"
+  short_description: "搭建、脚手架化、调试并验收可复用的 CAD 出图组件。"
+  default_prompt: "使用 $cad-structure-layout-debug 搭建或调试可复用的 CAD 出图组件。"

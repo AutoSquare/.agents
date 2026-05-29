@@ -75,6 +75,9 @@
     ],
     "codingGuidelines": [
       "karpathy-guidelines"
+    ],
+    "cadEngineering": [
+      "cad-structure-layout-debug"
     ]
   },
   "installManifest": {
@@ -114,7 +117,8 @@
       "slides",
       "design-system",
       "brand",
-      "karpathy-guidelines"
+      "karpathy-guidelines",
+      "cad-structure-layout-debug"
     ],
     "managedRules": [
       "00-cursor-ide.mdc",
@@ -175,7 +179,8 @@
       "slides",
       "design-system",
       "brand",
-      "karpathy-guidelines"
+      "karpathy-guidelines",
+      "cad-structure-layout-debug"
     ],
     "managedRules": [
       "01-language-and-naming.md",
