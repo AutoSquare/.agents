@@ -35,6 +35,10 @@ Codex:  %USERPROFILE%\.codex\skills
 
 - `cad-structure-layout-debug`：从零搭建或调试工程 CAD 出图组件，覆盖 Python/ezdxf、DXF 排版、布局引擎、明细表锚点、预览与外部 CAD 一致性、烟测和视觉验收；Cursor 与 Codex 安装脚本均托管该 Skill。
 
+## WPF + Python 工程脚手架
+
+- `wpf-python-mvvm-builder`：在已有 Visual Studio WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，包含 PythonBridge、Themes/Resources/Properties 与 `memory` / `archive` 两类持久化路线；Cursor 与 Codex 安装脚本均托管该 Skill。
+
 ## 工程与工作流
 
 - `karpathy-guidelines`：Karpathy 四原则（编码前思考、简洁优先、精准修改、目标驱动执行）；编写/审查/重构代码时使用。
@@ -77,4 +81,5 @@ Codex:  %USERPROFILE%\.codex\skills
 - 用户要求“设计令牌、幻灯片文案公式、布局模式”时，应用 `design-system`。
 - 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。
 - 用户要求“CAD 出图、DXF 排版、工程图布局、视图重叠、比例误跳、表格飞出、预览和 AutoCAD 不一致”时，应用 `cad-structure-layout-debug`。
+- 用户要求“WPF + Python、PythonBridge、MVVM 脚手架、已有 WPF 项目接 Python、memory/archive 持久化、`.gpdx` 式工程包”时，应用 `wpf-python-mvvm-builder`。
 - 用户要求编写、审查、重构代码，或需减少过度复杂、精准修改、定义可验证成功标准时，应用 `karpathy-guidelines`。

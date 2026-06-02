@@ -76,6 +76,9 @@
     "codingGuidelines": [
       "karpathy-guidelines"
     ],
+    "wpfPythonMvvm": [
+      "wpf-python-mvvm-builder"
+    ],
     "cadEngineering": [
       "cad-structure-layout-debug"
     ]
@@ -118,7 +121,8 @@
       "design-system",
       "brand",
       "karpathy-guidelines",
-      "cad-structure-layout-debug"
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder"
     ],
     "managedRules": [
       "00-cursor-ide.mdc",
@@ -180,7 +184,8 @@
       "design-system",
       "brand",
       "karpathy-guidelines",
-      "cad-structure-layout-debug"
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder"
     ],
     "managedRules": [
       "01-language-and-naming.md",

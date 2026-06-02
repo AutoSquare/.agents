@@ -1,0 +1,5 @@
+# Codex-only: Cursor 忽略本文件
+interface:
+  display_name: "WPF Python MVVM Builder"
+  short_description: "在已有 VS WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，支持 memory/archive 持久化路线。"
+  default_prompt: "使用 $wpf-python-mvvm-builder 为我的已有 VS WPF 项目增量接入 PythonBridge、MVVM 目录结构和持久化方案。"

@@ -197,7 +197,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
 | `output-templates.md` | 统一交付格式（表格、大纲、筛选日志）。 |
 
-工作区根目录另有 `cad-structure-layout-debug/`（CAD Skill 编辑源）。维护者用 `cad-structure-layout-debug/scripts/sync-to-agents.ps1` 同步到 `skills/cad-structure-layout-debug/` 后再运行 setup。
+工作区根目录另有 `cad-structure-layout-debug/`（CAD Skill 编辑源）与 `wpf-python-mvvm-builder/`（WPF + Python MVVM Skill 编辑源）。维护者先在源目录修改，再分别用对应 `scripts/sync-to-agents.ps1` 同步到 `.agents/skills/` 后运行 setup。
 
 ---
 
@@ -225,6 +225,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `banner-design` | 横幅尺寸与风格规范（完整生成链依赖未打包的 ai-artist 等，见 environment.md）。 |
 | **CAD 工程出图**（Cursor + Codex 托管） | |
 | `cad-structure-layout-debug` | 从零搭建或调试 CAD 出图组件，覆盖 DXF 排版、布局引擎、明细表锚点、预览一致性、烟测与视觉验收；编辑源在工作区根 `cad-structure-layout-debug/`，经 sync 发布到 `.agents/skills/`。 |
+| **WPF + Python 工程脚手架**（Cursor + Codex 托管） | |
+| `wpf-python-mvvm-builder` | 在已有 Visual Studio WPF 项目上增量补全 PythonBridge、MVVM 目录、Themes/Resources/Properties 与 memory/archive 持久化路线；编辑源在工作区根 `wpf-python-mvvm-builder/`，经 sync 发布到 `.agents/skills/`。 |
 | **工程与协作**（多源自 Matt Pocock 技能适配） | |
 | `karpathy-guidelines` | Karpathy 四原则：减少 LLM 编码错误（编码前思考、简洁优先、精准修改、目标驱动执行）。 |
 | `diagnose` | 有纪律的缺陷/性能诊断循环（重现→缩小→修复→回归）。 |

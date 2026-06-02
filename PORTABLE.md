@@ -6,7 +6,7 @@
 
 ## 包含内容
 
-- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能（`ppt-maker`、`academic-ppt-builder`）、**UI/UX 设计技能族（7 个）**、**Karpathy 编码准则（`karpathy-guidelines`）**、**CAD 出图调试（`cad-structure-layout-debug`）** 和辅助工作流技能。
+- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能（`ppt-maker`、`academic-ppt-builder`）、**UI/UX 设计技能族（7 个）**、**Karpathy 编码准则（`karpathy-guidelines`）**、**CAD 出图调试（`cad-structure-layout-debug`）**、**WPF + Python MVVM（`wpf-python-mvvm-builder`）** 和辅助工作流技能。
 - `mcp-servers-src/`：本地型 MCP 服务源码快照，包含 `academic-research-mcp`、`zotero-mcp`、`deck-builder`、`campus-net-mcp`；不包含 `.git`、`node_modules`、`.venv` 等机器依赖目录。
 - `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：默认安装 Skills + MCP；Rules 默认不装（User 手动录入 AGENTS.md）；可选 `-ProjectPath` 安装 `.mdc` 到指定工程。
 - `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `.agents/skills/`（含 Cursor 路径改写）。
@@ -64,6 +64,16 @@ $skill = "$env:USERPROFILE\.cursor\skills\cad-structure-layout-debug"
 py -3.10 "$skill\examples\minimal_engineering_drawing\generate.py" --out "$skill\out\minimal.dxf"
 py -3.10 "$skill\scripts\dxf_smoke_check.py" --dxf "$skill\out\minimal.dxf" --min-entities 10
 py -3.10 "$skill\scripts\render_dxf_preview.py" --dxf "$skill\out\minimal.dxf" --png "$skill\out\minimal.png"
+```
+
+详见已安装目录内 `README-cursor.md`。
+
+9. （可选）验证 `wpf-python-mvvm-builder`（需 Python 3 与本机 .NET SDK；对已有 WPF 项目执行 audit + smoke）：
+
+```powershell
+$skill = "$env:USERPROFILE\.cursor\skills\wpf-python-mvvm-builder"
+py -3 "$skill\scripts\audit_project.py" --project-dir "<你的WPF项目路径>" --abbr "<Abbr>"
+py -3 "$skill\scripts\smoke_bridge.py" --project-dir "<你的WPF项目路径>" --abbr "<Abbr>"
 ```
 
 详见已安装目录内 `README-cursor.md`。

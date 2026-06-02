@@ -114,6 +114,33 @@ py -3.10 "$skill\scripts\render_dxf_preview.py" --dxf "$skill\out\minimal.dxf" -
 
 Codex 路径将 `$env:USERPROFILE\.cursor\skills\` 替换为 `$env:USERPROFILE\.codex\skills\` 即可。
 
+## wpf-python-mvvm-builder 维护
+
+**编辑源**：工作区根 `wpf-python-mvvm-builder/`（沙箱）；**发布副本**：`.agents/skills/wpf-python-mvvm-builder/`（禁止手改，须 sync）。
+
+```powershell
+# 编辑源 → .agents 发布副本
+powershell -ExecutionPolicy Bypass -File "wpf-python-mvvm-builder\scripts\sync-to-agents.ps1"
+powershell -ExecutionPolicy Bypass -File "wpf-python-mvvm-builder\scripts\sync-to-agents.ps1" -DryRun
+
+# 安装到 Cursor
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
+```
+
+**前置**：Python 3；本机 .NET SDK（`dotnet build`）。脚本仅用标准库，无额外 pip 依赖。
+
+**冒烟**（对已有 WPF 项目，替换 `<path>` / `<Abbr>` / `<Project>`）：
+
+```powershell
+$skill = "$env:USERPROFILE\.cursor\skills\wpf-python-mvvm-builder"
+py -3 "$skill\scripts\audit_project.py" --project-dir "<path>" --abbr "<Abbr>"
+py -3 "$skill\scripts\smoke_bridge.py" --project-dir "<path>" --abbr "<Abbr>"
+dotnet build "<path>/<Project>.csproj"
+```
+
+Codex 安装与说明见 [`CODEX.md`](CODEX.md)（本小节只维护 Cursor 链路）。
+
 ## ppt-maker 维护
 
 **编辑源**：工作区根 `ppt-maker/`（沙箱）；**发布副本**：`.agents/skills/ppt-maker/`（禁止手改，须 sync）。

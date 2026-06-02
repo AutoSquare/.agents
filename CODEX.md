@@ -56,7 +56,15 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Ver
 %USERPROFILE%\.codex\skills\cad-structure-layout-debug
 ```
 
-Cursor 侧安装与验证见 [`PORTABLE.md`](PORTABLE.md) 与已安装目录内 `README-cursor.md`。
+`wpf-python-mvvm-builder` 也属于 Codex 托管 Skill，安装后位于：
+
+```text
+%USERPROFILE%\.codex\skills\wpf-python-mvvm-builder
+```
+
+该 Skill 用于在已有 Visual Studio WPF 项目上增量接入 PythonBridge、MVVM 目录结构、Themes/Resources/Properties 与 `memory` / `archive` 持久化路线。维护者应先修改工作区根目录的 `wpf-python-mvvm-builder/` 源目录，再运行 `wpf-python-mvvm-builder/scripts/sync-to-agents.ps1` 刷新 `.agents/skills/wpf-python-mvvm-builder/` 发布副本。
+
+Cursor 侧安装与验证见 [`PORTABLE.md`](PORTABLE.md) 与已安装目录内 `README-cursor.md`；本文件只说明 Codex 安装链路。
 
 ## MCP
 

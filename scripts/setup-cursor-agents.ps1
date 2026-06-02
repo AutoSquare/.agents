@@ -403,6 +403,17 @@ function Install-ManagedSkills {
             }
             Write-DetailLog "cad-structure-layout-debug: requires Python 3.10+; pip install ezdxf matplotlib pillow (see requirements.txt)"
         }
+        $wpfSkillTarget = Join-Path $SkillsTarget "wpf-python-mvvm-builder"
+        if (Test-Path $wpfSkillTarget) {
+            $auditOk = Test-Path (Join-Path $wpfSkillTarget "scripts\audit_project.py")
+            $scaffoldOk = Test-Path (Join-Path $wpfSkillTarget "scripts\scaffold_dual_stack.py")
+            if ($auditOk -and $scaffoldOk) {
+                Write-DetailLog "wpf-python-mvvm-builder: audit_project.py and scaffold_dual_stack.py OK"
+            } else {
+                Register-InstallWarning "wpf-python-mvvm-builder: missing audit or scaffold scripts — re-run sync-to-agents from edit source"
+            }
+            Write-DetailLog "wpf-python-mvvm-builder: requires Python 3 and .NET SDK (dotnet build)"
+        }
     }
     return $count
 }

@@ -1,0 +1,53 @@
+<Window x:Class="{{RootNamespace}}.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{{DisplayName}}" Height="620" Width="800">
+    <DockPanel Margin="12">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="运行样本计算" Command="{Binding RunSampleCommand}" Padding="12,4"/>
+        </StackPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" Margin="0,8,0,0" TextWrapping="Wrap"/>
+        <GroupBox Header="测试表单（编辑后自动保存至 memory 快照）" Padding="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="88"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="项目名称" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                <TextBox x:Name="ProjectNameBox" Grid.Row="0" Grid.Column="1"
+                         Text="{Binding ProjectName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="负责人" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                <TextBox x:Name="OwnerNameBox" Grid.Row="1" Grid.Column="1"
+                         Text="{Binding OwnerName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="备注" VerticalAlignment="Top" Margin="0,4,8,0"/>
+                <TextBox x:Name="MemoBox" Grid.Row="2" Grid.Column="1"
+                         Text="{Binding Memo, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True" MinHeight="56" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="联系电话" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                <TextBox x:Name="ContactPhoneBox" Grid.Row="3" Grid.Column="1"
+                         Text="{Binding ContactPhone, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="所属部门" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                <TextBox x:Name="DepartmentBox" Grid.Row="4" Grid.Column="1"
+                         Text="{Binding Department, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,0,8"/>
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="工程地点" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox x:Name="SiteAddressBox" Grid.Row="5" Grid.Column="1"
+                         Text="{Binding SiteAddress, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </GroupBox>
+    </DockPanel>
+</Window>
