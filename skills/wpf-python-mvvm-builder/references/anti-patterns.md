@@ -16,8 +16,10 @@
 ## 路径与仓库
 
 - ❌ `{Abbr}Env/` 提交到 git
+- ❌ `{Abbr}Env/` 是 venv，目录内存在 `pyvenv.cfg`
 - ❌ Skill 脚本硬编码 `GeoPile` 或本机盘符
 - ❌ 中文目录名存放 Python 或 Env
+- ✅ `{Abbr}Env/` 是可移植 Python 环境，可进入 Release 输出 / 安装包
 
 ## Scaffold
 

@@ -12,6 +12,16 @@ import tempfile
 from pathlib import Path
 
 
+def resolve_python(project_dir: Path, abbr: str) -> Path:
+    env_dir = project_dir / f"{abbr}Env"
+    candidates = (
+        env_dir / "python.exe",
+        env_dir / "Scripts" / "python.exe",
+        env_dir / "bin" / "python",
+    )
+    return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project-dir", required=True)
@@ -20,16 +30,16 @@ def main() -> None:
     project_dir = Path(args.project_dir).resolve()
     abbr = args.abbr.strip()
     py_folder = project_dir / f"{abbr}Py"
-    env_dir = project_dir / f"{abbr}Env"
     driver = py_folder / "CalculateDriver.py"
-    py_exe = env_dir / "Scripts" / "python.exe"
-    if not py_exe.is_file():
-        py_exe = env_dir / "bin" / "python"
+    py_exe = resolve_python(project_dir, abbr)
     if not driver.is_file():
         print(f"Missing driver: {driver}", file=sys.stderr)
         sys.exit(1)
     if not py_exe.is_file():
-        print(f"Missing python: {py_exe} — run setup_python_env.py first", file=sys.stderr)
+        print(
+            f"Missing python: {py_exe} — run setup_python_env.py to create the portable {abbr}Env",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     workspace = Path(tempfile.mkdtemp(prefix=f"{abbr}Work_smoke_"))

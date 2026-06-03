@@ -45,6 +45,8 @@ py -3 scripts/audit_project.py --project-dir "<path>" --abbr "<Abbr>"
 dotnet build "<path>/<Project>.csproj"
 ```
 
+发布注意：`{Abbr}Env` 是可移植 Python 环境，会进入 Release 输出和安装包；它不能是 venv，目录内不得有 `pyvenv.cfg`。交付前看 `audit_project.py` 的 `Release Python runtime safety` 小节，确认 `{Abbr}Env` 会被复制，且没有 `pyvenv.cfg` 或本机绝对路径泄漏。
+
 archive 路线把 `--persistence memory --app-id "<AppId>"` 替换为：
 
 ```powershell

@@ -5,22 +5,30 @@
 | 用途 | 名称 | 入库 |
 |------|------|------|
 | Python 脚本 | `{Abbr}Py/` | 是 |
-| Python 运行时 | `{Abbr}Env/` | **否**（gitignore） |
+| 可移植 Python 环境 | `{Abbr}Env/` | 按项目发布策略；不得是 venv |
 | 临时工作区 | `%Temp%\{Abbr}Work_{GUID}/` | 否 |
 
-示例：`Abbr=AS` → `ASPy/`、`ASEnv/`、`AS_WORKSPACE` 环境变量。
+示例：`Abbr=AS` -> `ASPy/`、`ASEnv/`、`AS_WORKSPACE` 环境变量。
 
 ## 禁止中文的路径与文件名
 
-- 项目简写、`*Py`、`*Env`、Driver 文件名、Assets 子目录（除 JSON **表逻辑名** 可为中文，如 `数据表/项目基本信息.json`）
-- 若用户给出中文项目名：提示提供英文简写；**软件窗口标题可中文**
+- 项目简写、`*Py`、`*Env`、Driver 文件名、Assets 子目录必须使用 ASCII。
+- JSON 表逻辑名可为中文，例如 `数据表/项目基本信息.json`。
+- 软件窗口标题可中文。
 
-## gitignore 片段（模板见 `templates/gitignore-snippet.txt`）
+## Python 环境规则
 
-```
-{Abbr}Env/
+- `{Abbr}Env/` 存放可移植 Python 环境和依赖，会进入 Release 输出和安装包。
+- `{Abbr}Env/pyvenv.cfg` 会记录开发机绝对路径，因此 `{Abbr}Env/` 不能是 venv。
+- `setup_python_env.py` 默认创建 Python 3.10.11 embeddable 环境；替换旧 venv 时使用 `--force`。
+
+## gitignore 片段
+
+```text
 *{Abbr}Work_*
 ```
+
+是否忽略 `{Abbr}Env/` 由项目发布策略决定；若安装包从本机 Release 输出构建，`{Abbr}Env/` 可以不入库但必须在构建机存在。
 
 ## csproj 注释锚点
 
@@ -29,5 +37,3 @@
 <!-- dual-stack: {Abbr}Env -->
 <!-- dual-stack: packages -->
 ```
-
-便于脚本幂等追加与 audit 检测。

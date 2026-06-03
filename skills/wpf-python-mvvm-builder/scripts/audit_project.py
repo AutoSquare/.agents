@@ -14,6 +14,7 @@ CSPROJ_ANCHORS = (
     "dual-stack: packages",
     "dual-stack: resources",
     "dual-stack: properties",
+    "dual-stack: {abbr}Env",
     "dual-stack: persistence-memory",
     "dual-stack: persistence-archive",
 )
@@ -58,6 +59,14 @@ def app_has_default_theme(app_xaml: Path) -> bool:
     return "DefaultTheme.xaml" in app_xaml.read_text(encoding="utf-8")
 
 
+def contains_text(path: Path, patterns: tuple[str, ...]) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return False
+    return any(pattern in text for pattern in patterns)
+
+
 def audit(project_dir: Path, abbr: str, expect: str = "") -> str:
     lines: list[str] = ["# Dual-Stack MVVM Audit", "", f"- project: `{project_dir}`", f"- abbr: `{abbr}`", ""]
     csproj = find_csproj(project_dir)
@@ -84,7 +93,9 @@ def audit(project_dir: Path, abbr: str, expect: str = "") -> str:
         p = project_dir / name
         lines.append(f"- `{name}`: {'present' if p.exists() else 'missing'}")
     lines.append(f"- `{env_folder}`: {'present' if (project_dir / env_folder).exists() else 'missing'}")
-    env_py = project_dir / env_folder / "Scripts" / "python.exe"
+    env_py = project_dir / env_folder / "python.exe"
+    if not env_py.is_file():
+        env_py = project_dir / env_folder / "Scripts" / "python.exe"
     if not env_py.is_file():
         env_py = project_dir / env_folder / "bin" / "python"
     lines.append(f"- `{env_folder}/python`: {'present' if env_py.is_file() else '**missing — run setup_python_env.py**'}")
@@ -93,7 +104,31 @@ def audit(project_dir: Path, abbr: str, expect: str = "") -> str:
 
     lines.append("\n## csproj anchors")
     for anchor in CSPROJ_ANCHORS:
-        lines.append(f"- `{anchor}`: {'present' if anchor in text else 'missing'}")
+        actual_anchor = anchor.format(abbr=abbr)
+        lines.append(f"- `{actual_anchor}`: {'present' if actual_anchor in text else 'missing'}")
+
+    lines.append("\n## Release Python runtime safety")
+    env_copy_pattern = f'{env_folder}/**/*'
+    legacy_env_copy = env_copy_pattern in text or f"{env_folder}\\**\\*" in text
+    runtime_copy = "Runtime/Python/**/*" in text or "Runtime\\Python\\**\\*" in text
+    pyvenv = project_dir / env_folder / "pyvenv.cfg"
+    release_dir = project_dir / "bin" / "Release"
+    release_pyvenv = list(release_dir.rglob("pyvenv.cfg")) if release_dir.is_dir() else []
+    leak_patterns = ("AppData\\Local\\Programs\\Python", "AppData/Local/Programs/Python", "C:\\Users\\")
+    release_leak_files: list[Path] = []
+    if release_dir.is_dir():
+        for candidate in release_dir.rglob("*"):
+            if candidate.is_file() and contains_text(candidate, leak_patterns):
+                release_leak_files.append(candidate)
+                if len(release_leak_files) >= 5:
+                    break
+    lines.append(f"- `.csproj` copies `{env_folder}` to output: **{legacy_env_copy}** (must be true)")
+    lines.append(f"- `.csproj` copies `Runtime/Python`: **{runtime_copy}** (must be false)")
+    lines.append(f"- `{env_folder}/pyvenv.cfg`: **{pyvenv.is_file()}** (must be false)")
+    lines.append(f"- Release output `pyvenv.cfg`: **{bool(release_pyvenv)}** (must be false)")
+    lines.append(f"- Release absolute Python path leaks found: **{bool(release_leak_files)}** (must be false)")
+    for leak in release_leak_files[:5]:
+        lines.append(f"  - `{leak.relative_to(project_dir)}`")
 
     lines.append("\n## Persistence modules")
     if mode == "memory":

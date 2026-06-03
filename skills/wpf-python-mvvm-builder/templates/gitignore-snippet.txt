@@ -1,4 +1,2 @@
-# {{Abbr}}Env/ — Python 运行时（venv 或 conda 复制），勿提交 git
-# {{Abbr}}Work_* — 临时计算工作区
-{{Abbr}}Env/
+# {{Abbr}}Work_* — temporary calculation workspaces
 *{{Abbr}}Work_*

@@ -1,6 +1,6 @@
 # csproj 接线
 
-## NuGet（脚手架追加）
+## NuGet
 
 ```xml
 <!-- dual-stack: packages -->
@@ -10,9 +10,9 @@
 </ItemGroup>
 ```
 
-版本可在 Skill 迭代时 bump；须与 TargetFramework 兼容。
-
 ## CopyToOutputDirectory
+
+`{Abbr}Env/` 是可移植 Python 环境，会复制到输出目录和安装包。它不能是 venv；目录内不得存在 `pyvenv.cfg`。
 
 ```xml
 <!-- dual-stack: {Abbr}Py -->
@@ -35,12 +35,12 @@
 </ItemGroup>
 ```
 
-## XML 文档（可选）
+## XML 文档
 
-GeoPile 启用 `GenerateDocumentationFile`；母版默认**不强制**，避免空项目 CS1591。用户要求时可 intake 开启。
+GeoPile 启用 `GenerateDocumentationFile`；模板默认不强制，避免空项目 CS1591。用户要求时可 intake 开启。
 
 ## 增量原则
 
-- 脚本只 **追加** 带锚点注释的 ItemGroup
-- 已存在锚点则跳过（幂等）
-- `--dry-run` 只打印将写入的片段
+- 脚本只追加带锚点注释的 ItemGroup。
+- 已存在锚点则跳过，保持幂等。
+- `--dry-run` 只打印将写入的片段。

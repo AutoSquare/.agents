@@ -56,7 +56,9 @@ py -3 scripts/scaffold_dual_stack.py ... --persistence memory --app-id "<AppId>"
 
 Scaffolds: MVVM + Python + **Themes/Resources/Properties** + App.xaml DefaultTheme merge + **持久化运行期接线**（memory 快照 + uiState/WindowPlacement / archive 文件菜单）。
 
-**`--apply` 默认自动执行 `setup_python_env.py`** 创建 `{Abbr}Env`；跳过请加 `--skip-python-env`。
+**`--apply` 默认自动执行 `setup_python_env.py`** 创建 `{Abbr}Env` 可移植 Python 环境；跳过请加 `--skip-python-env`。
+
+`{Abbr}Env` 是发布运行时目录，必须是可移植 Python 环境，不得是 venv；目录内不能出现 `pyvenv.cfg` 或开发机绝对路径。
 
 ### Phase 2b — Migrate (optional)
 
@@ -87,6 +89,8 @@ py -3 scripts/smoke_bridge.py --project-dir "<path>" --abbr "<Abbr>"
 py -3 scripts/audit_project.py --project-dir "<path>" --abbr "<Abbr>"
 dotnet build "<path>/<Project>.csproj"
 ```
+
+发布前额外检查：`audit_project.py` 的 `Release Python runtime safety` 小节中，`.csproj copies {Abbr}Env to output` 必须为 `True`；`{Abbr}Env/pyvenv.cfg`、`Release output pyvenv.cfg`、`Release absolute Python path leaks found` 都必须为 `False`。
 
 **Persistence acceptance (memory):** `%AppData%/{AppId}/session_snapshot.json` with `uiState.statusText` + `user_settings.json` with WindowPlacement after calc/exit.
 

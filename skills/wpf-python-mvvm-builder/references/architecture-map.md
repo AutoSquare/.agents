@@ -9,7 +9,7 @@
 | `Services/` | 计算编排、Python 桥、校验、路径 |
 | `Model/` | 工程文档、表访问、序列化 |
 | `{Abbr}Py/` | Python Driver 与表目录读写 |
-| `{Abbr}Env/` | 嵌入式或 venv 解释器（**不入库**） |
+| `{Abbr}Env/` | 可移植 Python 环境（发布运行时，禁止 venv/pyvenv.cfg） |
 | `Assets/Baseline/` | 新建工程默认 JSON 表种子 |
 
 依赖方向：`View → ViewModel / Services / Model`；`ViewModel → Services / Model`；`Services → Model`。**禁止** `Model → View / ViewModel`。
@@ -24,7 +24,7 @@ flowchart LR
   Session --> Export[ExportWorkspace]
   Export --> Ws[Temp_{Abbr}Work_GUID]
   Svc --> Bridge[PythonBridge]
-  Bridge --> PyExe["{Abbr}Env Scripts/python.exe or python.exe"]
+  Bridge --> PyExe["{Abbr}Env/python.exe"]
   PyExe --> Driver[CalculateDriver.py]
   Driver --> Ws
   Svc --> Merge[MergeTablesFromWorkspace]
