@@ -4,6 +4,7 @@
 |------|------|----------|
 | [`cursor/`](cursor/) | `.mdc`（YAML 头 + 正文） | **Cursor Project Rules**（可选 `-ProjectPath` 安装） |
 | [`codex-global/`](codex-global/) | `.md` | **Codex** 全局 `AGENTS.md` 与按需 `agent-rules/` |
+| [`antigravity/`](antigravity/) | `.md` | **Antigravity** 专有规则（被脚本聚合注入 `plugin.json`） |
 | [`universal/`](universal/) | `.md` | **Claude Code、OpenCode、Trea**；**Cursor User Rules 手动录入源** |
 
 ## Cursor：双通道
@@ -62,5 +63,6 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 1. **Cursor `.mdc`**：编辑 `cursor/` 下文件，更新 [`manifest.json`](../manifest.json) 的 `installManifest.managedRules`，再按需 `-ProjectPath` 安装。  
 2. **通用 / User 手动源**：编辑 `universal/AGENTS.md`，保持与 `cursor/` 团队条款一致（Cursor 专属条目写在 `00-cursor-ide.mdc`）。
 3. **Codex 全局规则**：编辑 `codex-global/AGENTS.md` 与 `codex-global/agent-rules/*.md`，再运行 `scripts/setup-codex-agents.ps1` 安装。
+4. **Antigravity 专有规则**：编辑 `antigravity/AGENTS.md` 与 `antigravity/agent-rules/*.md`，再运行 `scripts/setup-antigravity-agents.ps1` 将其重新聚合注入。
 
 `.mdc` 格式说明见 Cursor 文档：`description`、`alwaysApply`、`globs` 字段。

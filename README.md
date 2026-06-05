@@ -45,6 +45,42 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Cod
 
 ---
 
+### Antigravity（一键安装）
+
+**前置**：Windows 上已安装 Git、Python 3.10+、Node.js、npm 与 Antigravity CLI。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器寻找 `py -3.10` 或更高版本。
+
+进入 `.agents` 目录，在 PowerShell 中执行：
+
+```powershell
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1"
+```
+
+脚本会：
+
+- 将托管 `skills/` **增量覆盖**到 `%USERPROFILE%\.gemini\config\plugins\agents\skills\`（只覆盖 manifest 中同名托管项，**不删除**用户自己安装的其他 skill）
+- 将 `rules/antigravity/` 下的 Markdown 规则聚合注入到 `%USERPROFILE%\.gemini\config\plugins\agents\plugin.json` 的 `system_prompt` 中
+- 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`，并自动安装 Python/Node 依赖
+- 更新 `plugin.json` 时采用**增量聚合**逻辑：只刷新本包托管的 MCP 注册，**完全保留**用户自己在此文件中配置的其他 MCP 记录
+
+常用参数：
+
+```powershell
+# 预览将更新的托管项，不写入磁盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1" -WhatIf
+
+# 只更新 Rules 与 Skills，跳过 MCP 构建与依赖安装
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1" -SkipMcpInstall
+
+# 自定义 pip 镜像或使用官方源（默认使用清华源）
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1" -PipIndexUrl "https://mirrors.aliyun.com/pypi/simple/"
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1" -UseOfficialPipIndex
+```
+
+更细的 Antigravity 说明见 [`ANTIGRAVITY.md`](ANTIGRAVITY.md)。
+
+---
+
 ### Cursor（一键安装）
 
 **前置**：Windows 上已安装 Git、Python 3.10+、Node.js、Cursor。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
@@ -161,6 +197,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── README.md                 # 本文：平台安装、目录索引、Skills/MCP 总表
 ├── PORTABLE.md               # Cursor 迁移与脚本细节
 ├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
+├── ANTIGRAVITY.md            # Antigravity 安装与配置说明
 ├── manifest.json             # Skills / MCP 来源清单（机器可读）
 ├── mcp.md                    # MCP 调用规范（给智能体）
 ├── skills.md                 # Skills 选择规则（给智能体）
@@ -172,6 +209,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── rules/
 │   ├── cursor/               # Cursor Rules（.mdc）→ .cursor/rules/
 │   ├── codex-global/         # Codex 全局 AGENTS.md 与按需 agent-rules/
+│   ├── antigravity/          # Antigravity 专有规则（AGENTS.md + agent-rules/）
 │   └── universal/            # Claude Code / OpenCode / Trea（AGENTS.md）
 ├── mcp-servers-src/          # 需本地构建的 MCP 源码快照
 │   ├── academic-research-mcp/
@@ -181,6 +219,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 └── scripts/
     ├── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
     ├── setup-codex-agents.ps1    # 仅 Codex：写入 ~/.codex/
+    ├── setup-antigravity-agents.ps1 # 仅 Antigravity：写入 ~/.gemini/config/plugins/agents/
     └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族
 ```
 
@@ -261,6 +300,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 |------|------|------|
 | Cursor | `rules/cursor/*.mdc` | Cursor（含 `00` 团队规范 + 文献包规则） |
 | Codex | `rules/codex-global/AGENTS.md` + `rules/codex-global/agent-rules/*.md` | Codex 全局规则与按需规则 |
+| Antigravity | `rules/antigravity/AGENTS.md` + `agent-rules/*.md` | Antigravity（由脚本自动聚合注入 `plugin.json`） |
 | 通用 | `rules/universal/AGENTS.md` | Claude Code、OpenCode、Trea |
 
 完整文件表见 [`rules/README.md`](rules/README.md)。
@@ -281,7 +321,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 
 **常用工具（campus-net）**：`get_active_profile`、`onboard_school`、`ensure_auth`、`download_paper`、`download_papers`、`download_cnki`、`detect_network`。
 
-源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`。
+源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`；Antigravity 默认路径：`%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`。
 
 详细能力与调用约束见 [`mcp.md`](mcp.md)。
 
@@ -299,6 +339,25 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `CAMPUS_OUTPUT_DIR` | campus-net | PDF 默认输出目录 |
 
 `campus-net` 用户配置目录：Cursor 为 `~/.cursor/campus-net/`，Codex 为 `~/.codex/campus-net/`（含 `local.env`、`sessions/`、`active.json`）。
+
+---
+
+## 常见问题排错 (FAQ)
+
+### pip 安装依赖时报错 `[SSL: UNEXPECTED_EOF_WHILE_READING]` 或假死
+
+**原因**：通常是因为开启了 VPN / 网络代理（如 Clash、V2Ray 的系统代理或 TUN 模式），代理软件拦截了 Python `pip` 的 HTTPS 请求，导致证书验证失败；或者代理路由规则在处理国内镜像（如清华源）时发生中断，引发脚本假死。
+
+**解决方法**：
+1. **方案 A（最推荐）**：暂时彻底关闭代理软件，重新打开终端以清空环境变量，然后在正常的国内网络下重新运行安装脚本。
+2. **方案 B（信任镜像源）**：如果必须开启代理，在手动排错时可带上 `--trusted-host` 参数跳过 SSL 验证。例如：
+   ```bash
+   pip install requests -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+   ```
+3. **方案 C（使用 HTTP 源）**：在使用一键安装脚本时，可通过参数指定非 HTTPS 的阿里源：
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1" -PipIndexUrl "http://mirrors.aliyun.com/pypi/simple/"
+   ```
 
 ---
 

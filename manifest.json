@@ -231,5 +231,91 @@
     ],
     "installMode": "incremental_managed_only",
     "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and MCP registrations listed here may be overwritten. User-installed skills, rules, MCP dirs, and MCP registrations are not removed."
+  },
+  "antigravityInstallManifest": {
+    "packageId": "portable-antigravity-agents",
+    "managedSkills": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder",
+      "ppt-maker",
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor",
+      "ui-ux-pro-max",
+      "design",
+      "banner-design",
+      "ui-styling",
+      "slides",
+      "design-system",
+      "brand",
+      "karpathy-guidelines",
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder"
+    ],
+    "managedRules": [
+      "01-language-and-naming.md",
+      "02-doc-linkage-and-delivery.md",
+      "03-pre-development-requirements.md",
+      "04-comment-and-writing-quality.md",
+      "05-code-organization-and-architecture.md",
+      "06-pre-submit-checklist.md",
+      "07-skills-authoring.md",
+      "08-csharp-xml-docs.md",
+      "09-git-commit-message.md",
+      "10-karpathy-guidelines.md",
+      "11-literature-integrity.md",
+      "12-literature-workflow.md",
+      "13-agents-entry.md"
+    ],
+    "managedMcpServers": [
+      {
+        "name": "academic-research",
+        "sourceDir": "academic-research-mcp",
+        "kind": "python"
+      },
+      {
+        "name": "zotero",
+        "sourceDir": "zotero-mcp",
+        "kind": "node"
+      },
+      {
+        "name": "deck-builder",
+        "sourceDir": "deck-builder",
+        "kind": "node"
+      },
+      {
+        "name": "ppt-markdown",
+        "sourceDir": "",
+        "kind": "npx"
+      },
+      {
+        "name": "campus-net",
+        "sourceDir": "campus-net-mcp",
+        "kind": "python"
+      }
+    ],
+    "installMode": "incremental_managed_only",
+    "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and MCP registrations listed here may be overwritten. User-installed skills, rules, MCP dirs, and MCP registrations are not removed."
   }
 }
