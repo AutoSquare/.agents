@@ -1,10 +1,94 @@
 {
   "name": "portable-agents",
-  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Karpathy 编码准则等）；安装入口包含 Cursor 与 Codex 专用脚本。",
+  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Superpowers、去重后的 gstack、Karpathy 编码准则等）；安装入口包含 Cursor、Codex、Antigravity 与 QoderCN 脚本。",
   "skillsRoot": "skills",
   "rulesRoot": "rules",
   "rulesCursor": "rules/cursor",
   "rulesUniversal": "rules/universal/AGENTS.md",
+  "skillSources": {
+    "superpowers": {
+      "source": "https://github.com/obra/superpowers",
+      "version": "6.1.1",
+      "license": "MIT",
+      "workspaceSourceDir": "../superpowers/skills",
+      "copyMode": "verbatim",
+      "licenseFile": "licenses/superpowers-LICENSE.txt"
+    },
+    "gstack": {
+      "source": "https://github.com/garrytan/gstack",
+      "version": "1.60.1.0",
+      "license": "MIT",
+      "workspaceSourceDir": "../gstack",
+      "copyMode": "deduplicated_host_generated",
+      "licenseFile": "licenses/gstack-LICENSE.txt"
+    }
+  },
+  "gstackIntegration": {
+    "supportedHosts": [
+      "codex",
+      "cursor"
+    ],
+    "hostSkillsRoot": "host-skills",
+    "runtimeSourceDir": "runtime/gstack",
+    "selectedSkills": [
+      "gstack-benchmark",
+      "gstack-benchmark-models",
+      "gstack-browse",
+      "gstack-canary",
+      "gstack-cso",
+      "gstack-design-html",
+      "gstack-design-review",
+      "gstack-devex-review",
+      "gstack-diagram",
+      "gstack-document-generate",
+      "gstack-document-release",
+      "gstack-freeze",
+      "gstack-health",
+      "gstack-ios-clean",
+      "gstack-ios-design-review",
+      "gstack-ios-fix",
+      "gstack-ios-qa",
+      "gstack-ios-sync",
+      "gstack-land-and-deploy",
+      "gstack-learn",
+      "gstack-make-pdf",
+      "gstack-open-gstack-browser",
+      "gstack-pair-agent",
+      "gstack-plan-devex-review",
+      "gstack-plan-tune",
+      "gstack-qa",
+      "gstack-qa-only",
+      "gstack-retro",
+      "gstack-scrape",
+      "gstack-setup-browser-cookies",
+      "gstack-setup-deploy",
+      "gstack-skillify",
+      "gstack-unfreeze"
+    ],
+    "excludedSkills": {
+      "gstack": "router would expose omitted duplicate entries",
+      "gstack-autoplan": "brainstorming + writing-plans + review skills",
+      "gstack-careful": "global destructive-action guardrails",
+      "gstack-claude": "host-specific wrapper for another runtime",
+      "gstack-context-restore": "handoff",
+      "gstack-context-save": "handoff",
+      "gstack-design-consultation": "brand + design-system + ui-ux-pro-max",
+      "gstack-design-shotgun": "prototype + UI design skills",
+      "gstack-guard": "global guardrails + retained freeze skill",
+      "gstack-investigate": "diagnose + systematic-debugging",
+      "gstack-landing-report": "depends on the omitted ship workflow",
+      "gstack-office-hours": "brainstorming + grill-me",
+      "gstack-plan-ceo-review": "brainstorming + grill-me",
+      "gstack-plan-design-review": "ui-ux-pro-max + design-system",
+      "gstack-plan-eng-review": "writing-plans + improve-codebase-architecture",
+      "gstack-review": "requesting-code-review",
+      "gstack-setup-gbrain": "external global configuration is outside this portable package",
+      "gstack-ship": "finishing-a-development-branch",
+      "gstack-spec": "to-prd + to-issues",
+      "gstack-sync-gbrain": "depends on omitted gbrain setup",
+      "gstack-upgrade": "the portable package owns upgrades"
+    }
+  },
   "mcpServers": {
     "academic-research": {
       "source": "https://github.com/alisoroushmd/academic-research-mcp",
@@ -76,6 +160,22 @@
     "codingGuidelines": [
       "karpathy-guidelines"
     ],
+    "superpowers": [
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
+    ],
     "wpfPythonMvvm": [
       "wpf-python-mvvm-builder"
     ],
@@ -122,7 +222,21 @@
       "brand",
       "karpathy-guidelines",
       "cad-structure-layout-debug",
-      "wpf-python-mvvm-builder"
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
     ],
     "managedRules": [
       "00-cursor-ide.mdc",
@@ -185,7 +299,21 @@
       "brand",
       "karpathy-guidelines",
       "cad-structure-layout-debug",
-      "wpf-python-mvvm-builder"
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
     ],
     "managedRules": [
       "01-language-and-naming.md",
@@ -271,7 +399,21 @@
       "brand",
       "karpathy-guidelines",
       "cad-structure-layout-debug",
-      "wpf-python-mvvm-builder"
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
     ],
     "managedRules": [
       "01-language-and-naming.md",

@@ -8,6 +8,8 @@ param(
     [switch]$UseOfficialPipIndex,
     [switch]$SkipMcpInstall,
     [switch]$SkipSkillUpdate,
+    [switch]$SkipGstackInstall,
+    [switch]$SkipGstackBuild,
     [switch]$SkipRulesUpdate,
     [switch]$WhatIf,
     [switch]$NoClearScreen,
@@ -30,6 +32,11 @@ if ([string]::IsNullOrWhiteSpace($CodexHome)) {
 }
 
 $AgentsRoot = Split-Path -Parent $PSScriptRoot
+$GstackInstallLibrary = Join-Path $PSScriptRoot "gstack-install-lib.ps1"
+if (-not (Test-Path -LiteralPath $GstackInstallLibrary -PathType Leaf)) {
+    throw "gstack install library not found: $GstackInstallLibrary"
+}
+. $GstackInstallLibrary
 $CodexHome = [System.IO.Path]::GetFullPath($CodexHome)
 $SkillsSource = Join-Path $AgentsRoot "skills"
 $SkillsTarget = Join-Path $CodexHome "skills"
@@ -781,6 +788,17 @@ try {
 
     $script:InstallResult.RuleCount = Install-CodexRules -InstallManifest $installManifest
     $script:InstallResult.SkillCount = Install-CodexSkills -ManagedSkills $installManifest.ManagedSkills
+    if (-not $SkipSkillUpdate -and -not $SkipGstackInstall) {
+        $gstackResult = Install-GstackBundle `
+            -TargetHost "codex" `
+            -AgentsRoot $AgentsRoot `
+            -SkillsTarget $SkillsTarget `
+            -WhatIf:$WhatIf `
+            -SkipBuild:$SkipGstackBuild
+        $script:InstallResult.SkillCount += $gstackResult.SkillCount
+    } elseif ($SkipGstackInstall) {
+        Write-DetailLog "skip gstack: -SkipGstackInstall"
+    }
     $script:InstallResult.McpSourceCount = Install-CodexMcpSources -ManagedMcpServers $installManifest.ManagedMcpServers
     if (-not $SkipMcpInstall) {
         $script:InstallResult.McpRegisteredCount = Register-CodexMcpServers -ManagedMcpServers $installManifest.ManagedMcpServers

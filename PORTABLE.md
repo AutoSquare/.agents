@@ -6,18 +6,20 @@
 
 ## 包含内容
 
-- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能（`ppt-maker`、`academic-ppt-builder`）、**UI/UX 设计技能族（7 个）**、**Karpathy 编码准则（`karpathy-guidelines`）**、**CAD 出图调试（`cad-structure-layout-debug`）**、**WPF + Python MVVM（`wpf-python-mvvm-builder`）** 和辅助工作流技能。
+- `skills/`：完整 Skills 副本，包含 mattpocock 适配技能、文献检索技能、PPT 技能（`ppt-maker`、`academic-ppt-builder`）、**UI/UX 设计技能族（7 个）**、**Superpowers 软件开发方法（14 个）**、**Karpathy 编码准则（`karpathy-guidelines`）**、**CAD 出图调试（`cad-structure-layout-debug`）**、**WPF + Python MVVM（`wpf-python-mvvm-builder`）** 和辅助工作流技能。
+- `host-skills/cursor/` + `runtime/gstack/`：gstack 去重后的 33 个 Cursor 入口与共享运行时源码；21 个同义或不适合便携托管的入口不复制。
 - `mcp-servers-src/`：本地型 MCP 服务源码快照，包含 `academic-research-mcp`、`zotero-mcp`、`deck-builder`、`campus-net-mcp`；不包含 `.git`、`node_modules`、`.venv` 等机器依赖目录。
 - `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：默认安装 Skills + MCP；Rules 默认不装（User 手动录入 AGENTS.md）；可选 `-ProjectPath` 安装 `.mdc` 到指定工程。
 - `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `.agents/skills/`（含 Cursor 路径改写）。
 - `mcp.template.json`：MCP 配置模板，使用 `{{USERPROFILE}}` 占位。
 - `manifest.json`：Skills 与 MCP 来源清单。
+- `licenses/`：第三方技能许可证；Superpowers 与 gstack 均使用 MIT 许可证。
 - `mcp.md`、`skills.md`、`workflows.md`、`output-templates.md`、`environment.md`：给智能体读取的规范文档。
 
 ## 新电脑安装步骤
 
 1. 安装基础工具：
-   - Git
+   - Git for Windows（含 Git Bash；gstack 命令块使用 Bash）
    - Node.js 与 npm
    - Python 3.10+（若 PATH 中 `python` 是旧版本，安装脚本会优先通过 Windows `py` 启动器选择 3.10+）
    - Cursor
@@ -90,7 +92,8 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
 ## 安装脚本行为
 
-- 读取 [`manifest.json`](manifest.json) 的 `installManifest`，**仅增量替换托管 Skills**（同名 skill 目录）。
+- 读取 [`manifest.json`](manifest.json) 的 `installManifest`，**仅增量替换托管 Skills**（同名 skill 目录），其中包含 Superpowers 的 14 个技能。
+- 读取 `gstackIntegration`，安装 33 个 Cursor 专用入口；首次安装或版本变化时在 `~/.cursor/skills/gstack/` 编译运行时，同版本且产物完整时跳过。
 - **默认不安装 Rules**；结束时输出 AGENTS.md 手动录入提醒。
 - 提供 `-ProjectPath` 时：将托管 14 个 `.mdc` 增量复制到 `{ProjectPath}\.cursor\rules\`。
 - 优先从 `mcp-servers-src/` 复制源码并安装以下本地 MCP；若源码快照缺失，则从 GitHub 克隆：
@@ -118,6 +121,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Wh
 # 跳过 Skills 更新
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipSkillUpdate
 
+# 完全跳过 gstack，或只安装入口和运行时源码、不执行编译
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipGstackInstall
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipGstackBuild
+
 # 安装 Project Rules 到指定工程
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
 
@@ -136,6 +143,8 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -No
 | `-SkipMcpInstall` | 只装 Skills 与 MCP 配置，不构建 MCP 服务 |
 | `-WhatIf` | 预览将更新的项，不写盘；输出预览摘要 |
 | `-SkipSkillUpdate` | 跳过 Skills 增量更新 |
+| `-SkipGstackInstall` | 不安装 gstack 入口和运行时 |
+| `-SkipGstackBuild` | 安装 gstack 入口与运行时源码，但暂不编译二进制 |
 | `-ProjectPath` | 将托管 `.mdc` 安装到指定工程 `.cursor/rules/` |
 | `-Verbose` | 结束时不清屏，并展开缓冲中的详细日志 |
 | `-NoClearScreen` | 跳过清屏，摘要追加在进度输出之后 |
@@ -146,4 +155,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -No
 - `zotero` 需要本机启动 Zotero Desktop；写入能力需要 Zotero 本地桥接插件。
 - `academic-research` 基础检索不强制 API Key，但设置可选环境变量能提高配额或稳定性。
 - 迁移包不修改 Cursor 内置目录 `~/.cursor/skills-cursor/`。
+- gstack 首次构建需要 Bun；若本机没有 `bun`，脚本会通过 `npx --yes bun` 获取。Windows 浏览器运行时还需要 Node.js。
+- 若 `bash` 不在 PATH，执行 gstack 命令时使用 `C:\Program Files\Git\bin\bash.exe`。
+- gstack 仅接入 Cursor/Codex；本包不会把宿主专用入口复制给 Antigravity、QoderCN 或其他运行时。
 - **补充网页检索**：本包未内置网页搜索 MCP；需要时由用户使用浏览器或由其他已自行配置的 MCP 承担。

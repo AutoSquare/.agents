@@ -20,3 +20,5 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1
 - 将 MCP 服务端源码拷贝至 `%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`（包括依赖安装），并自动更新 Antigravity 的相关配置文件。
 
 **隔离保证**：脚本只会写入 `.gemini` 目录，完全不影响现有的 `.cursor` 和 `.codex` 安装环境。
+
+托管 Skills 包含 Superpowers 6.1.1 的 14 个技能。Antigravity 发现 `using-superpowers` 后按其会话入口选择技能，平台动作映射位于 `using-superpowers/references/antigravity-tools.md`；多智能体或任务跟踪能力不可用时应遵循该映射中的降级方式。

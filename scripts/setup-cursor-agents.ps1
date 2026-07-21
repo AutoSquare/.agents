@@ -6,6 +6,8 @@ param(
     [string]$ProjectPath,
     [switch]$SkipMcpInstall,
     [switch]$SkipSkillUpdate,
+    [switch]$SkipGstackInstall,
+    [switch]$SkipGstackBuild,
     [switch]$WhatIf,
     [switch]$BackupMcpJson,
     [switch]$OverwriteSkills,
@@ -41,6 +43,11 @@ if ($OverwriteSkills) {
 $ErrorActionPreference = "Stop"
 
 $AgentsRoot = Split-Path -Parent $PSScriptRoot
+$GstackInstallLibrary = Join-Path $PSScriptRoot "gstack-install-lib.ps1"
+if (-not (Test-Path -LiteralPath $GstackInstallLibrary -PathType Leaf)) {
+    throw "gstack install library not found: $GstackInstallLibrary"
+}
+. $GstackInstallLibrary
 $CursorRoot = Join-Path $env:USERPROFILE ".cursor"
 $SkillsSource = Join-Path $AgentsRoot "skills"
 $SkillsTarget = Join-Path $CursorRoot "skills"
@@ -1005,6 +1012,17 @@ try {
     }
 
     $script:InstallResult.SkillCount = Install-ManagedSkills -ManagedSkills $installManifest.ManagedSkills
+    if (-not $SkipSkillUpdate -and -not $SkipGstackInstall) {
+        $gstackResult = Install-GstackBundle `
+            -TargetHost "cursor" `
+            -AgentsRoot $AgentsRoot `
+            -SkillsTarget $SkillsTarget `
+            -WhatIf:$WhatIf `
+            -SkipBuild:$SkipGstackBuild
+        $script:InstallResult.SkillCount += $gstackResult.SkillCount
+    } elseif ($SkipGstackInstall) {
+        Write-DetailLog "skip gstack: -SkipGstackInstall"
+    }
 
     if ($ProjectPath) {
         $projectRulesTarget = Resolve-ProjectRulesTarget -Path $ProjectPath

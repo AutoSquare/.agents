@@ -1,6 +1,6 @@
 # `.agents` 智能体配置包
 
-可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）**、CAD 工程出图调试等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
+可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）**、CAD 工程出图调试、Superpowers 软件开发方法与去重后的 gstack 工程工作流等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
 
 > **给智能体**：进入工作区后先读本文；执行任务时再读 `mcp.md`、`skills.md`、`workflows.md`。
 
@@ -10,7 +10,7 @@
 
 ### Codex（一键安装）
 
-**前置**：Windows 上已安装 Git、Python 3.10+、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
+**前置**：Windows 上已安装 Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
 进入 `.agents` 目录，在 PowerShell 中执行：
 
@@ -22,6 +22,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 脚本会：
 
 - 将托管 `skills/` **增量覆盖**到 `%USERPROFILE%\.codex\skills\`（只覆盖 manifest 中同名托管项，不删除用户自装 skill）
+- 安装 33 个去重后的 Codex 版 gstack 入口，并在 `%USERPROFILE%\.codex\skills\gstack\` 首次编译共享运行时
 - 将 Codex 全局入口安装到 `%USERPROFILE%\.codex\AGENTS.md`，并备份已有文件
 - 将按需规则安装到 `%USERPROFILE%\.codex\agent-rules\`
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.codex\mcp-servers\`
@@ -36,6 +37,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Wha
 
 # 只安装 Rules 与 Skills，不构建或注册 MCP
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipMcpInstall
+
+# 不安装 gstack；或只复制 gstack 源码、暂不编译运行时
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipGstackInstall
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipGstackBuild
 
 # 指定 Codex 用户目录（测试或多环境时使用）
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -CodexHome "D:\tmp\codex-home"
@@ -83,7 +88,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1
 
 ### Cursor（一键安装）
 
-**前置**：Windows 上已安装 Git、Python 3.10+、Node.js、Cursor。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
+**前置**：Windows 上已安装 Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Cursor。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
 进入 `.agents` 目录，在 PowerShell 中执行：
 
@@ -99,6 +104,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 脚本会：
 
 - 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.cursor\skills\`（仅同名托管项，不删除用户自装 skill）
+- 安装 33 个去重后的 Cursor 版 gstack 入口，并在 `%USERPROFILE%\.cursor\skills\gstack\` 首次编译共享运行时
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.cursor\mcp-servers\`
 - 写入或合并 `%USERPROFILE%\.cursor\mcp.json`（已有配置会备份为 `mcp.json.bak-时间戳`）
 - **默认不安装 Rules**；结束时提醒按 [`rules/universal/AGENTS.md`](rules/universal/AGENTS.md) 各节**手动录入** Cursor Settings → Rules → **User**
@@ -116,6 +122,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Wh
 
 # 跳过 Skills 更新
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipSkillUpdate
+
+# 不安装 gstack；或只复制 gstack 源码、暂不编译运行时
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipGstackInstall
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -SkipGstackBuild
 
 # 可选：将 rules/cursor/*.mdc 安装到指定工程的 .cursor/rules/
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
@@ -199,6 +209,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
 ├── ANTIGRAVITY.md            # Antigravity 安装与配置说明
 ├── manifest.json             # Skills / MCP 来源清单（机器可读）
+├── licenses/                 # 第三方技能许可证
 ├── mcp.md                    # MCP 调用规范（给智能体）
 ├── skills.md                 # Skills 选择规则（给智能体）
 ├── workflows.md              # 文献检索 → 下载 → 引用 → PPT 流程
@@ -206,6 +217,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── environment.md            # 环境变量、路径、维护命令
 ├── mcp.template.json         # MCP 配置模板（替换 {{USERPROFILE}} 后使用）
 ├── skills/                   # 全部 Agent Skills（每目录一个 SKILL.md）
+├── host-skills/              # gstack 宿主生成入口（codex / cursor）
+├── runtime/gstack/           # gstack 共享运行时源码（安装时编译）
 ├── rules/
 │   ├── cursor/               # Cursor Rules（.mdc）→ .cursor/rules/
 │   ├── codex-global/         # Codex 全局 AGENTS.md 与按需 agent-rules/
@@ -220,12 +233,15 @@ Trea 使用 **`.agent`** 目录名（单数）：
     ├── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
     ├── setup-codex-agents.ps1    # 仅 Codex：写入 ~/.codex/
     ├── setup-antigravity-agents.ps1 # 仅 Antigravity：写入 ~/.gemini/config/plugins/agents/
+    ├── gstack-install-lib.ps1       # Codex / Cursor 共用 gstack 安装与构建逻辑
     └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族
 ```
 
 | 路径 | 说明 |
 |------|------|
 | `skills/` | 智能体技能包；每个子文件夹含 `SKILL.md`，由运行时自动发现。 |
+| `host-skills/{codex,cursor}/` | gstack 官方生成器的宿主专用入口，仅由对应安装脚本读取。 |
+| `runtime/gstack/` | gstack 1.60.1.0 的裁剪运行时源码；不含 `.git`、测试、依赖与预编译大文件。 |
 | `rules/cursor/` | Cursor 规则（`.mdc`）；见 [`rules/README.md`](rules/README.md)。 |
 | `rules/codex-global/` | Codex 全局入口与按需规则；由 `setup-codex-agents.ps1` 安装到 `%USERPROFILE%\.codex\`。 |
 | `rules/universal/` | 通用团队规范（`.md`）；非 Cursor 平台使用。 |
@@ -236,7 +252,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
 | `output-templates.md` | 统一交付格式（表格、大纲、筛选日志）。 |
 
-工作区根目录另有 `cad-structure-layout-debug/`（CAD Skill 编辑源）与 `wpf-python-mvvm-builder/`（WPF + Python MVVM Skill 编辑源）。维护者先在源目录修改，再分别用对应 `scripts/sync-to-agents.ps1` 同步到 `.agents/skills/` 后运行 setup。
+工作区根目录另有 `cad-structure-layout-debug/`、`wpf-python-mvvm-builder/`、`superpowers/` 与 `gstack/` 等编辑源。gstack 先用上游生成器分别生成 Codex/Cursor 入口，再按 `manifest.json` 的去重清单发布；共享运行时以裁剪源码形式纳入。
 
 ---
 
@@ -266,6 +282,27 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `cad-structure-layout-debug` | 从零搭建或调试 CAD 出图组件，覆盖 DXF 排版、布局引擎、明细表锚点、预览一致性、烟测与视觉验收；编辑源在工作区根 `cad-structure-layout-debug/`，经 sync 发布到 `.agents/skills/`。 |
 | **WPF + Python 工程脚手架**（Cursor + Codex 托管） | |
 | `wpf-python-mvvm-builder` | 在已有 Visual Studio WPF 项目上增量补全 PythonBridge、MVVM 目录、Themes/Resources/Properties 与 memory/archive 持久化路线；编辑源在工作区根 `wpf-python-mvvm-builder/`，经 sync 发布到 `.agents/skills/`。 |
+| **Superpowers 软件开发方法**（上游 `obra/superpowers` 6.1.1，MIT） | |
+| `using-superpowers` | 会话入口：要求先检查并调用匹配技能，再响应或执行任务。 |
+| `brainstorming` | 创意或功能开发前澄清意图、约束并形成经确认的设计。 |
+| `using-git-worktrees` | 在需要隔离的功能开发或计划执行前建立或复用工作树。 |
+| `writing-plans` | 将已确认的规格拆成含文件路径和验证步骤的实施计划。 |
+| `executing-plans` | 按检查点批量执行既有计划。 |
+| `subagent-driven-development` | 以独立实施与两阶段审查推进当前会话中的计划任务。 |
+| `dispatching-parallel-agents` | 对无共享状态、无顺序依赖的任务并行分派智能体。 |
+| `test-driven-development` | 在功能或缺陷实现前执行红—绿—重构循环。 |
+| `systematic-debugging` | 在提出修复前完成复现、根因定位与验证。 |
+| `requesting-code-review` | 在任务完成或合并前发起代码审查。 |
+| `receiving-code-review` | 对审查意见做技术核验后再实施。 |
+| `verification-before-completion` | 在宣称完成、修复或通过前运行并检查验证命令。 |
+| `finishing-a-development-branch` | 测试通过后选择合并、PR、保留或清理分支。 |
+| `writing-skills` | 用面向过程文档的测试驱动方法创建或修改技能。 |
+| **gstack 去重集成**（上游 `garrytan/gstack` 1.60.1.0，MIT；仅 Codex + Cursor） | |
+| `gstack-browse`、`gstack-qa`、`gstack-qa-only`、`gstack-scrape` | 浏览器自动化、站点 QA、回归证据与网页抓取。 |
+| `gstack-design-html`、`gstack-design-review`、`gstack-diagram`、`gstack-make-pdf` | HTML 设计、视觉审查、图表渲染与 PDF 生成。 |
+| `gstack-benchmark`、`gstack-benchmark-models`、`gstack-canary`、`gstack-health` | 性能/模型基准、发布金丝雀与健康检查。 |
+| `gstack-ios-*` | iOS 清理、修复、同步、QA 与设计审查。 |
+| 其余保留入口 | CSO、DevEx、发布文档、部署配置、复盘、学习、pair-agent、freeze/unfreeze 等；完整 33 项见 `manifest.json`。 |
 | **工程与协作**（多源自 Matt Pocock 技能适配） | |
 | `karpathy-guidelines` | Karpathy 四原则：减少 LLM 编码错误（编码前思考、简洁优先、精准修改、目标驱动执行）。 |
 | `diagnose` | 有纪律的缺陷/性能诊断循环（重现→缩小→修复→回归）。 |
@@ -289,6 +326,22 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `caveman` | 极简沟通模式（省 token）。 |
 
 分组索引见 [`manifest.json`](manifest.json) 的 `skillGroups`。
+
+### Superpowers 集成与维护边界
+
+- 本包集成的是上游 14 个技能目录；安装器依据 `manifest.json` 将它们作为普通托管 Skills 安装，不改写技能正文。
+- Codex 使用原生技能发现机制，与上游 Codex 插件的无 Hook 方式一致。Cursor、Antigravity 与 QoderCN 侧依赖各自运行时发现 `using-superpowers` 的描述；本包不额外安装上游 Cursor Marketplace 的会话启动 Hook。
+- 若某平台必须强制注入会话启动上下文，应改用该平台的上游官方 Superpowers 插件，并避免与本包重复托管同名技能。
+- 更新根目录 `superpowers/` 快照后，应同步 `superpowers/skills/*`、`superpowers/LICENSE`、`manifest.json` 中的版本和三个平台托管清单，再运行技能校验与安装器 `-WhatIf` 烟测。
+
+### gstack 集成与去重边界
+
+- 上游 54 个 Codex/Cursor 生成入口中保留 33 个；排除的 21 个及逐项理由记录在 `manifest.json > gstackIntegration.excludedSkills`，不会再复制一套同义流程。
+- 典型替代关系：`investigate` → `systematic-debugging`/`diagnose`，`review` → `requesting-code-review`，`ship` → `finishing-a-development-branch`，`spec` → `to-prd` + `to-issues`，上下文保存/恢复 → `handoff`。
+- `gstack-upgrade` 被排除，运行时更新由本仓库维护；托管运行时中的上游自动更新提示已关闭。gbrain 的全局配置与同步也不纳入。
+- gstack 入口含宿主路径，不能放入通用 `skills/` 后跨平台混用。目前仅 Codex、Cursor 安装脚本接入；Antigravity、QoderCN、Claude Code、OpenCode 与 Trea 保持原清单。
+- 首次安装会调用本机 Bun，未安装 Bun 时通过 `npx --yes bun` 获取，并编译浏览器、设计、PDF 等运行时；同版本且二进制完整时跳过重编译。可用 `-SkipGstackInstall` 完全跳过，或用 `-SkipGstackBuild` 只复制源码。
+- gstack 技能中的命令块使用 Bash；Windows 上若 `bash` 不在 PATH，应通过 `C:\Program Files\Git\bin\bash.exe` 执行。
 
 ---
 

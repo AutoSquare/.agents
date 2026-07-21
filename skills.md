@@ -39,6 +39,36 @@ Codex:  %USERPROFILE%\.codex\skills
 
 - `wpf-python-mvvm-builder`：在已有 Visual Studio WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，包含 PythonBridge、Themes/Resources/Properties 与 `memory` / `archive` 两类持久化路线；Cursor 与 Codex 安装脚本均托管该 Skill。
 
+## Superpowers 软件开发方法
+
+以下 14 个技能来自 `obra/superpowers` 6.1.1，技能正文按上游原文发布，许可证见 `licenses/superpowers-LICENSE.txt`。
+
+- `using-superpowers`：会话入口；在回复或执行任务前先检查并调用匹配技能。
+- `brainstorming`：创意、功能或行为变更前澄清需求并确认设计。
+- `using-git-worktrees`：为需要隔离的功能开发或计划执行准备工作树。
+- `writing-plans`、`executing-plans`：编写并按检查点执行实施计划。
+- `subagent-driven-development`、`dispatching-parallel-agents`：在运行时支持多智能体且任务可独立时分派执行与审查。
+- `test-driven-development`：实现功能或修复缺陷前执行红—绿—重构。
+- `systematic-debugging`：遇到缺陷、测试失败或异常行为时先定位根因。
+- `requesting-code-review`、`receiving-code-review`：发起代码审查并严谨处理反馈。
+- `verification-before-completion`：宣称完成前运行验证并核对输出。
+- `finishing-a-development-branch`：完成实现后选择合并、PR、保留或清理路线。
+- `writing-skills`：按测试驱动方法创建、修改或验证技能。
+
+该技能族与现有 `tdd`、`diagnose`、`write-a-skill` 存在能力重叠。进入 Superpowers 工作流后，优先使用其引用的 `test-driven-development`、`systematic-debugging`、`writing-skills`，避免同一步骤重复套用两套流程。用户规则与直接指令始终优先于技能正文。
+
+## gstack 去重集成
+
+gstack 1.60.1.0 仅为 Codex、Cursor 安装宿主专用入口。上游 54 项保留 33 项，目录名统一带 `gstack-` 前缀；共享运行时安装到对应用户 Skills 目录下的 `gstack/`。
+
+- 浏览器与 QA：`gstack-browse`、`gstack-open-gstack-browser`、`gstack-setup-browser-cookies`、`gstack-qa`、`gstack-qa-only`、`gstack-scrape`、`gstack-canary`、`gstack-pair-agent`。
+- 设计与文档：`gstack-design-html`、`gstack-design-review`、`gstack-diagram`、`gstack-make-pdf`、`gstack-document-generate`、`gstack-document-release`。
+- 评估与工程运营：`gstack-benchmark`、`gstack-benchmark-models`、`gstack-cso`、`gstack-devex-review`、`gstack-plan-devex-review`、`gstack-plan-tune`、`gstack-health`、`gstack-retro`、`gstack-learn`。
+- iOS：`gstack-ios-clean`、`gstack-ios-design-review`、`gstack-ios-fix`、`gstack-ios-qa`、`gstack-ios-sync`。
+- 部署与控制：`gstack-land-and-deploy`、`gstack-setup-deploy`、`gstack-freeze`、`gstack-unfreeze`、`gstack-skillify`。
+
+不重复安装的对应关系：gstack 的调查、审查、发版收尾、规格、上下文交接分别使用现有 `systematic-debugging`/`diagnose`、`requesting-code-review`、`finishing-a-development-branch`、`to-prd`/`to-issues`、`handoff`；CEO/工程/设计计划审查与 office-hours 使用现有 brainstorming、planning、grill、architecture、prototype、UI/UX 技能。完整排除清单见 `manifest.json > gstackIntegration.excludedSkills`。用户规则与直接指令始终高于 gstack 正文。
+
 ## 工程与工作流
 
 - `karpathy-guidelines`：Karpathy 四原则（编码前思考、简洁优先、精准修改、目标驱动执行）；编写/审查/重构代码时使用。
@@ -67,6 +97,10 @@ Codex:  %USERPROFILE%\.codex\skills
 
 ## 选择规则
 
+- 每次新会话由运行时发现 `using-superpowers` 时，先按其规则检查其他匹配技能；若运行时未自动加载技能描述，可显式调用 `using-superpowers`。
+- 用户要求新功能、组件或行为变更时，Superpowers 路线先应用 `brainstorming`；已存在经确认的规格或用户明确要求跳过时，以用户指令为准。
+- 用户报告缺陷、测试失败或异常行为时，Superpowers 路线应用 `systematic-debugging`；实现修复时再应用 `test-driven-development`。
+- 多智能体技能仅在运行时提供相应能力且任务彼此独立时使用；否则在当前智能体内顺序执行或说明能力限制。
 - 用户说“查文献、找论文、综述、参考文献”时，优先应用 `literature-search`。
 - 用户要求“从这些论文里挑、筛核心文献、系统综述初筛”时，应用 `paper-screening`。
 - 用户要求“总结论文、读 PDF、做文献卡片”时，应用 `paper-summary`。
@@ -82,4 +116,5 @@ Codex:  %USERPROFILE%\.codex\skills
 - 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。
 - 用户要求“CAD 出图、DXF 排版、工程图布局、视图重叠、比例误跳、表格飞出、预览和 AutoCAD 不一致”时，应用 `cad-structure-layout-debug`。
 - 用户要求“WPF + Python、PythonBridge、MVVM 脚手架、已有 WPF 项目接 Python、memory/archive 持久化、`.gpdx` 式工程包”时，应用 `wpf-python-mvvm-builder`。
+- 用户要求快速浏览器 QA、网页抓取、gstack 设计/PDF/基准/iOS 工作流时，选择对应的保留 gstack 入口；若需求落入上述排除映射，直接用现有技能，不再叠加同义 gstack 流程。
 - 用户要求编写、审查、重构代码，或需减少过度复杂、精准修改、定义可验证成功标准时，应用 `karpathy-guidelines`。

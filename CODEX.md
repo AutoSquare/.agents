@@ -4,7 +4,7 @@
 
 ## 一键安装
 
-前置要求：Git、Python 3.10+、Node.js、npm 与 Codex CLI。脚本会优先用 Windows `py` 启动器选择 `py -3.13`、`py -3.12`、`py -3.11`、`py -3.10`，最后才检查 PATH 中的 `python`；因此 PATH 中残留 Python 3.6 不会再导致 Python MCP 依赖安装失败。
+前置要求：Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Codex CLI。脚本会优先用 Windows `py` 启动器选择 `py -3.13`、`py -3.12`、`py -3.11`、`py -3.10`，最后才检查 PATH 中的 `python`；因此 PATH 中残留 Python 3.6 不会再导致 Python MCP 依赖安装失败。gstack 的命令块使用 Bash；若 `bash` 不在 PATH，使用 `C:\Program Files\Git\bin\bash.exe`。
 
 在 `.agents` 目录执行：
 
@@ -20,6 +20,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Wha
 
 # 只安装 Rules 与 Skills，不构建或注册 MCP
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipMcpInstall
+
+# 完全跳过 gstack，或只安装入口和运行时源码、不执行编译
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipGstackInstall
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -SkipGstackBuild
 
 # 海外或需官方 PyPI 时
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -UseOfficialPipIndex
@@ -41,10 +45,15 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Ver
 - `$CODEX_HOME/AGENTS.md`
 - `$CODEX_HOME/agent-rules/<managed-rule>.md`
 - `$CODEX_HOME/skills/<managed-skill>/`
+- `$CODEX_HOME/skills/gstack-*/` 与 `$CODEX_HOME/skills/gstack/`（去重后的宿主入口与共享运行时）
 - `$CODEX_HOME/mcp-servers/<managed-mcp-source>/`
 - `codex mcp` 中同名托管 MCP 注册：`academic-research`、`zotero`、`deck-builder`、`ppt-markdown`、`campus-net`
 
 脚本不会清空 `$CODEX_HOME/skills`、`$CODEX_HOME/agent-rules`、`$CODEX_HOME/mcp-servers`，也不会卸载用户自己添加的其他 MCP。
+
+`codexInstallManifest` 已托管 Superpowers 6.1.1 的 14 个技能。安装后由 Codex 原生技能发现机制加载；`using-superpowers` 负责会话入口与技能优先级，平台映射位于其 `references/codex-tools.md`。若使用多智能体类技能，还需确保当前 Codex 会话已启用多智能体能力；不可用时按技能中的降级说明顺序执行。
+
+`gstackIntegration` 另托管 gstack 1.60.1.0 的 33 个 Codex 专用入口。上游 54 项中的 21 项因与现有技能、全局护栏或便携边界重叠而排除；逐项理由见 `manifest.json`。首次安装会在 `$CODEX_HOME/skills/gstack/` 编译浏览器、设计、PDF 与辅助二进制；未安装 Bun 时通过 `npx --yes bun` 获取。同版本且运行时完整时不会重复编译。托管版本不启用上游自升级入口。
 
 对托管 MCP 源码目录，脚本会刷新仓库内随包携带的源码文件，但会保留已安装依赖目录（例如 `.venv`、`node_modules`）和依赖安装标记；当 `requirements.txt`、`package.json` 或 `package-lock.json` 未变化且入口文件存在时，会跳过重复的 `pip install` / `npm install` / build。因此首次安装仍可能较慢，后续重复执行应只做轻量刷新与 `codex mcp` 注册更新。
 
