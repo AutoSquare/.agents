@@ -44,6 +44,11 @@ Read only what is needed:
 - First classify the issue with **Triage**, then read only the relevant file under `references/`.
 - This skill covers **CAD drawing, DXF layout, preview, and visual verification**. Backend calculation debugging should use a project-specific backend-debug skill if one exists.
 
+## DSH Usage
+
+- Managed by `.agents/scripts/setup-dsh-agents.ps1` through `dshInstallManifest.managedSkills`; installed at `$DSH_HOME/skills/cad-structure-layout-debug/` (default `%USERPROFILE%\.dsh\skills\`).
+- `disable-model-invocation: true` means DSH exposes it only as `/cad-structure-layout-debug`.
+- Run the Python smoke commands with DSH `pwsh`; there is no Cursor `@` syntax in DSH.
 ## From Scratch Workflow
 
 1. Define the drawing contract before writing entities: page, units, margins, layers, views, captions, dimensions, notes, schedules, output files.

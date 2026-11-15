@@ -44,10 +44,15 @@ $ErrorActionPreference = "Stop"
 
 $AgentsRoot = Split-Path -Parent $PSScriptRoot
 $GstackInstallLibrary = Join-Path $PSScriptRoot "gstack-install-lib.ps1"
+$RetiredMcpCleanupLibrary = Join-Path $PSScriptRoot "retired-mcp-cleanup.ps1"
 if (-not (Test-Path -LiteralPath $GstackInstallLibrary -PathType Leaf)) {
     throw "gstack install library not found: $GstackInstallLibrary"
 }
+if (-not (Test-Path -LiteralPath $RetiredMcpCleanupLibrary -PathType Leaf)) {
+    throw "retired MCP cleanup library not found: $RetiredMcpCleanupLibrary"
+}
 . $GstackInstallLibrary
+. $RetiredMcpCleanupLibrary
 $CursorRoot = Join-Path $env:USERPROFILE ".cursor"
 $SkillsSource = Join-Path $AgentsRoot "skills"
 $SkillsTarget = Join-Path $CursorRoot "skills"
@@ -329,6 +334,7 @@ function Get-InstallManifest {
         ManagedSkills = $managedSkills
         ManagedRules = $managedRules
         LegacyRuleFilesToRemove = $legacyRuleFiles
+        RetiredMcpServers = @($manifest.retiredMcpServers)
     }
 }
 
@@ -911,17 +917,15 @@ function Install-DeckBuilderMcp {
 }
 
 function Set-McpJson {
+    param([string[]]$RetiredMcpServers)
     Write-PhaseProgress -Phase 'MCP config'
-    if ($WhatIf) {
-        Write-DetailLog "[WhatIf] would update MCP config: $McpJsonPath"
-        Complete-PhaseProgress
-        return 0
-    }
-    Ensure-Directory $CursorRoot
-    if ((Test-Path $McpJsonPath) -and $BackupMcpJson) {
-        $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-        Copy-Item $McpJsonPath "$McpJsonPath.bak-$timestamp" -Force
-        Write-DetailLog "backed up MCP config: $McpJsonPath.bak-$timestamp"
+    if (-not $WhatIf) {
+        Ensure-Directory $CursorRoot
+        if ((Test-Path $McpJsonPath) -and $BackupMcpJson) {
+            $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
+            Copy-Item $McpJsonPath "$McpJsonPath.bak-$timestamp" -Force
+            Write-DetailLog "backed up MCP config: $McpJsonPath.bak-$timestamp"
+        }
     }
 
     $existing = [ordered]@{ mcpServers = [ordered]@{} }
@@ -942,6 +946,20 @@ function Set-McpJson {
         if ($existing.mcpServers.Keys -contains $purge) {
             [void]$existing.mcpServers.Remove($purge)
         }
+    }
+    if (-not $SkipMcpInstall) {
+        $retiredRemoved = Invoke-RetiredMcpCleanup `
+            -Names $RetiredMcpServers `
+            -Context "Cursor MCP config" `
+            -WhatIf:$WhatIf `
+            -Exists { param($name) $existing.mcpServers.Keys -contains $name } `
+            -Remove { param($name) [void]$existing.mcpServers.Remove($name) }
+        Write-DetailLog "retired Cursor MCP registrations removed: $retiredRemoved"
+    }
+    if ($WhatIf) {
+        Write-DetailLog "[WhatIf] would update MCP config: $McpJsonPath"
+        Complete-PhaseProgress
+        return 0
     }
     $academicPython = Join-Path $McpServersRoot "academic-research-mcp\.venv\Scripts\python.exe"
     $academicServer = Join-Path $McpServersRoot "academic-research-mcp\server.py"
@@ -968,10 +986,6 @@ function Set-McpJson {
     $existing.mcpServers["deck-builder"] = [ordered]@{
         command = "node"
         args = @($deckBuilderServer)
-    }
-    $existing.mcpServers["ppt-markdown"] = [ordered]@{
-        command = "npx"
-        args = @("-y", "@botrun/mcp-ppt-generator")
     }
     $existing.mcpServers["campus-net"] = [ordered]@{
         command = $campusPython
@@ -1046,7 +1060,7 @@ try {
         Write-DetailLog "skip MCP install: -SkipMcpInstall"
     }
 
-    $mcpCount = Set-McpJson
+    $mcpCount = Set-McpJson -RetiredMcpServers $installManifest.RetiredMcpServers
     if ($mcpCount -gt 0) {
         $script:InstallResult.McpServerCount = $mcpCount
         $script:InstallResult.McpConfigUpdated = $true

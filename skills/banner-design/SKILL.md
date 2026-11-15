@@ -1,5 +1,5 @@
 ﻿---
-name: ckm:banner-design
+name: banner-design
 description: "设计社交媒体封面、广告横幅、网站 Hero、创意资产与印刷物料。提供多种美术指导方案，并生成 AI 视觉元素。操作：设计、创建、生成横幅。平台：Facebook、Twitter/X、LinkedIn、YouTube、Instagram、Google Display、网站 Hero、印刷。风格：极简、渐变、粗体排版、摄影、插画、几何、复古、玻璃拟态、3D、霓虹、双色调、编辑式、拼贴。联动已汉化的 ui-ux-pro-max、frontend-design、ai-artist、ai-multimodal 技能。"
 argument-hint: "[平台] [风格] [尺寸]"
 license: MIT

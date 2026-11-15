@@ -104,6 +104,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 - Python MCP 依赖安装使用 `pip --no-cache-dir`，并按进程退出码判断失败；pip 缓存损坏产生的 stderr 警告只进入详细日志，不中断脚本。
 - MCP 依赖安装会显示当前子步骤和 `pip` / `npm` 输出；Python MCP 会在写入依赖标记前检查 `mcp` 模块是否真实可导入，避免 `.venv` 半安装后重复卡住。`pip install` 使用 `--timeout 30 --retries 3 --prefer-binary`。
 - 写入或更新 `C:\Users\<当前用户>\.cursor\mcp.json`（不再注册 `brave-search`）；若曾在旧版本配置中遗留该条目，脚本会移除。
+- 发现清单标记的退役 MCP 时逐项询问是否删除；默认保留，`-WhatIf` 只报告，`-SkipMcpInstall` 不触发清理。
 - 如果已有 `mcp.json`，默认创建备份：`mcp.json.bak-时间戳`。
 - **不删除**目标目录中 manifest 未列出的 skill 或 rule 文件。
 

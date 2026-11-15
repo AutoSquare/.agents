@@ -44,7 +44,7 @@
 ## 生成 PPT（分流入口）
 
 - **默认**：`ppt-maker`（见下节「高保真视觉 PPT」）。
-- **学术快出**：用户明确答辩 / 开题 / 文献综述 / 要快出 pptx → `academic-ppt-builder` → `deck-builder` 或 `ppt-markdown`。
+- **学术快出**：用户明确答辩 / 开题 / 文献综述 / 要快出 pptx → `academic-ppt-builder` → `deck-builder`。
 - **商业 HTML**：Pitch → `slides` + `design-system` scripts。
 - **串联**：文献链 → academic 大纲确认 → ppt-maker 高保真（`output-templates.md` 映射）。
 
@@ -54,8 +54,7 @@
 2. 确认汇报场景、页数、时长、语言和风格。
 3. 先输出幻灯片大纲供用户确认。
 4. 若用户要求生成文件：
-   - 结构化演示文稿优先调用 `deck-builder`。
-   - Markdown 已成稿时调用 `ppt-markdown`。
+   - 调用 `deck-builder` 生成结构化演示文稿。
 5. PPT 文件名优先使用英文，正文内容优先中文。
 6. 每页标题应是观点句，不只是名词短语。
 7. 用户随后要高保真视觉 → 衔接 `ppt-maker`。

@@ -1,5 +1,5 @@
 ﻿---
-name: ckm:design-system
+name: design-system
 description: Token 架构、组件规范与幻灯片生成。三层 token（primitive→semantic→component）、CSS 变量、间距/排版尺度、组件规范、策略化幻灯片创建。适用于 design token、系统化设计、符合品牌规范的演示文稿。
 argument-hint: "[component or token]"
 license: MIT

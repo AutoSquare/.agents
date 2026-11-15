@@ -86,6 +86,15 @@ Helps with documents.
 ```
 
 无法与其它文档技能区分。
+## DSH 兼容要求
+
+DeepSeek Harness 从文件系统发现技能，不满足下列条件会**静默丢弃**该技能：
+
+- `name` 必须匹配 `^[a-z0-9]+(?:-[a-z0-9]+)*$`，且建议与技能目录同名（`<name>/SKILL.md`）。
+- `description` 必填；DSH 目录只展示规范化后的前 500 字符，触发语与能力说明应落在前 500 字符内（其余宿主上限为 1024）。
+- 可选 `disable-model-invocation: true`（仅 `/name` 调用）与 `user-invocable: false`；不要写 `disableModelInvocation` 等旧键。
+- 技能正文引用的脚本/资源应相对技能目录；宿主加载时会给出资源基目录。禁止硬编码 `%USERPROFILE%\.cursor\skills\` 等宿主绝对路径；确需绝对路径时，DSH 副本安装在 `$DSH_HOME/skills/`（默认 `~/.dsh/skills/`）。
+- 目录只识别一层：`<root>/<name>/SKILL.md`，不要依赖嵌套技能树。
 
 ## 何时加脚本
 

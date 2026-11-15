@@ -21,6 +21,7 @@
 | **Claude Code** | 若会话提供 AskUser / 类似表单工具则用；否则 | Markdown 选票 | 不依赖 `/slash`；通过 `@grill-me` 或 description 触发 |
 | **OpenCode** | 以当前会话 **实际注册工具** 为准 | Markdown 选票 | 默认走选票；若后续接入表单 MCP 则升通道 1 |
 | **Trea** | 以 Trea Agent **实际工具面** 为准 | Markdown 选票 | 与 Cursor 类似时可能是表单类工具；无则选票 |
+| **DeepSeek Harness (DSH)** | `ask_user_question`（一次可 1–4 题，每题带 `label`/`description`） | Markdown 选票 | 默认仍每轮 1 题；子代理不能调用 → 选票 |
 
 > 上表随宿主演进可增补行；**SKILL.md 的硬约束不变**。
 
@@ -74,6 +75,36 @@
 
 ---
 
+## DeepSeek Harness (DSH) — `ask_user_question`（通道 1）
+
+工具名：`ask_user_question`（DSH 内置）。参数结构与 Cursor 不同：
+
+```json
+{
+  "questions": [
+    {
+      "id": "slide_mode",
+      "header": "Pitch 视觉 · 第 1/6 轮",
+      "question": "Slide 整体明暗（推荐：hybrid）",
+      "options": [
+        { "label": "浅预览 + dark slide（Recommended）", "description": "推荐：预览浅色、slide 深色" },
+        { "label": "全浅色 SaaS" },
+        { "label": "全深色 cinematic" }
+      ],
+      "multi_select": false
+    }
+  ]
+}
+```
+
+- 默认仍按 grill-me 顺序模式：**每轮 1 题**，收答后再发下一题。
+- 用户明确要求「一次问完」时可一次发 **2–4 题**（DSH 支持多题；仍须停止等待）。
+- 推荐项放第一位并在 label 末尾加 `(Recommended)`。
+- 返回形如 `{"answers":[{"id":"<id>","selected":["<label>"],"custom":"<text>"}]}`；把 `selected` 的 label 视为用户选择。
+- 子代理（`subagent` / `subagent_fork`）**不能**调用该工具（`DELEGATED_CALLER`）：在子代理内改用 Markdown 选票，或把待决问题回传给主代理。
+
+---
+
 ## Claude Code
 
 - 技能安装路径通常为 `~/.claude/skills/` 或项目 `.claude/skills/`（与 Cursor 的 `.cursor/skills/` 独立，**内容应相同**）。
@@ -103,6 +134,7 @@
 - **源文件**：仓库 `.agents/skills/grill-me/`（跨 Agent 真相源）
 - **Cursor 副本**：`~/.cursor/skills/grill-me/`
 - **Claude Code 副本**：`~/.claude/skills/grill-me/`（若使用）
+- **DSH 副本**：`~/.dsh/skills/grill-me/`（由 `.agents/scripts/setup-dsh-agents.ps1` 安装）
 - 修改 skill 时 **各宿主副本应保持一致**；禁止只改 Cursor 版导致 Trea / OpenCode 仍读旧「一次一问纯文本」。
 
 ---

@@ -31,8 +31,16 @@ description: 将素材与结构化 slides 数据生成为 Vue 16:9 预览页，�
 
 ## 路径
 
-- 运行时：`%USERPROFILE%\.cursor\skills\ppt-maker\`
+- 运行时（Cursor）：`%USERPROFILE%\.cursor\skills\ppt-maker\`
+- 运行时（DSH）：`%USERPROFILE%\.dsh\skills\ppt-maker\`（由 `.agents/scripts/setup-dsh-agents.ps1` 安装）
 - 沙箱：`ppt-maker/`（维护者编辑源）
+
+## DSH 宿主差异
+
+- DSH **没有浏览器工具**：不得声称已完成逐页截图或 browser 验收。用 `pwsh` 的 `run_in_background` 启动预览/构建命令，把 URL 交给用户查看；导出在用户浏览器完成。
+- 验收：请用户确认页面，或用 `present` 交付已生成的 pptx/zip。
+- 视觉 intake 用 `ask_user_question`（`options` 带 `label` / `description`，推荐项置首位并标 `(Recommended)`）；默认仍每轮 1 题。
+- 其余流程与 Cursor / Codex 相同；`/grill-me` 在 DSH 中仍按顺序提问。
 
 ## 工作流
 

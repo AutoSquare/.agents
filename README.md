@@ -28,6 +28,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.codex\mcp-servers\`
 - 重复安装时保留 Codex MCP 的 `.venv` / `node_modules`，依赖清单未变化则跳过重复依赖安装
 - 用 `codex mcp remove/add` 刷新本包托管的 MCP 注册，不卸载用户自己添加的其他 MCP
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
 
 常用参数：
 
@@ -67,6 +68,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1
 - 将 `rules/antigravity/` 下的 Markdown 规则聚合注入到 `%USERPROFILE%\.gemini\config\plugins\agents\plugin.json` 的 `system_prompt` 中
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`，并自动安装 Python/Node 依赖
 - 更新 `plugin.json` 时采用**增量聚合**逻辑：只刷新本包托管的 MCP 注册，**完全保留**用户自己在此文件中配置的其他 MCP 记录
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
 
 常用参数：
 
@@ -107,6 +109,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 - 安装 33 个去重后的 Cursor 版 gstack 入口，并在 `%USERPROFILE%\.cursor\skills\gstack\` 首次编译共享运行时
 - 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.cursor\mcp-servers\`
 - 写入或合并 `%USERPROFILE%\.cursor\mcp.json`（已有配置会备份为 `mcp.json.bak-时间戳`）
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
 - **默认不安装 Rules**；结束时提醒按 [`rules/universal/AGENTS.md`](rules/universal/AGENTS.md) 各节**手动录入** Cursor Settings → Rules → **User**
 
 完成后 **重启 Cursor**，在 **Settings → Tools & MCP** 确认服务已启用，并按终端提醒录入 User Rules。
@@ -149,6 +152,76 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -No
 | **勿用** | Include third-party 整份导入 AGENTS.md；`~/.cursor/rules/`（Cursor 不加载） |
 
 更细的 Cursor 说明见 [`PORTABLE.md`](PORTABLE.md)。
+
+---
+
+### QoderCN（一键安装）
+
+**前置**：Windows 上已安装 Git for Windows、Python 3.10+、Node.js、npm 与 QoderCN CLI（需含 `qoderclicn` 命令）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
+
+进入 `.agents` 目录，在 PowerShell 中执行：
+
+```powershell
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1"
+```
+
+脚本会：
+
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.qoder-cn\skills\`（仅 `qodercnInstallManifest.managedSkills` 同名托管项，不删除用户自装 skill）
+- 将**薄入口** `rules/qoder/AGENTS.md` 覆盖到 `%USERPROFILE%\.qoder-cn\AGENTS.md`（常驻硬约束：中文回复、文档同步、git 禁令、文献诚信底线等）
+- 将 13 条 `rules/qoder/*.md` 规则直拷到 `%USERPROFILE%\.qoder-cn\rules\`，利用 Qoder 原生 trigger 体系按需注入：无 frontmatter 常驻；`trigger: model_decision` 只注入路径与描述、模型按需读取；`trigger: glob` 在触碰 `.cs` / `.csproj` / `.xaml` 后加载
+- 从 `mcp-servers-src/` 安装本地 MCP 到 `%USERPROFILE%\.qoder-cn\mcp-servers\`，并用 `qoderclicn mcp remove/add -s user` 刷新本包托管的 4 项注册，不卸载用户自己添加的其他 MCP
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
+- **不安装 gstack**（宿主支持清单仅 Codex / Cursor）；Superpowers 技能作为普通 Skills 托管，无会话启动 Hook
+
+常用参数：
+
+```powershell
+# 预览将更新的托管项，不写入磁盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1" -WhatIf
+
+# 只安装 Rules 与 Skills，不构建或注册 MCP
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1" -SkipMcpInstall
+
+# 跳过 Skills 或 Rules
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1" -SkipSkillUpdate
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1" -SkipRules
+```
+
+---
+
+### DeepSeek Harness（DSH）（一键安装）
+
+**前置**：Windows 上已安装 DSH 桌面端、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
+
+进入 `.agents` 目录，在 PowerShell 中执行：
+
+```powershell
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
+```
+
+脚本会：
+
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.dsh\skills\`（仅 `dshInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
+- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 DSH 技能根
+- 将薄入口 `rules/dsh/AGENTS.md` 写入 `%USERPROFILE%\.dsh\AGENTS.md` 托管块（保留用户内容并备份），13 条主题规则与 1 条 DSH 宿主规则直拷到 `%USERPROFILE%\.dsh\rules\`
+- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.dsh\mcp-servers\`，并把 `@deepseek-ai/dsh-mcp-client` 条目写入 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`（写前备份、写后 PyYAML 校验）
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
+- **不安装 gstack**（宿主支持清单仅 Codex / Cursor）
+
+常用参数：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -WhatIf            # 预览，不写盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipRules         # 跳过 Rules
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -DshHome "D:\tmp\dsh-home" -Profile "web"
+```
+
+更细的 DSH 说明见 [`DSH.md`](DSH.md)。
 
 ---
 
@@ -208,6 +281,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── PORTABLE.md               # Cursor 迁移与脚本细节
 ├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
 ├── ANTIGRAVITY.md            # Antigravity 安装与配置说明
+├── DSH.md                    # DeepSeek Harness 安装与规则/MCP 适配说明
 ├── manifest.json             # Skills / MCP 来源清单（机器可读）
 ├── licenses/                 # 第三方技能许可证
 ├── mcp.md                    # MCP 调用规范（给智能体）
@@ -216,6 +290,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── output-templates.md       # 候选文献池、摘要、筛选记录等模板
 ├── environment.md            # 环境变量、路径、维护命令
 ├── mcp.template.json         # MCP 配置模板（替换 {{USERPROFILE}} 后使用）
+├── mcp.template.dsh.yml      # DSH profile patch 的 MCP 条目模板（{{DSH_HOME}} / {{NODE}}）
 ├── skills/                   # 全部 Agent Skills（每目录一个 SKILL.md）
 ├── host-skills/              # gstack 宿主生成入口（codex / cursor）
 ├── runtime/gstack/           # gstack 共享运行时源码（安装时编译）
@@ -223,7 +298,10 @@ Trea 使用 **`.agent`** 目录名（单数）：
 │   ├── cursor/               # Cursor Rules（.mdc）→ .cursor/rules/
 │   ├── codex-global/         # Codex 全局 AGENTS.md 与按需 agent-rules/
 │   ├── antigravity/          # Antigravity 专有规则（AGENTS.md + agent-rules/）
+│   ├── qoder/                # QoderCN 规则（薄 AGENTS.md + trigger frontmatter 规则）
+│   ├── dsh/                  # DSH 规则（薄 AGENTS.md + 13 条主题规则 + DSH 宿主规则）
 │   └── universal/            # Claude Code / OpenCode / Trea（AGENTS.md）
+├── tests/                    # 安装器与 manifest 契约校验（pwsh）
 ├── mcp-servers-src/          # 需本地构建的 MCP 源码快照
 │   ├── academic-research-mcp/
 │   ├── zotero-mcp/
@@ -233,8 +311,10 @@ Trea 使用 **`.agent`** 目录名（单数）：
     ├── setup-cursor-agents.ps1   # 仅 Cursor：写入 ~/.cursor/
     ├── setup-codex-agents.ps1    # 仅 Codex：写入 ~/.codex/
     ├── setup-antigravity-agents.ps1 # 仅 Antigravity：写入 ~/.gemini/config/plugins/agents/
+    ├── setup-qodercn-agents.ps1  # 仅 QoderCN：写入 ~/.qoder-cn/
+    ├── setup-dsh-agents.ps1      # 仅 DSH：写入 $DSH_HOME/（技能、规则、MCP、profile patch）
     ├── gstack-install-lib.ps1       # Codex / Cursor 共用 gstack 安装与构建逻辑
-    └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族
+    └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族（含 ckm: 技能名归一化）
 ```
 
 | 路径 | 说明 |
@@ -244,10 +324,15 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `runtime/gstack/` | gstack 1.60.1.0 的裁剪运行时源码；不含 `.git`、测试、依赖与预编译大文件。 |
 | `rules/cursor/` | Cursor 规则（`.mdc`）；见 [`rules/README.md`](rules/README.md)。 |
 | `rules/codex-global/` | Codex 全局入口与按需规则；由 `setup-codex-agents.ps1` 安装到 `%USERPROFILE%\.codex\`。 |
+| `rules/qoder/` | QoderCN 薄入口 AGENTS.md 与 trigger 规则；由 `setup-qodercn-agents.ps1` 直拷到 `%USERPROFILE%\.qoder-cn\`。 |
+| `rules/dsh/` | DSH 薄入口 AGENTS.md 与 14 条按需规则；由 `setup-dsh-agents.ps1` 写入 `$DSH_HOME/`。 |
 | `rules/universal/` | 通用团队规范（`.md`）；非 Cursor 平台使用。 |
 | `mcp-servers-src/` | MCP 服务端源码；**不含** `.venv`、`node_modules`（需安装脚本或手动构建）。 |
 | `scripts/setup-cursor-agents.ps1` | **仅 Cursor**：安装 Skills + MCP 到用户目录。 |
 | `scripts/setup-codex-agents.ps1` | **仅 Codex**：安装 Rules + Skills + MCP 到用户目录，增量覆盖托管项。 |
+| `scripts/setup-qodercn-agents.ps1` | **仅 QoderCN**：安装 AGENTS.md + Rules + Skills + MCP 到 `%USERPROFILE%\.qoder-cn\`，增量覆盖托管项。 |
+| `scripts/setup-dsh-agents.ps1` | **仅 DSH**：安装 Skills + Rules + MCP 到 `$DSH_HOME`，并写 profile patch 托管块。 |
+| `tests/` | 安装器静态检查与 `-WhatIf` 预览测试（`dsh-adapter.Tests.ps1`、`retired-mcp-cleanup.Tests.ps1`）。 |
 | `mcp.template.json` | 非 Cursor 平台手工配置 MCP 时的 JSON 模板。 |
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
 | `output-templates.md` | 统一交付格式（表格、大纲、筛选日志）。 |
@@ -257,6 +342,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ---
 
 ## Skills 一览
+
+> DSH 用户级安装到 `%USERPROFILE%\.dsh\skills\`；`disable-model-invocation: true` 的技能（`cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）只通过 `/name` 调用。
 
 | Skill | 用途 |
 |-------|------|
@@ -269,7 +356,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `campus-net-onboarding` | 校园网 Profile 配置、CAS/VPN 会话、全文下载与失败清单 `manual_download_required.md`。 |
 | **汇报与演示** | |
 | `ppt-maker` | Vue 高保真幻灯片预览 + 浏览器导出 pptx/zip；默认「做 PPT」；**grill-me 顺序定稿** + `ui-ux-pro-max`；见 `skills/ppt-maker/发布说明.md`。 |
-| `academic-ppt-builder` | 学术快出：中文学术 PPT 大纲 + deck-builder / ppt-markdown 生成 pptx。 |
+| `academic-ppt-builder` | 学术快出：中文学术 PPT 大纲 + deck-builder 生成 pptx。 |
 | **UI/UX 设计**（源自 [`ui-ux-pro-max-skill`](../ui-ux-pro-max-skill/) 汉化，经 `sync-ui-ux-skills.ps1` 同步） | |
 | `ui-ux-pro-max` | React Native UI/UX BM25 检索与设计系统推荐（`search.py --design-system`）。 |
 | `design` | Logo、CIP 企业识别、图标生成与检索（生成脚本需 `GEMINI_API_KEY`）。 |
@@ -339,7 +426,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 - 上游 54 个 Codex/Cursor 生成入口中保留 33 个；排除的 21 个及逐项理由记录在 `manifest.json > gstackIntegration.excludedSkills`，不会再复制一套同义流程。
 - 典型替代关系：`investigate` → `systematic-debugging`/`diagnose`，`review` → `requesting-code-review`，`ship` → `finishing-a-development-branch`，`spec` → `to-prd` + `to-issues`，上下文保存/恢复 → `handoff`。
 - `gstack-upgrade` 被排除，运行时更新由本仓库维护；托管运行时中的上游自动更新提示已关闭。gbrain 的全局配置与同步也不纳入。
-- gstack 入口含宿主路径，不能放入通用 `skills/` 后跨平台混用。目前仅 Codex、Cursor 安装脚本接入；Antigravity、QoderCN、Claude Code、OpenCode 与 Trea 保持原清单。
+- gstack 入口含宿主路径，不能放入通用 `skills/` 后跨平台混用。目前仅 Codex、Cursor 安装脚本接入；Antigravity、QoderCN、DSH、Claude Code、OpenCode 与 Trea 保持原清单。
 - 首次安装会调用本机 Bun，未安装 Bun 时通过 `npx --yes bun` 获取，并编译浏览器、设计、PDF 等运行时；同版本且二进制完整时跳过重编译。可用 `-SkipGstackInstall` 完全跳过，或用 `-SkipGstackBuild` 只复制源码。
 - gstack 技能中的命令块使用 Bash；Windows 上若 `bash` 不在 PATH，应通过 `C:\Program Files\Git\bin\bash.exe` 执行。
 
@@ -354,6 +441,8 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | Cursor | `rules/cursor/*.mdc` | Cursor（含 `00` 团队规范 + 文献包规则） |
 | Codex | `rules/codex-global/AGENTS.md` + `rules/codex-global/agent-rules/*.md` | Codex 全局规则与按需规则 |
 | Antigravity | `rules/antigravity/AGENTS.md` + `agent-rules/*.md` | Antigravity（由脚本自动聚合注入 `plugin.json`） |
+| QoderCN | `rules/qoder/AGENTS.md` + `rules/qoder/*.md` | QoderCN（薄 AGENTS.md 常驻 + rules trigger 按需注入） |
+| DSH | `rules/dsh/AGENTS.md` + `rules/dsh/rules/*.md` | DeepSeek Harness（`$DSH_HOME/AGENTS.md` + 按需规则目录） |
 | 通用 | `rules/universal/AGENTS.md` | Claude Code、OpenCode、Trea |
 
 完整文件表见 [`rules/README.md`](rules/README.md)。
@@ -369,12 +458,11 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `academic-research` | 本地 Python | 多源学术检索：OpenAlex、Semantic Scholar、CrossRef、PubMed、arXiv、Unpaywall 等 | Python venv；可选 `S2_API_KEY`、`OPENALEX_EMAIL` 等 |
 | `zotero` | 本地 Node | 读写本地 Zotero 库、附件、集合、BibTeX | Zotero Desktop 运行；需构建 `dist/index.js` |
 | `deck-builder` | 本地 Node | 结构化生成可编辑 `.pptx` | `npm install` + `npm run build` |
-| `ppt-markdown` | npx 远程包 | Markdown 转 PowerPoint | Node.js；`npx -y @botrun/mcp-ppt-generator` |
 | `campus-net` | 本地 Python（本仓库附带） | 学校 Profile、馆藏探测、CAS/VPN 会话、DOI 全文下载；失败写入 `manual_download_required.md` | Python venv + Playwright Chromium；Codex 下可选 `CAMPUS_USERNAME` / `CAMPUS_PASSWORD` 或 `~/.codex/campus-net/local.env` |
 
 **常用工具（campus-net）**：`get_active_profile`、`onboard_school`、`ensure_auth`、`download_paper`、`download_papers`、`download_cnki`、`detect_network`。
 
-源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`；Antigravity 默认路径：`%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`。
+源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`；Antigravity 默认路径：`%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`；DSH 默认路径：`%USERPROFILE%\.dsh\mcp-servers\`，注册在 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`。
 
 详细能力与调用约束见 [`mcp.md`](mcp.md)。
 
@@ -417,8 +505,9 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ## 智能体阅读顺序
 
 1. 本文（安装与总览）  
-2. [`mcp.md`](mcp.md) — 调用 MCP 前  
-3. [`skills.md`](skills.md) — 选择技能前  
-4. [`workflows.md`](workflows.md) — 文献/PPT 类任务  
-5. [`output-templates.md`](output-templates.md) — 需要统一交付格式时  
-6. [`environment.md`](environment.md) — 排错与更新  
+2. [`DSH.md`](DSH.md) — DSH 安装、技能发现、规则与 MCP  
+3. [`mcp.md`](mcp.md) — 调用 MCP 前  
+4. [`skills.md`](skills.md) — 选择技能前  
+5. [`workflows.md`](workflows.md) — 文献/PPT 类任务  
+6. [`output-templates.md`](output-templates.md) — 需要统一交付格式时  
+7. [`environment.md`](environment.md) — 排错与更新  

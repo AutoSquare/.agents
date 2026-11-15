@@ -47,9 +47,11 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Ver
 - `$CODEX_HOME/skills/<managed-skill>/`
 - `$CODEX_HOME/skills/gstack-*/` 与 `$CODEX_HOME/skills/gstack/`（去重后的宿主入口与共享运行时）
 - `$CODEX_HOME/mcp-servers/<managed-mcp-source>/`
-- `codex mcp` 中同名托管 MCP 注册：`academic-research`、`zotero`、`deck-builder`、`ppt-markdown`、`campus-net`
+- `codex mcp` 中同名托管 MCP 注册：`academic-research`、`zotero`、`deck-builder`、`campus-net`
 
 脚本不会清空 `$CODEX_HOME/skills`、`$CODEX_HOME/agent-rules`、`$CODEX_HOME/mcp-servers`，也不会卸载用户自己添加的其他 MCP。
+
+如果配置中仍有旧版本声明的退役 MCP，脚本会在 MCP 阶段逐项询问是否删除。空输入、拒绝、无交互输入以及 `-SkipMcpInstall` 均保留旧项；`-WhatIf` 只报告待确认项，不写配置。
 
 `codexInstallManifest` 已托管 Superpowers 6.1.1 的 14 个技能。安装后由 Codex 原生技能发现机制加载；`using-superpowers` 负责会话入口与技能优先级，平台映射位于其 `references/codex-tools.md`。若使用多智能体类技能，还需确保当前 Codex 会话已启用多智能体能力；不可用时按技能中的降级说明顺序执行。
 

@@ -2,7 +2,7 @@
 name: grill-me
 description: >-
   结构化拷问：沿设计树追问直至决策闭合，每题附推荐项；优先用宿主提供的结构化选题能力，
-  否则用 Markdown 选票协议。兼容 Cursor、Claude Code、OpenCode、Trea 等 Agent。
+  否则用 Markdown 选票协议。兼容 Cursor、Claude Code、OpenCode、Trea、DeepSeek Harness 等 Agent。
   在用户说 grill me、拷问设计、抗压测试计划、定风格/定方案、或「先问我再动手」时使用。
 ---
 
@@ -27,7 +27,7 @@ description: >-
 | **批量 intake** | 用户**明确**说「一次问完」「可以问很多个」 | 一轮 **2–4 题**（见下通道限制） |
 
 - 用户说「逐条拷问」「一个一个来」→ **顺序 grill**
-- 用户说「可以问很多个」「一次问完」→ **批量 intake**（仍受 AskQuestion 题数上限约束）
+- 用户说「可以问很多个」「一次问完」→ **批量 intake**（仍受宿主题数上限约束）
 - **默认一律顺序 grill**；含 ppt-maker 视觉 intake，**禁止**首轮一次塞 6 题
 
 ### Cursor `AskQuestion` 硬上限
@@ -41,13 +41,19 @@ description: >-
 
 详见 [PLATFORMS.md](PLATFORMS.md) §Cursor 故障排除。
 
+### DeepSeek Harness `ask_user_question`
+
+- 支持一次 1–4 题，但**默认仍每轮 1 题**；用户明确要求「一次问完」时才批量。
+- 子代理不能调用 → 子代理内改用 Markdown 选票。
+- 详见 [PLATFORMS.md](PLATFORMS.md) §DeepSeek Harness。
+
 ## 通道选择（跨 Agent 适配）
 
 按当前宿主 **实际可用能力**，从高到低选一种通道（详见 [PLATFORMS.md](PLATFORMS.md)）：
 
 | 优先级 | 通道 | 说明 |
 |--------|------|------|
-| **1** | **结构化选题工具** | 宿主提供的多选 / 表单类工具（如 Cursor `AskQuestion`） |
+| **1** | **结构化选题工具** | 宿主提供的多选 / 表单类工具（Cursor `AskQuestion`；DSH `ask_user_question`） |
 | **2** | **Markdown 选票** | 任意 Agent 均可用；无专用工具时的**标准降级**，不是次品 |
 
 **规则：**
@@ -87,7 +93,7 @@ description: >-
 1. 梳理待决项（决策树）
 2. 剔除已由代码库/文档确认的事实
 3. 默认「顺序 grill」；仅用户明确要求时用「批量 intake」
-4. 按 PLATFORMS.md 选通道 → 每轮只发 1 题（AskQuestion）或 1 段选票
+4. 按 PLATFORMS.md 选通道 → 每轮只发 1 题（结构化工具；DSH 为 `ask_user_question`）或 1 段选票
 5. 等待用户答案 → 未闭合则下一题；全部闭合 → 表格复述共识
 6. 已闭合 → 交付 / 开工
 ```
@@ -117,5 +123,5 @@ description: >-
 
 ## 更多资料
 
-- [PLATFORMS.md](PLATFORMS.md) — Cursor / Claude Code / OpenCode / Trea 通道对照
+- [PLATFORMS.md](PLATFORMS.md) — Cursor / Claude Code / OpenCode / Trea / DSH 通道对照
 - [EXAMPLES.md](EXAMPLES.md) — 结构化工具 JSON 与 Markdown 选票示例

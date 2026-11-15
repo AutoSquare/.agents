@@ -33,10 +33,15 @@ if ([string]::IsNullOrWhiteSpace($CodexHome)) {
 
 $AgentsRoot = Split-Path -Parent $PSScriptRoot
 $GstackInstallLibrary = Join-Path $PSScriptRoot "gstack-install-lib.ps1"
+$RetiredMcpCleanupLibrary = Join-Path $PSScriptRoot "retired-mcp-cleanup.ps1"
 if (-not (Test-Path -LiteralPath $GstackInstallLibrary -PathType Leaf)) {
     throw "gstack install library not found: $GstackInstallLibrary"
 }
+if (-not (Test-Path -LiteralPath $RetiredMcpCleanupLibrary -PathType Leaf)) {
+    throw "retired MCP cleanup library not found: $RetiredMcpCleanupLibrary"
+}
 . $GstackInstallLibrary
+. $RetiredMcpCleanupLibrary
 $CodexHome = [System.IO.Path]::GetFullPath($CodexHome)
 $SkillsSource = Join-Path $AgentsRoot "skills"
 $SkillsTarget = Join-Path $CodexHome "skills"
@@ -441,6 +446,7 @@ function Get-CodexInstallManifest {
         ManagedSkills = @($install.managedSkills)
         ManagedRules = @($install.managedRules)
         ManagedMcpServers = @($install.managedMcpServers)
+        RetiredMcpServers = @($manifest.retiredMcpServers)
     }
 }
 
@@ -663,6 +669,18 @@ function Invoke-CodexMcpRemove {
     }
 }
 
+function Test-CodexMcpRegistration {
+    param([string]$Name)
+    $previousPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $null = & codex mcp get $Name --json 2>&1
+        return $LASTEXITCODE -eq 0
+    } finally {
+        $ErrorActionPreference = $previousPreference
+    }
+}
+
 function Invoke-CodexMcpAdd {
     param(
         [string]$Name,
@@ -683,8 +701,18 @@ function Invoke-CodexMcpAdd {
 }
 
 function Register-CodexMcpServers {
-    param($ManagedMcpServers)
+    param(
+        $ManagedMcpServers,
+        [string[]]$RetiredMcpServers
+    )
     Assert-Command "codex"
+    $retiredRemoved = Invoke-RetiredMcpCleanup `
+        -Names $RetiredMcpServers `
+        -Context "Codex MCP registrations" `
+        -WhatIf:$WhatIf `
+        -Exists { param($name) Test-CodexMcpRegistration -Name $name } `
+        -Remove { param($name) Invoke-CodexMcpRemove -Name $name }
+    Write-DetailLog "retired Codex MCP registrations removed: $retiredRemoved"
     $count = 0
     foreach ($server in $ManagedMcpServers) {
         $mcpName = [string]$server.name
@@ -711,9 +739,6 @@ function Register-CodexMcpServers {
             "deck-builder" {
                 $entry = Join-Path $McpTargetRoot "deck-builder\build\index.js"
                 Invoke-CodexMcpAdd -Name $mcpName -Command @("node", $entry)
-            }
-            "ppt-markdown" {
-                Invoke-CodexMcpAdd -Name $mcpName -Command @("npx", "-y", "@botrun/mcp-ppt-generator")
             }
             "campus-net" {
                 $python = Join-Path $McpTargetRoot "campus-net-mcp\.venv\Scripts\python.exe"
@@ -801,7 +826,9 @@ try {
     }
     $script:InstallResult.McpSourceCount = Install-CodexMcpSources -ManagedMcpServers $installManifest.ManagedMcpServers
     if (-not $SkipMcpInstall) {
-        $script:InstallResult.McpRegisteredCount = Register-CodexMcpServers -ManagedMcpServers $installManifest.ManagedMcpServers
+        $script:InstallResult.McpRegisteredCount = Register-CodexMcpServers `
+            -ManagedMcpServers $installManifest.ManagedMcpServers `
+            -RetiredMcpServers $installManifest.RetiredMcpServers
     }
 
     Show-InstallSummary

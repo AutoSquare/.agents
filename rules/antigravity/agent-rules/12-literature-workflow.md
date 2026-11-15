@@ -15,7 +15,7 @@
 | 研究空白、选题 | `research-gap-analysis` | - |
 | 校内/VPN 全文 PDF | `campus-net-onboarding` | `campus-net` |
 | �?PPT / 幻灯片（默认�?| `ppt-maker` | 联动 `ui-ux-pro-max` |
-| 学术快出 PPT | `academic-ppt-builder` | `deck-builder`、`ppt-markdown` |
+| 学术快出 PPT | `academic-ppt-builder` | `deck-builder` |
 
 ## 全文下载
 

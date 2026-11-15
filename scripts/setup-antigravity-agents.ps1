@@ -8,6 +8,12 @@ param (
 $ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
+$retiredMcpCleanupLibrary = Join-Path $PSScriptRoot "retired-mcp-cleanup.ps1"
+if (-not (Test-Path -LiteralPath $retiredMcpCleanupLibrary -PathType Leaf)) {
+    throw "retired MCP cleanup library not found: $retiredMcpCleanupLibrary"
+}
+. $retiredMcpCleanupLibrary
+
 $workspaceRoot = Split-Path (Split-Path $MyInvocation.MyCommand.Path)
 $manifestPath = Join-Path $workspaceRoot "manifest.json"
 if (-not (Test-Path $manifestPath)) {
@@ -17,6 +23,7 @@ if (-not (Test-Path $manifestPath)) {
 
 $manifest = Get-Content $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $manifestConfig = $manifest.antigravityInstallManifest
+$retiredMcpServers = @($manifest.retiredMcpServers)
 if (-not $manifestConfig) {
     Write-Error "antigravityInstallManifest not found in manifest.json."
     exit 1
@@ -77,21 +84,19 @@ if (Test-Path $pluginJsonPath) {
 }
 
 if (-not $SkipMcpInstall) {
+    $retiredRemoved = Invoke-RetiredMcpCleanup `
+        -Names $retiredMcpServers `
+        -Context "Antigravity MCP config" `
+        -WhatIf:$WhatIf `
+        -Exists { param($name) $mcpServersConfig.ContainsKey($name) } `
+        -Remove { param($name) [void]$mcpServersConfig.Remove($name) }
+    Write-Host "  retired MCP registrations removed: $retiredRemoved"
     Write-Host "`n>>> Installing MCP Servers..." -ForegroundColor Cyan
     foreach ($mcp in $manifestConfig.managedMcpServers) {
         $mcpName = $mcp.name
         $mcpKind = $mcp.kind
         $sourceDir = $mcp.sourceDir
         
-        if ($mcpKind -eq "npx") {
-            Write-Host "  -> NPX MCP: $mcpName"
-            $mcpServersConfig[$mcpName] = @{
-                command = "npx"
-                args = @("-y", "@botrun/mcp-ppt-generator")
-            }
-            continue
-        }
-
         if (-not $sourceDir) { continue }
         
         $src = Join-Path $workspaceRoot "mcp-servers-src\$sourceDir"

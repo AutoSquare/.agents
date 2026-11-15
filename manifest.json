@@ -1,10 +1,12 @@
 {
   "name": "portable-agents",
-  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Superpowers、去重后的 gstack、Karpathy 编码准则等）；安装入口包含 Cursor、Codex、Antigravity 与 QoderCN 脚本。",
+  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Superpowers、去重后的 gstack、Karpathy 编码准则等）；安装入口为 scripts/ 下的 Cursor、Codex、Antigravity、QoderCN 与 DSH 安装脚本。",
   "skillsRoot": "skills",
   "rulesRoot": "rules",
   "rulesCursor": "rules/cursor",
   "rulesUniversal": "rules/universal/AGENTS.md",
+  "rulesQoder": "rules/qoder",
+  "rulesDsh": "rules/dsh",
   "skillSources": {
     "superpowers": {
       "source": "https://github.com/obra/superpowers",
@@ -105,17 +107,15 @@
       "install": "git clone + npm install + npm run build",
       "purpose": "structured editable PPTX generation"
     },
-    "ppt-markdown": {
-      "source": "https://www.npmjs.com/package/@botrun/mcp-ppt-generator",
-      "install": "npx -y @botrun/mcp-ppt-generator",
-      "purpose": "Markdown to PPTX"
-    },
     "campus-net-mcp": {
       "source": "bundled: .agents/mcp-servers-src/campus-net-mcp",
       "install": ".agents/scripts/setup-cursor-agents.ps1 或 .agents/scripts/setup-codex-agents.ps1",
       "purpose": "通用学校 Profile：馆藏探测、会话与全文下载链路"
     }
   },
+  "retiredMcpServers": [
+    "ppt-markdown"
+  ],
   "skillGroups": {
     "literatureAndPpt": [
       "literature-search",
@@ -347,11 +347,6 @@
         "kind": "node"
       },
       {
-        "name": "ppt-markdown",
-        "sourceDir": "",
-        "kind": "npx"
-      },
-      {
         "name": "campus-net",
         "sourceDir": "campus-net-mcp",
         "kind": "python"
@@ -447,9 +442,99 @@
         "kind": "node"
       },
       {
-        "name": "ppt-markdown",
-        "sourceDir": "",
-        "kind": "npx"
+        "name": "campus-net",
+        "sourceDir": "campus-net-mcp",
+        "kind": "python"
+      }
+    ],
+    "installMode": "incremental_managed_only",
+    "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and MCP registrations listed here may be overwritten. User-installed skills, rules, MCP dirs, and MCP registrations are not removed."
+  },
+  "qodercnInstallManifest": {
+    "packageId": "portable-qodercn-agents",
+    "managedSkills": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder",
+      "ppt-maker",
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor",
+      "ui-ux-pro-max",
+      "design",
+      "banner-design",
+      "ui-styling",
+      "slides",
+      "design-system",
+      "brand",
+      "karpathy-guidelines",
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
+    ],
+    "managedRules": [
+      "01-与本包-agents-的协作.md",
+      "02-语言与命名规范.md",
+      "03-文档联动与交付要求.md",
+      "04-开发前置要求.md",
+      "05-注释与技术写作规范.md",
+      "06-代码组织与架构规范.md",
+      "07-执行检查清单提交前必须完成.md",
+      "08-Skills-自动生成规范.md",
+      "09-C-系列含-WPFWinUI3-等开发规范.md",
+      "10-Git-提交说明与手动提交规范.md",
+      "11-Karpathy-指南.md",
+      "12-文献与学术诚信.md",
+      "13-文献工作流.md"
+    ],
+    "managedMcpServers": [
+      {
+        "name": "academic-research",
+        "sourceDir": "academic-research-mcp",
+        "kind": "python"
+      },
+      {
+        "name": "zotero",
+        "sourceDir": "zotero-mcp",
+        "kind": "node"
+      },
+      {
+        "name": "deck-builder",
+        "sourceDir": "deck-builder",
+        "kind": "node"
       },
       {
         "name": "campus-net",
@@ -459,5 +544,120 @@
     ],
     "installMode": "incremental_managed_only",
     "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and MCP registrations listed here may be overwritten. User-installed skills, rules, MCP dirs, and MCP registrations are not removed."
+  },
+  "dshInstallManifest": {
+    "packageId": "portable-dsh-agents",
+    "managedSkills": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder",
+      "ppt-maker",
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor",
+      "ui-ux-pro-max",
+      "design",
+      "banner-design",
+      "ui-styling",
+      "slides",
+      "design-system",
+      "brand",
+      "karpathy-guidelines",
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
+    ],
+    "pathRewriteSkills": [
+      "ui-ux-pro-max",
+      "design",
+      "design-system",
+      "slides",
+      "brand",
+      "banner-design",
+      "ui-styling",
+      "ppt-maker"
+    ],
+    "entryFile": "rules/dsh/AGENTS.md",
+    "rulesDir": "rules/dsh/rules",
+    "managedRules": [
+      "01-language-and-naming.md",
+      "02-doc-linkage-and-delivery.md",
+      "03-pre-development-requirements.md",
+      "04-comment-and-writing-quality.md",
+      "05-code-organization-and-architecture.md",
+      "06-pre-submit-checklist.md",
+      "07-skills-authoring.md",
+      "08-csharp-xml-docs.md",
+      "09-git-commit-message.md",
+      "10-karpathy-guidelines.md",
+      "11-literature-integrity.md",
+      "12-literature-workflow.md",
+      "13-agents-entry.md",
+      "14-dsh-host.md"
+    ],
+    "managedMcpServers": [
+      {
+        "name": "academic-research",
+        "sourceDir": "academic-research-mcp",
+        "kind": "python"
+      },
+      {
+        "name": "zotero",
+        "sourceDir": "zotero-mcp",
+        "kind": "node"
+      },
+      {
+        "name": "deck-builder",
+        "sourceDir": "deck-builder",
+        "kind": "node"
+      },
+      {
+        "name": "campus-net",
+        "sourceDir": "campus-net-mcp",
+        "kind": "python"
+      }
+    ],
+    "patchEntryIds": [
+      "mcp-academic-research",
+      "mcp-zotero",
+      "mcp-deck-builder",
+      "mcp-campus-net"
+    ],
+    "patchPath": "$DSH_HOME/profiles/<profile>/cordis.patch.yml",
+    "installMode": "incremental_managed_only",
+    "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and the managed patch block are overwritten. User-installed skills, rules, MCP dirs, other patch entries, and other hosts are not removed or modified."
   }
 }

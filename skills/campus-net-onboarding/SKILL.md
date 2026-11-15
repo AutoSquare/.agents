@@ -9,7 +9,7 @@ description: 在用户需要校园网馆藏全文、校外 VPN 文献下载或�
 
 在用户需要：**自动判断是否具备校内馆藏条件**、**网页 VPN/CAS 自动登录抓取 PDF**、**知网 CNKI（机构入口）下载**或**首次配置学校**时使用。依赖已启用的 `campus-net` MCP。
 
-## 须联动的 Cursor 技能
+## 须联动的同包技能
 
 按任务择优选用（本技能不承担文献元数据综述主流程）：
 
@@ -26,7 +26,7 @@ description: 在用户需要校园网馆藏全文、校外 VPN 文献下载或�
 
 ### 须联动或并行的 MCP（工具名）
 
-- **`campus-net`**（必选，本场景核心）：见下文「必选流程」中列出的工具名。
+- **`campus-net`**（必选，本场景核心）：见下文「必选流程」中列出的工具名。DSH 中工具名为 `mcp__campus-net__<tool>`，用户配置目录为 `$DSH_HOME/campus-net/`（由 `CAMPNET_USER_ROOT` 指定）。
 - **`academic-research`**：在用户尚未获得 DOI/开放获取链时，`smart_search` / `find_paper` / `open_access`。
 - **网页检索**：本迁移包未内置网页搜索 MCP；无内置学校 Profile 时，用 `discover_school_profile` 返回的 **`suggested_web_search_queries`**，指导用户**在浏览器**中检索图书馆 HTTPS、VPN、`doi_resolver_template` 等，并将用户确认的 URL 写入 `onboard_school`。
 - **`zotero`**：条目与附件同步时 `zotero_import`（或等价写入工具，以本机 MCP 为准）。

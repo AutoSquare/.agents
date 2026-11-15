@@ -1,13 +1,13 @@
 ---
 name: academic-ppt-builder
-description: 将论文检索结果、综述材料或研究报告转换为中文学术 PPT 大纲，并调用 deck-builder / ppt-markdown MCP 快速生成可编辑 pptx。在用户明确要求学术场景（答辩、开题、文献综述）或要快出 pptx 时使用；泛称「做 PPT」默认用 ppt-maker。
+description: 将论文检索结果、综述材料或研究报告转换为中文学术 PPT 大纲，并调用 deck-builder MCP 快速生成可编辑 pptx。在用户明确要求学术场景（答辩、开题、文献综述）或要快出 pptx 时使用；泛称「做 PPT」默认用 ppt-maker。
 ---
 
 # 学术 PPT 生成
 
 ## 适用范围
 
-用于把研究材料转成可讲述的演示文稿。优先调用 `deck-builder` MCP 生成结构化 PPT；若用户提供 Markdown 或要求从 Markdown 转 PPT，可调用 `ppt-markdown` MCP。
+用于把研究材料转成可讲述的演示文稿。调用 `deck-builder` MCP 生成结构化、可编辑的 PPT。
 
 ## 默认结构
 
@@ -26,7 +26,7 @@ description: 将论文检索结果、综述材料或研究报告转换为中文�
 2. 确认页数、时长、语言、风格和是否需要参考文献页。
 3. 将材料压缩为每页一个中心观点，避免一页堆叠过多文字。
 4. 输出 PPT 大纲并标注每页讲述意图。
-5. 若用户要求生成文件，调用 `deck-builder` 或 `ppt-markdown` 生成 `.pptx`。
+5. 若用户要求生成文件，调用 `deck-builder` 生成 `.pptx`。
 
 ## 输出格式
 

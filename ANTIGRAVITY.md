@@ -18,6 +18,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1
 - 将托管的 Skills 增量拷贝到 `%USERPROFILE%\.gemini\config\plugins\agents\skills\`。
 - 自动将 `rules/antigravity/` 下的所有 Markdown 文件拼接组合，写入 `%USERPROFILE%\.gemini\config\plugins\agents\plugin.json` 的 `system_prompt` 字段中，实现开箱即用的规则挂载。
 - 将 MCP 服务端源码拷贝至 `%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`（包括依赖安装），并自动更新 Antigravity 的相关配置文件。
+- 发现旧版本遗留的退役 MCP 时逐项询问是否删除；默认保留，`-WhatIf` 只报告，`-SkipMcpInstall` 不触发清理。
 
 **隔离保证**：脚本只会写入 `.gemini` 目录，完全不影响现有的 `.cursor` 和 `.codex` 安装环境。
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# 从 ui-ux-pro-max-skill 同步 7 个 UI/UX Skill 到 .agents/skills/，并改写为 Cursor 用户级路径。
+# 从 ui-ux-pro-max-skill 同步 7 个 UI/UX Skill 到 .agents/skills/，改写为 Cursor 用户级路径，并把 ckm: 技能名归一化为 kebab-case。
 param(
     [string]$UpstreamPath,
     [switch]$Assemble,
@@ -122,6 +122,40 @@ function Invoke-PathRewrite {
     return $rewriteCount
 }
 
+function Invoke-SkillNameNormalize {
+    param(
+        [string]$SkillRoot
+    )
+
+    $skillFile = Join-Path $SkillRoot "SKILL.md"
+    if (-not (Test-Path -LiteralPath $skillFile -PathType Leaf)) { return $false }
+
+    $bytes = [System.IO.File]::ReadAllBytes($skillFile)
+    $hasBom = ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
+    $content = [System.Text.Encoding]::UTF8.GetString($bytes)
+    if ($hasBom) { $content = $content.Substring(1) }
+
+    $normalized = [regex]::Replace($content, '(?m)^name:\s*ckm:([a-z0-9-]+)\s*$', 'name: $1', 1)
+    if ($normalized -eq $content) { return $false }
+    if (-not $DryRun) {
+        $encoding = New-Object System.Text.UTF8Encoding($hasBom)
+        [System.IO.File]::WriteAllText($skillFile, $normalized, $encoding)
+    }
+    return $true
+}
+
+function Get-CkmSkillNames {
+    param([string[]]$SkillDirs)
+
+    $hits = @()
+    foreach ($dir in $SkillDirs) {
+        $skillFile = Join-Path $dir "SKILL.md"
+        if (-not (Test-Path -LiteralPath $skillFile -PathType Leaf)) { continue }
+        $content = Get-Content -LiteralPath $skillFile -Raw -Encoding UTF8
+        if ($content -match '(?m)^name:\s*ckm:') { $hits += $skillFile }
+    }
+    return $hits
+}
 function Test-NoClaudePaths {
     param([string[]]$SkillDirs)
 
@@ -190,6 +224,13 @@ foreach ($name in $ClaudeKitSkills) {
     $syncedDirs += $target
     Write-Host "synced: $name"
 }
+$normalizedCount = 0
+foreach ($name in $ClaudeKitSkills) {
+    if (Invoke-SkillNameNormalize -SkillRoot (Join-Path $SkillsTarget $name)) {
+        $normalizedCount++
+        Write-Host "name normalize: $name (ckm: prefix removed)"
+    }
+}
 
 $uiUxTarget = Join-Path $SkillsTarget "ui-ux-pro-max"
 if (-not $DryRun) {
@@ -225,6 +266,14 @@ if (-not $DryRun) {
         throw "Path rewrite incomplete. Fix sync-ui-ux-skills.ps1 or upstream content."
     }
     Write-Host "path verify: OK (no .claude/skills or ~/.claude/skills in synced skills)"
+
+    $ckmHits = Get-CkmSkillNames -SkillDirs $syncedDirs
+    if ($ckmHits.Count -gt 0) {
+        Write-Warning "Residual ckm: skill names found ($($ckmHits.Count)):"
+        $ckmHits | ForEach-Object { Write-Warning $_ }
+        throw "Skill name normalization incomplete. Fix sync-ui-ux-skills.ps1."
+    }
+    Write-Host "name verify: OK (no ckm: prefixed skill names)"
 }
 
 $fileCount = 0
@@ -244,6 +293,7 @@ Write-Host "  skills:     $($SkillNames -join ', ')"
 Write-Host "  files:      $fileCount"
 Write-Host "  size (MB):  $([math]::Round($sizeBytes / 1MB, 2))"
 Write-Host "  rewrites:   $totalRewrites file(s)"
+Write-Host "  names:      $normalizedCount normalized"
 if ($DryRun) {
     Write-Host "  mode:       dry-run (no files written)"
 }

@@ -5,7 +5,10 @@
 ```text
 Cursor: %USERPROFILE%\.cursor\skills
 Codex:  %USERPROFILE%\.codex\skills
+DSH:    %USERPROFILE%\.dsh\skills（项目内 .agents/skills 优先于用户级）
 ```
+
+DSH 调用方式：模型用 `skill` 工具按名称加载；用户可用 `/<name>` 显式调用。标有 `disable-model-invocation: true` 的技能（`cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）不会出现在模型目录中，只能由用户 `/name` 触发。
 
 ## 文献检索与综述
 
@@ -19,7 +22,7 @@ Codex:  %USERPROFILE%\.codex\skills
 ## PPT 与汇报
 
 - `ppt-maker`：默认路径。Vue 16:9 预览 + 浏览器导出 pptx/zip；须 **grill-me 顺序 intake** + `ui-ux-pro-max`；任务副本在 `ppt-projects/{slug}/`。详见 `skills/ppt-maker/发布说明.md`。
-- `academic-ppt-builder`：学术快出。答辩、开题、文献综述或明确要快出 pptx 时，调用 deck-builder / ppt-markdown MCP。
+- `academic-ppt-builder`：学术快出。答辩、开题、文献综述或明确要快出 pptx 时，调用 deck-builder MCP。
 
 ## UI/UX 设计
 
@@ -33,11 +36,11 @@ Codex:  %USERPROFILE%\.codex\skills
 
 ## CAD 工程出图
 
-- `cad-structure-layout-debug`：从零搭建或调试工程 CAD 出图组件，覆盖 Python/ezdxf、DXF 排版、布局引擎、明细表锚点、预览与外部 CAD 一致性、烟测和视觉验收；Cursor 与 Codex 安装脚本均托管该 Skill。
+- `cad-structure-layout-debug`：从零搭建或调试工程 CAD 出图组件，覆盖 Python/ezdxf、DXF 排版、布局引擎、明细表锚点、预览与外部 CAD 一致性、烟测和视觉验收；Cursor、Codex 与 DSH 安装脚本均托管该 Skill。
 
 ## WPF + Python 工程脚手架
 
-- `wpf-python-mvvm-builder`：在已有 Visual Studio WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，包含 PythonBridge、Themes/Resources/Properties 与 `memory` / `archive` 两类持久化路线；Cursor 与 Codex 安装脚本均托管该 Skill。
+- `wpf-python-mvvm-builder`：在已有 Visual Studio WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，包含 PythonBridge、Themes/Resources/Properties 与 `memory` / `archive` 两类持久化路线；Cursor、Codex 与 DSH 安装脚本均托管该 Skill。
 
 ## Superpowers 软件开发方法
 
@@ -59,7 +62,7 @@ Codex:  %USERPROFILE%\.codex\skills
 
 ## gstack 去重集成
 
-gstack 1.60.1.0 仅为 Codex、Cursor 安装宿主专用入口。上游 54 项保留 33 项，目录名统一带 `gstack-` 前缀；共享运行时安装到对应用户 Skills 目录下的 `gstack/`。
+gstack 1.60.1.0 仅为 Codex、Cursor 安装宿主专用入口（Antigravity、QoderCN、DSH 不安装）。上游 54 项保留 33 项，目录名统一带 `gstack-` 前缀；共享运行时安装到对应用户 Skills 目录下的 `gstack/`。
 
 - 浏览器与 QA：`gstack-browse`、`gstack-open-gstack-browser`、`gstack-setup-browser-cookies`、`gstack-qa`、`gstack-qa-only`、`gstack-scrape`、`gstack-canary`、`gstack-pair-agent`。
 - 设计与文档：`gstack-design-html`、`gstack-design-review`、`gstack-diagram`、`gstack-make-pdf`、`gstack-document-generate`、`gstack-document-release`。

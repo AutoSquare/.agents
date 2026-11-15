@@ -12,10 +12,23 @@
 - **Cursor Project Rules（可选）**：`-ProjectPath` 安装到 `{工程根}/.cursor/rules`
 - Cursor 本地 MCP 服务：`%USERPROFILE%\.cursor\mcp-servers`
 - Codex 本地 MCP 服务：`%USERPROFILE%\.codex\mcp-servers`
+- QoderCN 用户级 Skills：`%USERPROFILE%\.qoder-cn\skills`
+- QoderCN 记忆入口（常驻薄 AGENTS.md）：`%USERPROFILE%\.qoder-cn\AGENTS.md`
+- QoderCN 规则（trigger frontmatter 按需注入）：`%USERPROFILE%\.qoder-cn\rules`
+- QoderCN 本地 MCP 服务：`%USERPROFILE%\.qoder-cn\mcp-servers`
+- QoderCN MCP 配置：`%USERPROFILE%\.qoder-cn\settings.json`（经 `qoderclicn mcp add/remove -s user` 管理，脚本不直接改写 JSON）
+- DSH 用户级 Skills：`%USERPROFILE%\.dsh\skills`
+- DSH 全局规则入口：`%USERPROFILE%\.dsh\AGENTS.md`
+- DSH 按需规则：`%USERPROFILE%\.dsh\rules`
+- DSH 本地 MCP 服务：`%USERPROFILE%\.dsh\mcp-servers`
+- DSH MCP 注册：`%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml` 的托管标记块
+- DSH campus-net 用户根：`%USERPROFILE%\.dsh\campus-net`
 - 迁移包 Skills 副本：`.agents/skills`
 - 迁移包 MCP 源码快照：`.agents/mcp-servers-src`
 - **Cursor** 写入脚本（非通用 IDE 安装名）：`scripts/setup-cursor-agents.ps1`（在 `.agents` 目录内执行）
 - **Codex** 写入脚本：`scripts/setup-codex-agents.ps1`（在 `.agents` 目录内执行）
+- **QoderCN** 写入脚本：`scripts/setup-qodercn-agents.ps1`（在 `.agents` 目录内执行）
+- **DSH** 写入脚本：`scripts/setup-dsh-agents.ps1`（在 `.agents` 目录内执行；写入 `$DSH_HOME`）
 - **UI/UX 技能同步**（维护者）：`scripts/sync-ui-ux-skills.ps1`（在 `.agents` 目录内执行）
 - 安装记录：`MCP与Skills配置记录.md`（若存在）
 
@@ -49,6 +62,9 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -Upst
 # 安装到 Cursor（Skills + MCP；Rules 见终端提醒手动录入 AGENTS.md）
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
+# 安装到 DSH（Skills + Rules + MCP；写入 $DSH_HOME）
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
+
 # 安装到 Codex（Rules + Skills + MCP；只覆盖 manifest 托管项）
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 
@@ -61,6 +77,8 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 **`banner-design` 限制**：完整生成链引用未打包 Skill `ai-artist`、`ai-multimodal`、`chrome-devtools`；迁入包仅含 SKILL + references。
 
 **Claude Code 手动安装**：若复制到 `~/.claude/skills/`，须将 SKILL 内 `$env:USERPROFILE\.cursor\skills\` 替换为 Claude 用户级路径（含 `ppt-maker`、`ui-ux-pro-max`）。
+
+**DSH 安装**：`setup-dsh-agents.ps1` 会把 `pathRewriteSkills` 中的 `$env:USERPROFILE\.cursor\skills\` / `%USERPROFILE%\.cursor\skills\` / `~/.cursor/skills` 改写为当前 `$DSH_HOME` 技能根；`-NoPathRewrite` 可关闭。
 
 **Codex 安装**：使用 `setup-codex-agents.ps1` 写入 `%USERPROFILE%\.codex\skills\`；若手动复制 Skill，须将仅适用于 Cursor 的命令路径替换为 Codex 用户级路径。
 
@@ -177,6 +195,7 @@ node "$env:USERPROFILE\.codex\skills\ppt-maker\scripts\check-node.mjs"
 ## 重启要求
 
 - 修改 `%USERPROFILE%\.cursor\mcp.json` 后，需要重启 Cursor 或重新打开 Agent 会话。
+- 修改 DSH 的 `cordis.patch.yml` 后，HMR 通常会自动重载；未生效时重启 DSH 桌面端并新开会话。
 - 使用 `codex mcp add/remove` 更新 MCP 后，需要新开 Codex 会话。
 - 新增或修改 Skills 后，建议重启 Cursor 或新开 Agent 会话。
 - 不要修改 `%USERPROFILE%\.cursor\skills-cursor`，该目录为 Cursor 内置 Skills。

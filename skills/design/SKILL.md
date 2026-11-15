@@ -1,5 +1,5 @@
 ﻿---
-name: ckm:design
+name: design
 description: "综合设计技能：品牌识别、设计令牌、UI 样式、Logo 生成（55 种风格，Gemini AI）、企业识别系统 CIP（50 项交付物与样机）、HTML 演示文稿（Chart.js）、横幅设计（22 种风格，社交/广告/网页/印刷）、图标设计（15 种风格，SVG，Gemini 3.1 Pro）、社交配图（HTML→截图，多平台）。操作：设计 Logo、创建 CIP、生成样机、制作幻灯片、设计横幅、生成图标、制作社交配图、品牌识别、设计系统。平台：Facebook、Twitter、LinkedIn、YouTube、Instagram、Pinterest、TikTok、Threads、Google Ads。"
 argument-hint: "[设计类型] [上下文]"
 license: MIT

@@ -1,0 +1,54 @@
+# DSH profile patch entries for the portable-agents local MCP servers.
+# setup-dsh-agents.ps1 replaces the DSH home and node placeholders, then writes
+# this block into $DSH_HOME/profiles/<profile>/cordis.patch.yml between the
+# managed markers. New rows need the `insert` list; a bare `- id: ...` patch
+# entry is an override target and is reported as "entry not found".
+# Credentials are passed explicitly because DSH scrubs ambient
+# KEY/PASSWORD/SECRET/TOKEN variables from stdio MCP child processes.
+- insert:
+    - id: mcp-academic-research
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: academic-research
+        transport: stdio
+        command: '{{DSH_HOME}}\mcp-servers\academic-research-mcp\.venv\Scripts\python.exe'
+        args:
+          - '{{DSH_HOME}}\mcp-servers\academic-research-mcp\server.py'
+        env:
+          S2_API_KEY: !!js process.env.S2_API_KEY || ''
+          OPENALEX_EMAIL: !!js process.env.OPENALEX_EMAIL || ''
+          CROSSREF_EMAIL: !!js process.env.CROSSREF_EMAIL || ''
+          NCBI_API_KEY: !!js process.env.NCBI_API_KEY || ''
+    - id: mcp-zotero
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: zotero
+        transport: stdio
+        command: '{{NODE}}'
+        args:
+          - '{{DSH_HOME}}\mcp-servers\zotero-mcp\dist\index.js'
+        env:
+          PADDLEOCR_TOKEN: !!js process.env.PADDLEOCR_TOKEN || ''
+    - id: mcp-deck-builder
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: deck-builder
+        transport: stdio
+        command: '{{NODE}}'
+        args:
+          - '{{DSH_HOME}}\mcp-servers\deck-builder\build\index.js'
+    - id: mcp-campus-net
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: campus-net
+        transport: stdio
+        command: '{{DSH_HOME}}\mcp-servers\campus-net-mcp\.venv\Scripts\python.exe'
+        args:
+          - '{{DSH_HOME}}\mcp-servers\campus-net-mcp\server.py'
+        env:
+          CAMPNET_USER_ROOT: '{{DSH_HOME}}\campus-net'
+          CAMPUS_USERNAME: !!js process.env.CAMPUS_USERNAME || ''
+          CAMPUS_PASSWORD: !!js process.env.CAMPUS_PASSWORD || ''
+          CAMPUS_OUTPUT_DIR: !!js process.env.CAMPUS_OUTPUT_DIR || ''
+          OPENALEX_EMAIL: !!js process.env.OPENALEX_EMAIL || ''
+          CROSSREF_EMAIL: !!js process.env.CROSSREF_EMAIL || ''

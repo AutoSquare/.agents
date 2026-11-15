@@ -12,6 +12,7 @@ Distilled from GeoPile. **Do not** scaffold WPF from zero — create an empty WP
 
 - Codex: install or copy this folder to `$CODEX_HOME/skills/wpf-python-mvvm-builder/`; Codex-only display metadata lives in `agents/openai.yaml`. See [README-codex.md](README-codex.md).
 - Cursor: managed by `.agents/scripts/setup-cursor-agents.ps1` (`installManifest.managedSkills`); after install use `%USERPROFILE%\.cursor\skills\wpf-python-mvvm-builder\` or `@wpf-python-mvvm-builder`. See [README-cursor.md](README-cursor.md). Cursor-facing docs stay separate so Codex edits do not change Cursor behavior.
+- DSH: managed by `.agents/scripts/setup-dsh-agents.ps1` (`dshInstallManifest.managedSkills`); installs to `$DSH_HOME/skills/wpf-python-mvvm-builder/`. The skill sets `disable-model-invocation: true`, so DSH exposes it only as `/wpf-python-mvvm-builder`.
 - Intake questions are host-neutral: use the host's structured question tool when available; otherwise ask one Markdown ballot question and stop until the user answers.
 - Keep the normal execution order: intake first, then audit, scaffold with `--dry-run`, apply only after review, and verify with the smoke/audit/build commands.
 
@@ -21,6 +22,11 @@ Distilled from GeoPile. **Do not** scaffold WPF from zero — create an empty WP
 - Path: `%USERPROFILE%\.cursor\skills\wpf-python-mvvm-builder\`
 - Intake: prefer `AskQuestion` with one question per round; fall back to a single Markdown ballot and stop until the user answers.
 - Full install, verification, and maintainer sync: [README-cursor.md](README-cursor.md).
+## DSH Usage
+
+- Install from `.agents`: `powershell -ExecutionPolicy Bypass -File .\scripts\setup-dsh-agents.ps1`; path is `$DSH_HOME/skills/wpf-python-mvvm-builder/` (default `%USERPROFILE%\.dsh\skills\`).
+- Intake: use `ask_user_question` (one question per round; put the recommended option first with `(Recommended)`); fall back to a Markdown ballot when the tool is unavailable.
+- Use DSH `pwsh` for `py -3 scripts/audit_project.py` and the smoke/build commands.
 
 ## Persistence modes
 
