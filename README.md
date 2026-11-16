@@ -225,6 +225,42 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -DshHo
 
 ---
 
+### ZCode（一键安装）
+
+**前置**：Windows 上已安装 ZCode、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
+
+进入 `.agents` 目录，在 PowerShell 中执行：
+
+```powershell
+cd D:\你的项目路径\.agents
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1"
+```
+
+脚本会：
+
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.zcode\skills\`（仅 `zcodeInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
+- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 ZCode 技能根
+- 将薄入口 `rules/zcode/AGENTS.md` 写入 `%USERPROFILE%\.zcode\AGENTS.md` 托管块（保留用户内容并备份），14 条规则直拷到 `%USERPROFILE%\.zcode\rules\`
+- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.zcode\mcp-servers\`，并**增量合并**写入 `%USERPROFILE%\.zcode\cli\config.json` 的 `mcp.servers`（绝对路径、不展开环境变量模板；写前备份、写后 JSON 校验，保留用户其余键与服务器）
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
+- **不安装 gstack**（宿主支持清单仅 Codex / Cursor），不写入 hooks 配置
+
+注意：ZCode 用户级同名技能会**遮蔽**项目内 `.agents/skills/`（与 DSH 相反）；更新技能源后重跑安装器同步。
+
+常用参数：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -WhatIf            # 预览，不写盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipRules         # 跳过 Rules
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -ZcodeHome "D:\tmp\zcode-home"  # 测试/多环境
+```
+
+更细的 ZCode 说明见 [`ZCODE.md`](ZCODE.md)。
+
+---
+
 ### Claude Code
 
 本包不附带 Claude 专用安装脚本，采用 **手动挂载**（与 Cursor 共用同一份 `skills/` 与 MCP 源码）。
@@ -282,6 +318,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
 ├── ANTIGRAVITY.md            # Antigravity 安装与配置说明
 ├── DSH.md                    # DeepSeek Harness 安装与规则/MCP 适配说明
+├── ZCODE.md                  # ZCode 安装与规则/MCP 适配说明
 ├── manifest.json             # Skills / MCP 来源清单（机器可读）
 ├── licenses/                 # 第三方技能许可证
 ├── mcp.md                    # MCP 调用规范（给智能体）
@@ -300,6 +337,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 │   ├── antigravity/          # Antigravity 专有规则（AGENTS.md + agent-rules/）
 │   ├── qoder/                # QoderCN 规则（薄 AGENTS.md + trigger frontmatter 规则）
 │   ├── dsh/                  # DSH 规则（薄 AGENTS.md + 13 条主题规则 + DSH 宿主规则）
+│   ├── zcode/                # ZCode 规则（薄 AGENTS.md + 13 条主题规则 + ZCode 宿主规则）
 │   └── universal/            # Claude Code / OpenCode / Trea（AGENTS.md）
 ├── tests/                    # 安装器与 manifest 契约校验（pwsh）
 ├── mcp-servers-src/          # 需本地构建的 MCP 源码快照
@@ -313,6 +351,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
     ├── setup-antigravity-agents.ps1 # 仅 Antigravity：写入 ~/.gemini/config/plugins/agents/
     ├── setup-qodercn-agents.ps1  # 仅 QoderCN：写入 ~/.qoder-cn/
     ├── setup-dsh-agents.ps1      # 仅 DSH：写入 $DSH_HOME/（技能、规则、MCP、profile patch）
+    ├── setup-zcode-agents.ps1    # 仅 ZCode：写入 ~/.zcode/（技能、规则、MCP、config.json 增量合并）
     ├── gstack-install-lib.ps1       # Codex / Cursor 共用 gstack 安装与构建逻辑
     └── sync-ui-ux-skills.ps1     # 维护者：从 ui-ux-pro-max-skill 同步 UI/UX 技能族（含 ckm: 技能名归一化）
 ```
@@ -326,12 +365,14 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `rules/codex-global/` | Codex 全局入口与按需规则；由 `setup-codex-agents.ps1` 安装到 `%USERPROFILE%\.codex\`。 |
 | `rules/qoder/` | QoderCN 薄入口 AGENTS.md 与 trigger 规则；由 `setup-qodercn-agents.ps1` 直拷到 `%USERPROFILE%\.qoder-cn\`。 |
 | `rules/dsh/` | DSH 薄入口 AGENTS.md 与 14 条按需规则；由 `setup-dsh-agents.ps1` 写入 `$DSH_HOME/`。 |
+| `rules/zcode/` | ZCode 薄入口 AGENTS.md 与 14 条按需规则；由 `setup-zcode-agents.ps1` 写入 `~/.zcode/`。 |
 | `rules/universal/` | 通用团队规范（`.md`）；非 Cursor 平台使用。 |
 | `mcp-servers-src/` | MCP 服务端源码；**不含** `.venv`、`node_modules`（需安装脚本或手动构建）。 |
 | `scripts/setup-cursor-agents.ps1` | **仅 Cursor**：安装 Skills + MCP 到用户目录。 |
 | `scripts/setup-codex-agents.ps1` | **仅 Codex**：安装 Rules + Skills + MCP 到用户目录，增量覆盖托管项。 |
 | `scripts/setup-qodercn-agents.ps1` | **仅 QoderCN**：安装 AGENTS.md + Rules + Skills + MCP 到 `%USERPROFILE%\.qoder-cn\`，增量覆盖托管项。 |
 | `scripts/setup-dsh-agents.ps1` | **仅 DSH**：安装 Skills + Rules + MCP 到 `$DSH_HOME`，并写 profile patch 托管块。 |
+| `scripts/setup-zcode-agents.ps1` | **仅 ZCode**：安装 Skills + Rules + MCP 到 `~/.zcode/`，并增量合并 `config.json` 的 `mcp.servers`。 |
 | `tests/` | 安装器静态检查与 `-WhatIf` 预览测试（`dsh-adapter.Tests.ps1`、`retired-mcp-cleanup.Tests.ps1`）。 |
 | `mcp.template.json` | 非 Cursor 平台手工配置 MCP 时的 JSON 模板。 |
 | `workflows.md` | 多技能串联的标准工作流（查文献、筛文献、下全文、做 PPT）。 |
@@ -343,7 +384,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 
 ## Skills 一览
 
-> DSH 用户级安装到 `%USERPROFILE%\.dsh\skills\`；`disable-model-invocation: true` 的技能（`cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）只通过 `/name` 调用。
+> DSH 用户级安装到 `%USERPROFILE%\.dsh\skills\`；ZCode 用户级安装到 `%USERPROFILE%\.zcode\skills\`（同名技能优先于项目内 `.agents/skills/`）；`disable-model-invocation: true` 的技能（`cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）只通过 `/name` 调用（ZCode 不识别该键，技能同样可被模型按需调用）。
 
 | Skill | 用途 |
 |-------|------|
@@ -443,6 +484,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | Antigravity | `rules/antigravity/AGENTS.md` + `agent-rules/*.md` | Antigravity（由脚本自动聚合注入 `plugin.json`） |
 | QoderCN | `rules/qoder/AGENTS.md` + `rules/qoder/*.md` | QoderCN（薄 AGENTS.md 常驻 + rules trigger 按需注入） |
 | DSH | `rules/dsh/AGENTS.md` + `rules/dsh/rules/*.md` | DeepSeek Harness（`$DSH_HOME/AGENTS.md` + 按需规则目录） |
+| ZCode | `rules/zcode/AGENTS.md` + `rules/zcode/rules/*.md` | ZCode（`~/.zcode/AGENTS.md` 托管块 + `~/.zcode/rules/` 按需读取） |
 | 通用 | `rules/universal/AGENTS.md` | Claude Code、OpenCode、Trea |
 
 完整文件表见 [`rules/README.md`](rules/README.md)。
@@ -462,7 +504,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 
 **常用工具（campus-net）**：`get_active_profile`、`onboard_school`、`ensure_auth`、`download_paper`、`download_papers`、`download_cnki`、`detect_network`。
 
-源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`；Antigravity 默认路径：`%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`；DSH 默认路径：`%USERPROFILE%\.dsh\mcp-servers\`，注册在 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`。
+源码位置：`mcp-servers-src/<名称>/`。安装后 Cursor 默认路径：`%USERPROFILE%\.cursor\mcp-servers\`；Codex 默认路径：`%USERPROFILE%\.codex\mcp-servers\`；Antigravity 默认路径：`%USERPROFILE%\.gemini\config\plugins\agents\mcp-servers\`；DSH 默认路径：`%USERPROFILE%\.dsh\mcp-servers\`，注册在 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`；ZCode 默认路径：`%USERPROFILE%\.zcode\mcp-servers\`，注册在 `%USERPROFILE%\.zcode\cli\config.json` 的 `mcp.servers`。
 
 详细能力与调用约束见 [`mcp.md`](mcp.md)。
 

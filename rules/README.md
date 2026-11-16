@@ -7,6 +7,7 @@
 | [`antigravity/`](antigravity/) | `.md` | **Antigravity** 专有规则（被脚本聚合注入 `plugin.json`） |
 | [`qoder/`](qoder/) | `.md`（YAML frontmatter trigger） | **QoderCN**：薄 `AGENTS.md` 常驻 + rules 按 `model_decision` / `glob` 按需注入 |
 | [`dsh/`](dsh/) | `.md`（无 trigger） | **DSH**：薄 `AGENTS.md` 常驻 + `rules/` 按需读取（14 条） |
+| [`zcode/`](zcode/) | `.md`（无 trigger） | **ZCode**：薄 `AGENTS.md` 托管块 + `~/.zcode/rules/` 按需读取（14 条） |
 | [`universal/`](universal/) | `.md` | **Claude Code、OpenCode、Trea**；**Cursor User Rules 手动录入源** |
 
 ## Cursor：双通道
@@ -68,5 +69,6 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 4. **Antigravity 专有规则**：编辑 `antigravity/AGENTS.md` 与 `antigravity/agent-rules/*.md`，再运行 `scripts/setup-antigravity-agents.ps1` 将其重新聚合注入。
 5. **QoderCN 规则**：编辑 `qoder/AGENTS.md` 与 `qoder/*.md`（frontmatter trigger 决定常驻或按需），更新 [`manifest.json`](../manifest.json) 的 `qodercnInstallManifest.managedRules`，再运行 `scripts/setup-qodercn-agents.ps1` 直拷到 `%USERPROFILE%\.qoder-cn\`。
 6. **DSH 规则**：编辑 `dsh/AGENTS.md` 与 `dsh/rules/*.md`（无 trigger；由 `AGENTS.md` 索引按需读取），更新 [`manifest.json`](../manifest.json) 的 `dshInstallManifest.managedRules`，再运行 `scripts/setup-dsh-agents.ps1` 写入 `$DSH_HOME/`。
+7. **ZCode 规则**：编辑 `zcode/AGENTS.md` 与 `zcode/rules/*.md`（无 trigger；由 `AGENTS.md` 索引按需读取），更新 [`manifest.json`](../manifest.json) 的 `zcodeInstallManifest.managedRules`，再运行 `scripts/setup-zcode-agents.ps1` 写入 `~/.zcode/`。
 
 `.mdc` 格式说明见 Cursor 文档：`description`、`alwaysApply`、`globs` 字段。

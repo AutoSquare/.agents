@@ -1,6 +1,6 @@
 {
   "name": "portable-agents",
-  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Superpowers、去重后的 gstack、Karpathy 编码准则等）；安装入口为 scripts/ 下的 Cursor、Codex、Antigravity、QoderCN 与 DSH 安装脚本。",
+  "description": "可迁移 Agent Skills + Rules + MCP 包（文献检索、Zotero、PPT、ppt-maker、campus-net、UI/UX 设计技能、Superpowers、去重后的 gstack、Karpathy 编码准则等）；安装入口为 scripts/ 下的 Cursor、Codex、Antigravity、QoderCN、DSH 与 ZCode 安装脚本。",
   "skillsRoot": "skills",
   "rulesRoot": "rules",
   "rulesCursor": "rules/cursor",
@@ -659,5 +659,114 @@
     "patchPath": "$DSH_HOME/profiles/<profile>/cordis.patch.yml",
     "installMode": "incremental_managed_only",
     "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and the managed patch block are overwritten. User-installed skills, rules, MCP dirs, other patch entries, and other hosts are not removed or modified."
+  },
+  "zcodeInstallManifest": {
+    "packageId": "portable-zcode-agents",
+    "managedSkills": [
+      "literature-search",
+      "campus-net-onboarding",
+      "paper-screening",
+      "paper-summary",
+      "citation-export",
+      "research-gap-analysis",
+      "academic-ppt-builder",
+      "ppt-maker",
+      "diagnose",
+      "grill-with-docs",
+      "improve-codebase-architecture",
+      "prototype",
+      "setup-matt-pocock-skills",
+      "tdd",
+      "to-issues",
+      "to-prd",
+      "triage",
+      "zoom-out",
+      "caveman",
+      "grill-me",
+      "handoff",
+      "write-a-skill",
+      "git-guardrails",
+      "migrate-to-shoehorn",
+      "scaffold-exercises",
+      "setup-pre-commit",
+      "adapt-mattpocock-skills-for-cursor",
+      "ui-ux-pro-max",
+      "design",
+      "banner-design",
+      "ui-styling",
+      "slides",
+      "design-system",
+      "brand",
+      "karpathy-guidelines",
+      "cad-structure-layout-debug",
+      "wpf-python-mvvm-builder",
+      "using-superpowers",
+      "brainstorming",
+      "using-git-worktrees",
+      "writing-plans",
+      "executing-plans",
+      "subagent-driven-development",
+      "dispatching-parallel-agents",
+      "test-driven-development",
+      "systematic-debugging",
+      "requesting-code-review",
+      "receiving-code-review",
+      "verification-before-completion",
+      "finishing-a-development-branch",
+      "writing-skills"
+    ],
+    "pathRewriteSkills": [
+      "ui-ux-pro-max",
+      "design",
+      "design-system",
+      "slides",
+      "brand",
+      "banner-design",
+      "ui-styling",
+      "ppt-maker"
+    ],
+    "entryFile": "rules/zcode/AGENTS.md",
+    "rulesDir": "rules/zcode/rules",
+    "managedRules": [
+      "01-language-and-naming.md",
+      "02-doc-linkage-and-delivery.md",
+      "03-pre-development-requirements.md",
+      "04-comment-and-writing-quality.md",
+      "05-code-organization-and-architecture.md",
+      "06-pre-submit-checklist.md",
+      "07-skills-authoring.md",
+      "08-csharp-xml-docs.md",
+      "09-git-commit-message.md",
+      "10-karpathy-guidelines.md",
+      "11-literature-integrity.md",
+      "12-literature-workflow.md",
+      "13-agents-entry.md",
+      "14-zcode-host.md"
+    ],
+    "managedMcpServers": [
+      {
+        "name": "academic-research",
+        "sourceDir": "academic-research-mcp",
+        "kind": "python"
+      },
+      {
+        "name": "zotero",
+        "sourceDir": "zotero-mcp",
+        "kind": "node"
+      },
+      {
+        "name": "deck-builder",
+        "sourceDir": "deck-builder",
+        "kind": "node"
+      },
+      {
+        "name": "campus-net",
+        "sourceDir": "campus-net-mcp",
+        "kind": "python"
+      }
+    ],
+    "configPath": "~/.zcode/cli/config.json (mcp.servers)",
+    "installMode": "incremental_managed_only",
+    "managedOnlyGuarantee": "Only same-name managed skills, rules, MCP source dirs, and the managed mcp.servers entries are overwritten. User-installed skills, rules, MCP dirs, other config.json keys and servers, and other hosts are not removed or modified."
   }
 }
