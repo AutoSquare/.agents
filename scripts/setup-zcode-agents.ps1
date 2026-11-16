@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # ZCode: install Skills, Rules, and local MCP servers for the ZCode host.
-# Usage: run from the .agents directory of this repo:
+# Usage: run from the package root directory of this repo:
 #   powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1"
 [CmdletBinding()]
 param(

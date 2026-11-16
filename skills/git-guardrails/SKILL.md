@@ -6,7 +6,7 @@ description: 配置 Claude Code 钩子，在危险 git 命令执行前拦截（p
 # Setup Git Guardrails（Git 护栏）
 
 配置 PreToolUse 钩子：在 Claude 执行前拦截并阻止危险 git 命令。
-> **DSH 宿主**：DeepSeek Harness 没有 PreToolUse 钩子机制，本技能不适用。不要在 DSH 环境创建 `.claude/settings.json`、`.cursor/hooks.json` 或任何钩子文件；DSH 侧由审批/沙箱策略与 `.agents/rules/dsh/09-git-commit-message.md` 中的 git 禁令代替。以下步骤仅供 Claude Code / Cursor 参考。
+> **DSH 宿主**：DeepSeek Harness 没有 PreToolUse 钩子机制，本技能不适用。不要在 DSH 环境创建 `.claude/settings.json`、`.cursor/hooks.json` 或任何钩子文件；DSH 侧由审批/沙箱策略与 `<配置包根目录>/rules/dsh/09-git-commit-message.md` 中的 git 禁令代替。以下步骤仅供 Claude Code / Cursor 参考。
 
 ## 会拦截的内容
 

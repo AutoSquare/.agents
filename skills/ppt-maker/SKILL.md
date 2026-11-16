@@ -32,7 +32,7 @@ description: 将素材与结构化 slides 数据生成为 Vue 16:9 预览页，�
 ## 路径
 
 - 运行时（Cursor）：`%USERPROFILE%\.cursor\skills\ppt-maker\`
-- 运行时（DSH）：`%USERPROFILE%\.dsh\skills\ppt-maker\`（由 `.agents/scripts/setup-dsh-agents.ps1` 安装）
+- 运行时（DSH）：`%USERPROFILE%\.dsh\skills\ppt-maker\`（由 `<配置包根目录>/scripts/setup-dsh-agents.ps1` 安装）
 - 沙箱：`ppt-maker/`（维护者编辑源）
 
 ## DSH 宿主差异
@@ -178,7 +178,7 @@ npm run serve
 
 ```powershell
 node ppt-maker/scripts/sync-to-agents.mjs
-cd .agents
+cd <配置包根目录>
 powershell -ExecutionPolicy Bypass -File .\scripts\setup-cursor-agents.ps1
 ```
 

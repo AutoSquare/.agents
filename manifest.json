@@ -108,8 +108,8 @@
       "purpose": "structured editable PPTX generation"
     },
     "campus-net-mcp": {
-      "source": "bundled: .agents/mcp-servers-src/campus-net-mcp",
-      "install": ".agents/scripts/setup-cursor-agents.ps1 或 .agents/scripts/setup-codex-agents.ps1",
+      "source": "bundled: mcp-servers-src/campus-net-mcp",
+      "install": "scripts/setup-cursor-agents.ps1 或 scripts/setup-codex-agents.ps1",
       "purpose": "通用学校 Profile：馆藏探测、会话与全文下载链路"
     }
   },

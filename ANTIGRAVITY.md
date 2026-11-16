@@ -1,12 +1,12 @@
 # Antigravity 安装说明
 
-本文记录 `.agents` 包面向 Antigravity 的安装方式。
+本文记录本包面向 Antigravity 的安装方式。
 
 ## 一键安装
 
 **前置要求**：Windows 上已安装 Git、Python 3.10+、Node.js、npm 与 Antigravity CLI。如果 PATH 默认的 `python` 版本较旧，脚本会自动通过 Windows `py` 启动器向下兼容查找 `py -3.10` 或以上版本。
 
-在 `.agents` 目录执行：
+在配置包根目录执行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1"

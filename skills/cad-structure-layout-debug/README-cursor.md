@@ -2,10 +2,10 @@
 
 ## 安装
 
-在 `.agents` 目录执行：
+在配置包根目录执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
@@ -53,15 +53,15 @@ py -3.10 "$skill\scripts\render_dxf_preview.py" --dxf "$skill\out\minimal.dxf" -
 
 ## 维护者工作流
 
-编辑源在工作区根目录 `cad-structure-layout-debug/`（非 `.agents/skills/` 手改）：
+编辑源在工作区根目录 `cad-structure-layout-debug/`（非 `<配置包根目录>/skills/` 手改）：
 
 ```powershell
 # 1. 编辑 cad-structure-layout-debug/ 下的 SKILL.md、references、scripts 等
-# 2. 同步到 .agents 发布副本
+# 2. 同步到 <配置包根目录> 发布副本
 powershell -ExecutionPolicy Bypass -File "cad-structure-layout-debug\scripts\sync-to-agents.ps1"
 
 # 3. 安装到 Cursor（及可选 Codex）
-cd .agents
+cd <配置包根目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 ```

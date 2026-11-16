@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # QoderCN: install Skills, Rules, and MCP servers to ~/.qoder-cn/
-# Usage: run from the .agents directory of this repo:
+# Usage: run from the package root directory of this repo:
 #   powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1"
 [CmdletBinding()]
 param(

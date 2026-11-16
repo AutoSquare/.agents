@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # DeepSeek Harness (DSH): install Skills, Rules, and local MCP servers.
-# Usage: run from the .agents directory of this repo:
+# Usage: run from the package root directory of this repo:
 #   powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
 [CmdletBinding()]
 param(

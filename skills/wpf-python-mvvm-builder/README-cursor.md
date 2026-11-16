@@ -2,10 +2,10 @@
 
 ## 安装
 
-在 `.agents` 目录执行：
+在配置包根目录执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
@@ -72,16 +72,16 @@ AgentStatistics Phase B/C 冻结命令块见 [SKILL.md](SKILL.md)（维护者 / 
 
 ## 维护者工作流
 
-编辑源在工作区根目录 `wpf-python-mvvm-builder/`（非 `.agents/skills/` 手改）：
+编辑源在工作区根目录 `wpf-python-mvvm-builder/`（非 `<配置包根目录>/skills/` 手改）：
 
 ```powershell
 # 1. 编辑 wpf-python-mvvm-builder/ 下的 SKILL.md、references、scripts 等
-# 2. 同步到 .agents 发布副本
+# 2. 同步到 <配置包根目录> 发布副本
 powershell -ExecutionPolicy Bypass -File "wpf-python-mvvm-builder\scripts\sync-to-agents.ps1"
 
 # 3. 安装到 Cursor
-cd .agents
+cd <配置包根目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
-Codex 侧安装与说明见 [README-codex.md](README-codex.md) 与 `.agents/CODEX.md`（本文件不修改 Codex 文档）。
+Codex 侧安装与说明见 [README-codex.md](README-codex.md) 与 `<配置包根目录>/CODEX.md`（本文件不修改 Codex 文档）。

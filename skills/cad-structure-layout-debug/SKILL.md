@@ -32,21 +32,21 @@ Read only what is needed:
 
 ## Cursor Usage
 
-- This skill is managed by `.agents/scripts/setup-cursor-agents.ps1` through `installManifest.managedSkills`.
+- This skill is managed by `<配置包根目录>/scripts/setup-cursor-agents.ps1` through `installManifest.managedSkills`.
 - After installation, use it from `%USERPROFILE%\.cursor\skills\cad-structure-layout-debug\` (or `@cad-structure-layout-debug` in chat).
 - First classify the issue with **Triage**, then read only the relevant file under `references/`; see `README-cursor.md` for install and verification.
 - This skill covers **CAD drawing, DXF layout, preview, and visual verification**. Backend calculation debugging should use a project-specific backend-debug skill if one exists.
 
 ## Codex Usage
 
-- This skill is managed by `.agents/scripts/setup-codex-agents.ps1` through `codexInstallManifest.managedSkills`.
+- This skill is managed by `<配置包根目录>/scripts/setup-codex-agents.ps1` through `codexInstallManifest.managedSkills`.
 - After installation, use it from `$CODEX_HOME/skills/cad-structure-layout-debug/`.
 - First classify the issue with **Triage**, then read only the relevant file under `references/`.
 - This skill covers **CAD drawing, DXF layout, preview, and visual verification**. Backend calculation debugging should use a project-specific backend-debug skill if one exists.
 
 ## DSH Usage
 
-- Managed by `.agents/scripts/setup-dsh-agents.ps1` through `dshInstallManifest.managedSkills`; installed at `$DSH_HOME/skills/cad-structure-layout-debug/` (default `%USERPROFILE%\.dsh\skills\`).
+- Managed by `<配置包根目录>/scripts/setup-dsh-agents.ps1` through `dshInstallManifest.managedSkills`; installed at `$DSH_HOME/skills/cad-structure-layout-debug/` (default `%USERPROFILE%\.dsh\skills\`).
 - `disable-model-invocation: true` means DSH exposes it only as `/cad-structure-layout-debug`.
 - Run the Python smoke commands with DSH `pwsh`; there is no Cursor `@` syntax in DSH.
 ## From Scratch Workflow

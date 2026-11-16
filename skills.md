@@ -5,7 +5,7 @@
 ```text
 Cursor: %USERPROFILE%\.cursor\skills
 Codex:  %USERPROFILE%\.codex\skills
-DSH:    %USERPROFILE%\.dsh\skills（项目内 .agents/skills 优先于用户级）
+DSH:    %USERPROFILE%\.dsh\skills（项目内 <配置包根目录>/skills 优先于用户级）
 ```
 
 DSH 调用方式：模型用 `skill` 工具按名称加载；用户可用 `/<name>` 显式调用。标有 `disable-model-invocation: true` 的技能（`cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）不会出现在模型目录中，只能由用户 `/name` 触发。

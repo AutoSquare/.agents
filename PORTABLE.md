@@ -1,8 +1,8 @@
-# `.agents` 迁移说明（Cursor 细节）
+# `<配置包根目录>` 迁移说明（Cursor 细节）
 
 > **多平台安装**（Claude Code、OpenCode、Trea）见 [`README.md`](README.md)。
 
-本目录是可单独迁移的智能体配置包。复制 `.agents/` 到其他账号或其他电脑后，可恢复当前使用的 Skills 与 MCP 配置。
+本目录是可单独迁移的智能体配置包。复制 `<配置包根目录>/` 到其他账号或其他电脑后，可恢复当前使用的 Skills 与 MCP 配置。
 
 ## 包含内容
 
@@ -10,7 +10,7 @@
 - `host-skills/cursor/` + `runtime/gstack/`：gstack 去重后的 33 个 Cursor 入口与共享运行时源码；21 个同义或不适合便携托管的入口不复制。
 - `mcp-servers-src/`：本地型 MCP 服务源码快照，包含 `academic-research-mcp`、`zotero-mcp`、`deck-builder`、`campus-net-mcp`；不包含 `.git`、`node_modules`、`.venv` 等机器依赖目录。
 - `scripts/setup-cursor-agents.ps1`：**仅限 Cursor**：默认安装 Skills + MCP；Rules 默认不装（User 手动录入 AGENTS.md）；可选 `-ProjectPath` 安装 `.mdc` 到指定工程。
-- `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `.agents/skills/`（含 Cursor 路径改写）。
+- `scripts/sync-ui-ux-skills.ps1`：**维护者**：从 `ui-ux-pro-max-skill` 同步 7 个 UI/UX Skill 到 `<配置包根目录>/skills/`（含 Cursor 路径改写）。
 - `mcp.template.json`：MCP 配置模板，使用 `{{USERPROFILE}}` 占位。
 - `manifest.json`：Skills 与 MCP 来源清单。
 - `licenses/`：第三方技能许可证；Superpowers 与 gstack 均使用 MIT 许可证。
@@ -24,12 +24,12 @@
    - Python 3.10+（若 PATH 中 `python` 是旧版本，安装脚本会优先通过 Windows `py` 启动器选择 3.10+）
    - Cursor
 
-2. 将整个 `.agents/` 文件夹复制到任意项目根目录（UI/UX Skill 已随包附带，**无需** sibling 的 `ui-ux-pro-max-skill` 即可安装）。
+2. 将整个 `<配置包根目录>/` 文件夹复制到任意项目根目录（UI/UX Skill 已随包附带，**无需** sibling 的 `ui-ux-pro-max-skill` 即可安装）。
 
-3. 进入 `.agents` 目录，在 PowerShell 中执行：
+3. 进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
@@ -82,10 +82,10 @@ py -3 "$skill\scripts\smoke_bridge.py" --project-dir "<你的WPF项目路径>" -
 
 ## 维护 UI/UX 技能（可选）
 
-若本机仍有 `ui-ux-pro-max-skill` 源码并修改汉化，进入 `.agents` 后执行：
+若本机仍有 `ui-ux-pro-max-skill` 源码并修改汉化，进入 `<配置包根目录>` 后执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -Assemble
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
@@ -110,7 +110,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
 ## 可选参数
 
-以下命令均在 `.agents` 目录内执行：
+以下命令均在配置包根目录内执行：
 
 ```powershell
 # 只安装 Skills 和写入 MCP 配置，不克隆或构建 MCP 服务

@@ -23,10 +23,10 @@
 
 ### 2. Project Rules（单工程，可选）
 
-进入 `.agents` 目录，指定工程根路径：
+进入 `<配置包根目录>` 目录，指定工程根路径：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -ProjectPath "D:\GeoPile"
 ```
 
@@ -46,7 +46,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 | `07-skills-authoring.mdc` | `skills/**/SKILL.md` | Skills 可迁移与文档 |
 | `08-csharp-xml-docs.mdc` | `**/*.{cs,csproj,xaml}` | C# XML 注释与格式 |
 | `09-git-commit-message.mdc` | 始终 | Git 提交说明规范 |
-| `agents-entry.mdc` | 始终 | `.agents` 包入口与 MCP |
+| `agents-entry.mdc` | 始终 | `<配置包根目录>` 包入口与 MCP |
 | `literature-integrity.mdc` | 始终 | 文献诚信 |
 | `literature-workflow.mdc` | `**/*.{md,mdx}` | 文献 Skill/MCP 选用 |
 | `karpathy-guidelines.mdc` | 始终 | Karpathy 四原则 |
@@ -57,7 +57,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 
 | 平台 | 建议挂载方式 |
 |------|----------------|
-| **Claude Code** | 将正文合并进项目根 `CLAUDE.md`，或 `import`/引用 `.agents/rules/universal/AGENTS.md` |
+| **Claude Code** | 将正文合并进项目根 `CLAUDE.md`，或 `import`/引用 `<配置包根目录>/rules/universal/AGENTS.md` |
 | **OpenCode** | 在 OpenCode 规则设置中指向该文件，或复制到其要求的 rules 目录 |
 | **Trea** | 开启 `将AGENTS.md包含在上下文中` 设置选项 |
 

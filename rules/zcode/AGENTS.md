@@ -1,6 +1,6 @@
 # ZCode 全局规则入口
 
-本文件由 `.agents/scripts/setup-zcode-agents.ps1` 安装到 `~/.zcode/AGENTS.md`（默认 `%USERPROFILE%\.zcode\AGENTS.md`）的托管块，适用于本机所有 ZCode 会话。工作区 `AGENTS.md` 在其后加载，可收窄或覆盖本文件；冲突时优先级为：系统/开发者消息 > 直接用户指令 > 工作区规则 > 本文件。
+本文件由 `<配置包根目录>/scripts/setup-zcode-agents.ps1` 安装到 `~/.zcode/AGENTS.md`（默认 `%USERPROFILE%\.zcode\AGENTS.md`）的托管块，适用于本机所有 ZCode 会话。工作区 `AGENTS.md` 在其后加载，可收窄或覆盖本文件；冲突时优先级为：系统/开发者消息 > 直接用户指令 > 工作区规则 > 本文件。
 
 ## 常驻硬约束
 
@@ -30,7 +30,7 @@
 - 编写、审查、重构代码：`10-karpathy-guidelines.md`
 - 文献、引用、综述、学术输出：`11-literature-integrity.md`
 - 文献检索、全文下载、引用导出、PPT：`12-literature-workflow.md`
-- 项目含 `.agents/` 配置包：`13-agents-entry.md`
+- 项目含智能体配置包（目录名任意）：`13-agents-entry.md`
 - ZCode 工具映射、模式、技能发现、MCP 与子代理：`14-zcode-host.md`
 
 ## Skills

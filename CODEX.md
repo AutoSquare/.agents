@@ -1,12 +1,12 @@
 # Codex 安装说明
 
-本文记录 `.agents` 包面向 Codex 的安装方式。Cursor 仍使用 [`PORTABLE.md`](PORTABLE.md) 与 `scripts/setup-cursor-agents.ps1`。
+本文记录本包面向 Codex 的安装方式。Cursor 仍使用 [`PORTABLE.md`](PORTABLE.md) 与 `scripts/setup-cursor-agents.ps1`。
 
 ## 一键安装
 
 前置要求：Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Codex CLI。脚本会优先用 Windows `py` 启动器选择 `py -3.13`、`py -3.12`、`py -3.11`、`py -3.10`，最后才检查 PATH 中的 `python`；因此 PATH 中残留 Python 3.6 不会再导致 Python MCP 依赖安装失败。gstack 的命令块使用 Bash；若 `bash` 不在 PATH，使用 `C:\Program Files\Git\bin\bash.exe`。
 
-在 `.agents` 目录执行：
+在配置包根目录执行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
@@ -73,7 +73,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Ver
 %USERPROFILE%\.codex\skills\wpf-python-mvvm-builder
 ```
 
-该 Skill 用于在已有 Visual Studio WPF 项目上增量接入 PythonBridge、MVVM 目录结构、Themes/Resources/Properties 与 `memory` / `archive` 持久化路线。维护者应先修改工作区根目录的 `wpf-python-mvvm-builder/` 源目录，再运行 `wpf-python-mvvm-builder/scripts/sync-to-agents.ps1` 刷新 `.agents/skills/wpf-python-mvvm-builder/` 发布副本。
+该 Skill 用于在已有 Visual Studio WPF 项目上增量接入 PythonBridge、MVVM 目录结构、Themes/Resources/Properties 与 `memory` / `archive` 持久化路线。维护者应先修改工作区根目录的 `wpf-python-mvvm-builder/` 源目录，再运行 `wpf-python-mvvm-builder/scripts/sync-to-agents.ps1` 刷新 `<配置包根目录>/skills/wpf-python-mvvm-builder/` 发布副本。
 
 Cursor 侧安装与验证见 [`PORTABLE.md`](PORTABLE.md) 与已安装目录内 `README-cursor.md`；本文件只说明 Codex 安装链路。
 

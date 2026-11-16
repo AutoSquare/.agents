@@ -27,7 +27,7 @@
 - 编写、审查、重构代码：`10-karpathy-guidelines.md`
 - 文献、论文、引用、综述、学术输出：`11-literature-integrity.md`
 - 文献检索、全文下载、引用导出、PPT：`12-literature-workflow.md`
-- 项目含 `.agents/` 配置包时：`13-agents-entry.md`
+- 项目含智能体配置包（目录名任意）时：`13-agents-entry.md`
 
 ## Skills
 

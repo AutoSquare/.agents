@@ -4,14 +4,14 @@
 
 > **Cursor 用户**：
 > - **User Rules（跨项目）**：运行 `setup-cursor-agents.ps1` 后，按本文**自第 2 个 `##` 二级标题起至文末**逐条手动录入 Cursor Settings → Rules → User（setup 脚本会自动解析条数与节名；**首节无需录入**）；勿整份粘贴。
-> - **Project Rules（可选）**：在 `.agents` 目录执行 `setup-cursor-agents.ps1 -ProjectPath "工程根路径"`，将 `.agents/rules/cursor/*.mdc` 安装到该工程的 `.cursor/rules/`。
+> - **Project Rules（可选）**：在 `<配置包根目录>` 目录执行 `setup-cursor-agents.ps1 -ProjectPath "工程根路径"`，将 `<配置包根目录>/rules/cursor/*.mdc` 安装到该工程的 `.cursor/rules/`。
 > - **Claude Code / OpenCode / Trea**：仍可直接使用本文全文。
 
 ---
 
-## 1. 与本包 `.agents` 的协作
+## 1. 与本包 `<配置包根目录>` 的协作
 
-若项目含有 `.agents/`（Trea 下为 `.agent/`）文献与 MCP 配置包，学术类任务另见包内 `workflows.md` 与 `skills/`；本规范侧重**通用工程交付**，二者同时生效时不互相矛盾。
+若项目含有智能体配置包（常见目录名 `AI规则仓库/`、`.agents/`，Trea 下为 `.agent/`；目录名不限），学术类任务另见包内 `workflows.md` 与 `skills/`；本规范侧重**通用工程交付**，二者同时生效时不互相矛盾。
 
 ## 2. 语言与命名规范
 

@@ -1,6 +1,6 @@
-# `.agents` 智能体配置包
+# 智能体配置包
 
-可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）**、CAD 工程出图调试、Superpowers 软件开发方法与去重后的 gstack 工程工作流等场景。复制到任意项目根目录的 `.agents/` 后，按所用 IDE / Agent 运行时选择下方安装方式。
+可迁移的 **Agent Skills + Rules + MCP** 配置仓库，面向文献检索、校园网全文、Zotero、学术 PPT、**UI/UX 设计（React Native）**、CAD 工程出图调试、Superpowers 软件开发方法与去重后的 gstack 工程工作流等场景。复制到任意项目根目录的 `<配置包根目录>/` 后，按所用 IDE / Agent 运行时选择下方安装方式。目录名可任意（安装脚本按自身位置定位）；但 DSH / ZCode 的**项目级自动技能发现只识别 `.agents/`**，目录不叫 `.agents` 时请使用用户级安装。
 
 > **给智能体**：进入工作区后先读本文；执行任务时再读 `mcp.md`、`skills.md`、`workflows.md`。
 
@@ -12,10 +12,10 @@
 
 **前置**：Windows 上已安装 Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Codex CLI（需支持 `codex mcp`，本包按 `codex-cli 0.134.0` 验证）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 ```
 
@@ -51,14 +51,84 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1" -Cod
 
 ---
 
+### ZCode（一键安装）
+
+**前置**：Windows 上已安装 ZCode、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
+
+进入配置包根目录，在 PowerShell 中执行：
+
+```powershell
+cd <本项目目录>
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1"
+```
+
+脚本会：
+
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.zcode\skills\`（仅 `zcodeInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
+- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 ZCode 技能根
+- 将薄入口 `rules/zcode/AGENTS.md` 写入 `%USERPROFILE%\.zcode\AGENTS.md` 托管块（保留用户内容并备份），14 条规则直拷到 `%USERPROFILE%\.zcode\rules\`
+- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.zcode\mcp-servers\`，并**增量合并**写入 `%USERPROFILE%\.zcode\cli\config.json` 的 `mcp.servers`（绝对路径、不展开环境变量模板；写前备份、写后 JSON 校验，保留用户其余键与服务器）
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
+- **不安装 gstack**（宿主支持清单仅 Codex / Cursor），不写入 hooks 配置
+
+注意：ZCode 用户级同名技能会**遮蔽**项目内 `.agents/skills/`（与 DSH 相反）；更新技能源后重跑安装器同步。
+
+常用参数：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -WhatIf            # 预览，不写盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipRules         # 跳过 Rules
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -ZcodeHome "D:\tmp\zcode-home"  # 测试/多环境
+```
+
+更细的 ZCode 说明见 [`ZCODE.md`](ZCODE.md)。
+
+---
+
+### DeepSeek Harness（DSH）（一键安装）
+
+**前置**：Windows 上已安装 DSH 桌面端、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
+
+进入配置包根目录，在 PowerShell 中执行：
+
+```powershell
+cd <本项目目录>
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
+```
+
+脚本会：
+
+- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.dsh\skills\`（仅 `dshInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
+- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 DSH 技能根
+- 将薄入口 `rules/dsh/AGENTS.md` 写入 `%USERPROFILE%\.dsh\AGENTS.md` 托管块（保留用户内容并备份），13 条主题规则与 1 条 DSH 宿主规则直拷到 `%USERPROFILE%\.dsh\rules\`
+- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.dsh\mcp-servers\`，并把 `@deepseek-ai/dsh-mcp-client` 条目写入 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`（写前备份、写后 PyYAML 校验）
+- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
+- **不安装 gstack**（宿主支持清单仅 Codex / Cursor）
+
+常用参数：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -WhatIf            # 预览，不写盘
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipRules         # 跳过 Rules
+powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -DshHome "D:\tmp\dsh-home" -Profile "web"
+```
+
+更细的 DSH 说明见 [`DSH.md`](DSH.md)。
+
+---
+
 ### Antigravity（一键安装）
 
 **前置**：Windows 上已安装 Git、Python 3.10+、Node.js、npm 与 Antigravity CLI。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器寻找 `py -3.10` 或更高版本。
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1"
 ```
 
@@ -92,14 +162,14 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-antigravity-agents.ps1
 
 **前置**：Windows 上已安装 Git for Windows（含 Git Bash）、Python 3.10+、Node.js、npm 与 Cursor。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
-（若已在 `.agents` 内，直接执行第二行即可。）
+（若已在 `<配置包根目录>` 内，直接执行第二行即可。）
 
 脚本结束后会**清屏**并显示**分层着色**的结构化摘要；调试时可加 `-Verbose`（展开详细日志）、`-NoClearScreen`（不清屏）或 `-NoColor`（禁用着色；输出重定向时亦自动禁用）。
 
@@ -114,7 +184,7 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
 完成后 **重启 Cursor**，在 **Settings → Tools & MCP** 确认服务已启用，并按终端提醒录入 User Rules。
 
-常用参数（均在 `.agents` 目录内执行）：
+常用参数（均在配置包根目录内执行）：
 
 ```powershell
 # 只装 Skills/MCP，不构建 MCP 服务
@@ -159,10 +229,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -No
 
 **前置**：Windows 上已安装 Git for Windows、Python 3.10+、Node.js、npm 与 QoderCN CLI（需含 `qoderclicn` 命令）。若 PATH 中的 `python` 是旧版本，脚本会优先通过 Windows `py` 启动器选择 `py -3.10` 或更高版本。
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1"
 ```
 
@@ -191,82 +261,12 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-qodercn-agents.ps1" -S
 
 ---
 
-### DeepSeek Harness（DSH）（一键安装）
-
-**前置**：Windows 上已安装 DSH 桌面端、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
-
-进入 `.agents` 目录，在 PowerShell 中执行：
-
-```powershell
-cd D:\你的项目路径\.agents
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
-```
-
-脚本会：
-
-- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.dsh\skills\`（仅 `dshInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
-- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 DSH 技能根
-- 将薄入口 `rules/dsh/AGENTS.md` 写入 `%USERPROFILE%\.dsh\AGENTS.md` 托管块（保留用户内容并备份），13 条主题规则与 1 条 DSH 宿主规则直拷到 `%USERPROFILE%\.dsh\rules\`
-- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.dsh\mcp-servers\`，并把 `@deepseek-ai/dsh-mcp-client` 条目写入 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`（写前备份、写后 PyYAML 校验）
-- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
-- **不安装 gstack**（宿主支持清单仅 Codex / Cursor）
-
-常用参数：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -WhatIf            # 预览，不写盘
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -SkipRules         # 跳过 Rules
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1" -DshHome "D:\tmp\dsh-home" -Profile "web"
-```
-
-更细的 DSH 说明见 [`DSH.md`](DSH.md)。
-
----
-
-### ZCode（一键安装）
-
-**前置**：Windows 上已安装 ZCode、Python 3.10+、Node.js 18+ 与 npm。脚本优先通过 `py` 启动器选择 3.10+；PATH 中的旧版 `python` 会被跳过。首次安装 MCP 需要网络（pip 默认清华源，`campus-net` 会下载 Playwright Chromium）。
-
-进入 `.agents` 目录，在 PowerShell 中执行：
-
-```powershell
-cd D:\你的项目路径\.agents
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1"
-```
-
-脚本会：
-
-- 将 manifest 托管的 `skills/` **增量覆盖**到 `%USERPROFILE%\.zcode\skills\`（仅 `zcodeInstallManifest.managedSkills` 同名项，不删除用户自装 skill）
-- 对 `pathRewriteSkills` 中的技能把 Cursor 绝对路径改写为当前 ZCode 技能根
-- 将薄入口 `rules/zcode/AGENTS.md` 写入 `%USERPROFILE%\.zcode\AGENTS.md` 托管块（保留用户内容并备份），14 条规则直拷到 `%USERPROFILE%\.zcode\rules\`
-- 从 `mcp-servers-src/` 构建 4 个本地 MCP 到 `%USERPROFILE%\.zcode\mcp-servers\`，并**增量合并**写入 `%USERPROFILE%\.zcode\cli\config.json` 的 `mcp.servers`（绝对路径、不展开环境变量模板；写前备份、写后 JSON 校验，保留用户其余键与服务器）
-- 发现旧版本遗留的退役 MCP 时先询问；默认保留，只有用户明确确认后才删除
-- **不安装 gstack**（宿主支持清单仅 Codex / Cursor），不写入 hooks 配置
-
-注意：ZCode 用户级同名技能会**遮蔽**项目内 `.agents/skills/`（与 DSH 相反）；更新技能源后重跑安装器同步。
-
-常用参数：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -WhatIf            # 预览，不写盘
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipMcpInstall    # 只装 Rules 与 Skills
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipSkillUpdate   # 跳过 Skills
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -SkipRules         # 跳过 Rules
-powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -ZcodeHome "D:\tmp\zcode-home"  # 测试/多环境
-```
-
-更细的 ZCode 说明见 [`ZCODE.md`](ZCODE.md)。
-
----
-
 ### Claude Code
 
 本包不附带 Claude 专用安装脚本，采用 **手动挂载**（与 Cursor 共用同一份 `skills/` 与 MCP 源码）。
 
 1. **Skills**（任选其一）  
-   - **用户级**：将 `.agents/skills/` 下各子目录复制到 `~/.claude/skills/`（macOS/Linux）或 `%USERPROFILE%\.claude\skills\`（Windows）。  
+   - **用户级**：将 `<配置包根目录>/skills/` 下各子目录复制到 `~/.claude/skills/`（macOS/Linux）或 `%USERPROFILE%\.claude\skills\`（Windows）。  
    - **项目级**：复制到项目内 `.claude/skills/`（若你的 Claude Code 版本支持项目 Skills）。
 
 2. **MCP**  
@@ -275,10 +275,10 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -Zco
    - 按 Claude Code 文档把 JSON 合并进其 MCP 配置（项目或用户级，以当前版本为准）。
 
 3. **Rules**  
-   - 团队开发规范：`.agents/rules/universal/AGENTS.md`（建议写入 `CLAUDE.md` 或设为项目规则源）。
+   - 团队开发规范：`<配置包根目录>/rules/universal/AGENTS.md`（建议写入 `CLAUDE.md` 或设为项目规则源）。
 
 4. **项目引导**（可选）  
-   - 在仓库根 `CLAUDE.md` / `AGENTS.md` 中指向 `.agents/README.md` 与上述 Rules 文件。
+   - 在仓库根 `CLAUDE.md` / `AGENTS.md` 中指向 `<配置包根目录>/README.md` 与上述 Rules 文件。
 
 5. **环境变量**  
    - 见下文 [环境变量](#环境变量)；`campus-net` 凭据可放在 Claude 配置中的等价 env 或手动指定的 `CAMPNET_USER_ROOT/local.env`。
@@ -289,8 +289,8 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1" -Zco
 
 OpenCode 各版本对 Skills / MCP 的路径可能不同，通用做法：
 
-1. 克隆本仓库，将 **`.agents` 放在项目根目录**（或只拷贝 `skills/` + `mcp-servers-src/`）。
-2. 在 OpenCode 设置中把 **Skills 目录** 指向本包的 `.agents/skills/`（或复制到 OpenCode 要求的 `skills` 路径）。
+1. 克隆本仓库，将 **`<配置包根目录>` 放在项目根目录**（或只拷贝 `skills/` + `mcp-servers-src/`）。
+2. 在 OpenCode 设置中把 **Skills 目录** 指向本包的 `<配置包根目录>/skills/`（或复制到 OpenCode 要求的 `skills` 路径）。
 3. **Rules**：将 [`rules/universal/AGENTS.md`](rules/universal/AGENTS.md) 配置为项目规则/说明文件。
 4. MCP：用 [`mcp.template.json`](mcp.template.json) 作模板，把 `command` / `args` 改为本机路径后粘贴到 OpenCode 的 MCP 配置界面。
 5. 需要 Python MCP 时，在对应目录执行 `python -m venv .venv` 与 `pip install -r requirements.txt`；`campus-net` 另需 `playwright install chromium`。
@@ -304,7 +304,7 @@ OpenCode 各版本对 Skills / MCP 的路径可能不同，通用做法：
 Trea 使用 **`.agent`** 目录名（单数）：
 
 1. 下载 / 克隆本仓库。  
-2. 将根目录下的 **`.agents` 文件夹重命名为 `.agent`**，并放在 Trea 识别的项目根路径。  
+2. 将根目录下的 **`<配置包根目录>` 文件夹重命名为 `.agent`**，并放在 Trea 识别的项目根路径。  
 3. Skills 即 `.agent/skills/`；团队规范即 `.agent/rules/universal/AGENTS.md`；MCP 见 [`mcp.template.json`](mcp.template.json) 与 [`mcp.md`](mcp.md)。
 
 ---
@@ -312,7 +312,7 @@ Trea 使用 **`.agent`** 目录名（单数）：
 ## 目录结构
 
 ```text
-.agents/
+<配置包根目录>/
 ├── README.md                 # 本文：平台安装、目录索引、Skills/MCP 总表
 ├── PORTABLE.md               # Cursor 迁移与脚本细节
 ├── CODEX.md                  # Codex 安装与 MCP 增量适配说明
@@ -407,9 +407,9 @@ Trea 使用 **`.agent`** 目录名（单数）：
 | `slides` | 融资/产品路演幻灯片结构与文案（联动 design-system scripts）。 |
 | `banner-design` | 横幅尺寸与风格规范（完整生成链依赖未打包的 ai-artist 等，见 environment.md）。 |
 | **CAD 工程出图**（Cursor + Codex 托管） | |
-| `cad-structure-layout-debug` | 从零搭建或调试 CAD 出图组件，覆盖 DXF 排版、布局引擎、明细表锚点、预览一致性、烟测与视觉验收；编辑源在工作区根 `cad-structure-layout-debug/`，经 sync 发布到 `.agents/skills/`。 |
+| `cad-structure-layout-debug` | 从零搭建或调试 CAD 出图组件，覆盖 DXF 排版、布局引擎、明细表锚点、预览一致性、烟测与视觉验收；编辑源在工作区根 `cad-structure-layout-debug/`，经 sync 发布到 `<配置包根目录>/skills/`。 |
 | **WPF + Python 工程脚手架**（Cursor + Codex 托管） | |
-| `wpf-python-mvvm-builder` | 在已有 Visual Studio WPF 项目上增量补全 PythonBridge、MVVM 目录、Themes/Resources/Properties 与 memory/archive 持久化路线；编辑源在工作区根 `wpf-python-mvvm-builder/`，经 sync 发布到 `.agents/skills/`。 |
+| `wpf-python-mvvm-builder` | 在已有 Visual Studio WPF 项目上增量补全 PythonBridge、MVVM 目录、Themes/Resources/Properties 与 memory/archive 持久化路线；编辑源在工作区根 `wpf-python-mvvm-builder/`，经 sync 发布到 `<配置包根目录>/skills/`。 |
 | **Superpowers 软件开发方法**（上游 `obra/superpowers` 6.1.1，MIT） | |
 | `using-superpowers` | 会话入口：要求先检查并调用匹配技能，再响应或执行任务。 |
 | `brainstorming` | 创意或功能开发前澄清意图、约束并形成经确认的设计。 |

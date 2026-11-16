@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# 从 ui-ux-pro-max-skill 同步 7 个 UI/UX Skill 到 .agents/skills/，改写为 Cursor 用户级路径，并把 ckm: 技能名归一化为 kebab-case。
+# 从 ui-ux-pro-max-skill 同步 7 个 UI/UX Skill 到 <配置包根目录>/skills/，改写为 Cursor 用户级路径，并把 ckm: 技能名归一化为 kebab-case。
 param(
     [string]$UpstreamPath,
     [switch]$Assemble,

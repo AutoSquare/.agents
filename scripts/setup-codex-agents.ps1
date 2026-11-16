@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Codex: install managed Skills, global rules, and MCP servers.
-# Usage: cd path\to\.agents  then  powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
+# Usage: cd path\to\<package-root>  then  powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 [CmdletBinding()]
 param(
     [string]$CodexHome,

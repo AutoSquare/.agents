@@ -8,7 +8,7 @@
 - Codex 用户级 Skills：`%USERPROFILE%\.codex\skills`
 - Codex 全局规则入口：`%USERPROFILE%\.codex\AGENTS.md`
 - Codex 按需规则：`%USERPROFILE%\.codex\agent-rules`
-- **Cursor User Rules**：手动录入，源文件 `.agents/rules/universal/AGENTS.md`（setup 默认不装 rules）
+- **Cursor User Rules**：手动录入，源文件 `<配置包根目录>/rules/universal/AGENTS.md`（setup 默认不装 rules）
 - **Cursor Project Rules（可选）**：`-ProjectPath` 安装到 `{工程根}/.cursor/rules`
 - Cursor 本地 MCP 服务：`%USERPROFILE%\.cursor\mcp-servers`
 - Codex 本地 MCP 服务：`%USERPROFILE%\.codex\mcp-servers`
@@ -23,13 +23,13 @@
 - DSH 本地 MCP 服务：`%USERPROFILE%\.dsh\mcp-servers`
 - DSH MCP 注册：`%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml` 的托管标记块
 - DSH campus-net 用户根：`%USERPROFILE%\.dsh\campus-net`
-- 迁移包 Skills 副本：`.agents/skills`
-- 迁移包 MCP 源码快照：`.agents/mcp-servers-src`
-- **Cursor** 写入脚本（非通用 IDE 安装名）：`scripts/setup-cursor-agents.ps1`（在 `.agents` 目录内执行）
-- **Codex** 写入脚本：`scripts/setup-codex-agents.ps1`（在 `.agents` 目录内执行）
-- **QoderCN** 写入脚本：`scripts/setup-qodercn-agents.ps1`（在 `.agents` 目录内执行）
-- **DSH** 写入脚本：`scripts/setup-dsh-agents.ps1`（在 `.agents` 目录内执行；写入 `$DSH_HOME`）
-- **UI/UX 技能同步**（维护者）：`scripts/sync-ui-ux-skills.ps1`（在 `.agents` 目录内执行）
+- 迁移包 Skills 副本：`<配置包根目录>/skills`
+- 迁移包 MCP 源码快照：`<配置包根目录>/mcp-servers-src`
+- **Cursor** 写入脚本（非通用 IDE 安装名）：`scripts/setup-cursor-agents.ps1`（在配置包根目录内执行）
+- **Codex** 写入脚本：`scripts/setup-codex-agents.ps1`（在配置包根目录内执行）
+- **QoderCN** 写入脚本：`scripts/setup-qodercn-agents.ps1`（在配置包根目录内执行）
+- **DSH** 写入脚本：`scripts/setup-dsh-agents.ps1`（在配置包根目录内执行；写入 `$DSH_HOME`）
+- **UI/UX 技能同步**（维护者）：`scripts/sync-ui-ux-skills.ps1`（在配置包根目录内执行）
 - 安装记录：`MCP与Skills配置记录.md`（若存在）
 
 ## 环境变量
@@ -50,13 +50,13 @@ setx NCBI_API_KEY "你的 NCBI API Key"
 
 ## UI/UX 技能维护
 
-真相源为同仓库或 sibling 路径下的 `ui-ux-pro-max-skill/`。更新汉化或模板后，进入 `.agents` 执行：
+真相源为同仓库或 sibling 路径下的 `ui-ux-pro-max-skill/`。更新汉化或模板后，进入配置包根目录执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -Assemble
 
-# 仅复制 .agents 到新机器、无 sibling 仓库时
+# 仅复制 <配置包根目录> 到新机器、无 sibling 仓库时
 powershell -ExecutionPolicy Bypass -File ".\scripts\sync-ui-ux-skills.ps1" -UpstreamPath "D:\path\to\ui-ux-pro-max-skill"
 
 # 安装到 Cursor（Skills + MCP；Rules 见终端提醒手动录入 AGENTS.md）
@@ -84,19 +84,19 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1" -Pr
 
 ## karpathy-guidelines 维护
 
-**编辑源**：工作区 sibling `andrej-karpathy-skills/`；**发布副本**：`.agents/skills/karpathy-guidelines/`、`.agents/rules/cursor/karpathy-guidelines.mdc`、`AGENTS.md` §11（禁止手改副本，须 sync）。
+**编辑源**：工作区 sibling `andrej-karpathy-skills/`；**发布副本**：`<配置包根目录>/skills/karpathy-guidelines/`、`<配置包根目录>/rules/cursor/karpathy-guidelines.mdc`、`AGENTS.md` §11（禁止手改副本，须 sync）。
 
 ```powershell
-# andrej-karpathy-skills → .agents（四路同步）
+# andrej-karpathy-skills → <配置包根目录>（四路同步）
 node andrej-karpathy-skills/scripts/sync-to-agents.mjs
 node andrej-karpathy-skills/scripts/sync-to-agents.mjs --dry-run
 
 # 安装到 Cursor
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
 # 安装到 Codex
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 ```
 
@@ -104,15 +104,15 @@ powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 
 ## cad-structure-layout-debug 维护
 
-**编辑源**：工作区根 `cad-structure-layout-debug/`（沙箱）；**发布副本**：`.agents/skills/cad-structure-layout-debug/`（禁止手改，须 sync）。
+**编辑源**：工作区根 `cad-structure-layout-debug/`（沙箱）；**发布副本**：`<配置包根目录>/skills/cad-structure-layout-debug/`（禁止手改，须 sync）。
 
 ```powershell
-# 编辑源 → .agents 发布副本
+# 编辑源 → <配置包根目录> 发布副本
 powershell -ExecutionPolicy Bypass -File "cad-structure-layout-debug\scripts\sync-to-agents.ps1"
 powershell -ExecutionPolicy Bypass -File "cad-structure-layout-debug\scripts\sync-to-agents.ps1" -DryRun
 
 # 安装到 Cursor
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 
 # 安装到 Codex
@@ -134,15 +134,15 @@ Codex 路径将 `$env:USERPROFILE\.cursor\skills\` 替换为 `$env:USERPROFILE\.
 
 ## wpf-python-mvvm-builder 维护
 
-**编辑源**：工作区根 `wpf-python-mvvm-builder/`（沙箱）；**发布副本**：`.agents/skills/wpf-python-mvvm-builder/`（禁止手改，须 sync）。
+**编辑源**：工作区根 `wpf-python-mvvm-builder/`（沙箱）；**发布副本**：`<配置包根目录>/skills/wpf-python-mvvm-builder/`（禁止手改，须 sync）。
 
 ```powershell
-# 编辑源 → .agents 发布副本
+# 编辑源 → <配置包根目录> 发布副本
 powershell -ExecutionPolicy Bypass -File "wpf-python-mvvm-builder\scripts\sync-to-agents.ps1"
 powershell -ExecutionPolicy Bypass -File "wpf-python-mvvm-builder\scripts\sync-to-agents.ps1" -DryRun
 
 # 安装到 Cursor
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
@@ -161,15 +161,15 @@ Codex 安装与说明见 [`CODEX.md`](CODEX.md)（本小节只维护 Cursor 链�
 
 ## ppt-maker 维护
 
-**编辑源**：工作区根 `ppt-maker/`（沙箱）；**发布副本**：`.agents/skills/ppt-maker/`（禁止手改，须 sync）。
+**编辑源**：工作区根 `ppt-maker/`（沙箱）；**发布副本**：`<配置包根目录>/skills/ppt-maker/`（禁止手改，须 sync）。
 
 ```powershell
-# 沙箱 → .agents 发布副本
+# 沙箱 → <配置包根目录> 发布副本
 node ppt-maker/scripts/sync-to-agents.mjs
 node ppt-maker/scripts/sync-to-agents.mjs --dry-run
 
 # 安装到 Cursor
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 ```
 
@@ -202,15 +202,15 @@ node "$env:USERPROFILE\.codex\skills\ppt-maker\scripts\check-node.mjs"
 
 ## 迁移安装
 
-将 `.agents/` 复制到新电脑任意项目根目录后，进入 `.agents` 执行 setup；按终端提醒手动录入 User Rules。
+将 `<配置包根目录>/` 复制到新电脑任意项目根目录后，进入配置包根目录执行 setup；按终端提醒手动录入 User Rules。
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-codex-agents.ps1"
 ```
 
-安装脚本会优先使用 `.agents/mcp-servers-src/` 内的源码快照；如果源码快照缺失，才从对应 GitHub 仓库克隆。
+安装脚本会优先使用 `<配置包根目录>/mcp-servers-src/` 内的源码快照；如果源码快照缺失，才从对应 GitHub 仓库克隆。
 
 Codex 脚本的增量边界：只覆盖 `manifest.json` 的 `codexInstallManifest` 声明的同名托管 skill、rule、MCP 源码目录和 MCP 注册；用户自装内容不删除、不卸载。
 
@@ -248,7 +248,7 @@ npm install
 npm run build
 ```
 
-如有 `campus-net-mcp`：在项目侧更新 `.agents/mcp-servers-src/campus-net-mcp` 后再次运行对应平台 setup，或直接覆盖 `%USERPROFILE%\.cursor\mcp-servers\campus-net-mcp` / `%USERPROFILE%\.codex\mcp-servers\campus-net-mcp` 并重装 venv 依赖。
+如有 `campus-net-mcp`：在项目侧更新 `<配置包根目录>/mcp-servers-src/campus-net-mcp` 后再次运行对应平台 setup，或直接覆盖 `%USERPROFILE%\.cursor\mcp-servers\campus-net-mcp` / `%USERPROFILE%\.codex\mcp-servers\campus-net-mcp` 并重装 venv 依赖。
 
 ## 排查顺序
 

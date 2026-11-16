@@ -2,17 +2,17 @@
 
 将素材与结构化数据生成为 Vue 16:9 幻灯片预览，并在浏览器中导出 PPT。
 
-**发布副本**：`.agents/skills/ppt-maker/`（随 `.agents` 分发）  
+**发布副本**：`<配置包根目录>/skills/ppt-maker/`（随 `<配置包根目录>` 分发）  
 **本目录**：维护者沙箱（可选；完整 AI 规则仓库保留双树时使用）
 
 ---
 
 ## 终端用户
 
-1. 安装 `.agents` 配置包后执行：
+1. 安装 `<配置包根目录>` 配置包后执行：
 
 ```powershell
-cd .agents
+cd <配置包根目录>
 powershell -ExecutionPolicy Bypass -File .\scripts\setup-cursor-agents.ps1
 ```
 
@@ -24,15 +24,15 @@ powershell -ExecutionPolicy Bypass -File .\scripts\setup-cursor-agents.ps1
 
 ---
 
-## 维护者（沙箱 → .agents）
+## 维护者（沙箱 → <配置包根目录>）
 
 ```text
 编辑 ppt-maker/（本目录）
   → node ppt-maker/scripts/sync-to-agents.mjs
-  → cd .agents && powershell -File .\scripts\setup-cursor-agents.ps1
+  → cd <配置包根目录> && powershell -File .\scripts\setup-cursor-agents.ps1
 ```
 
-**禁止**只改 `.agents/skills/ppt-maker/` 而不回写本目录。
+**禁止**只改 `<配置包根目录>/skills/ppt-maker/` 而不回写本目录。
 
 ### 同步 kit-template（可选）
 

@@ -58,4 +58,4 @@ archive 路线把 `--persistence memory --app-id "<AppId>"` 替换为：
 - 不修改 `README-cursor.md`。
 - 不依赖 `.cursor` 路径。
 - 不要求更新 Cursor install manifest。
-- 若未来要纳入可迁移 `.agents` 包，只登记 `codexInstallManifest.managedSkills`，不要改 Cursor 的 `installManifest.managedSkills`。
+- 若未来要纳入可迁移 `<配置包根目录>` 包，只登记 `codexInstallManifest.managedSkills`，不要改 Cursor 的 `installManifest.managedSkills`。

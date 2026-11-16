@@ -1,6 +1,6 @@
 # DeepSeek Harness（DSH）安装说明
 
-本文记录 `.agents` 包面向 DeepSeek Harness（DSH）的适配方式。本包按 DSH `0.2.1-rc.3` 桌面端验证。Cursor 见 [`PORTABLE.md`](PORTABLE.md)，Codex 见 [`CODEX.md`](CODEX.md)，Antigravity 见 [`ANTIGRAVITY.md`](ANTIGRAVITY.md)。
+本文记录本包面向 DeepSeek Harness（DSH）的适配方式。本包按 DSH `0.2.1-rc.3` 桌面端验证。Cursor 见 [`PORTABLE.md`](PORTABLE.md)，Codex 见 [`CODEX.md`](CODEX.md)，Antigravity 见 [`ANTIGRAVITY.md`](ANTIGRAVITY.md)。
 
 ## 前置
 
@@ -11,10 +11,10 @@
 
 ## 一键安装
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-dsh-agents.ps1"
 ```
 
@@ -64,7 +64,7 @@ DSH 从文件系统按目录一层发现技能，优先级如下（数字越小�
 | 400 | 用户 DSH | `$DSH_HOME/skills` |
 | 500 | 共享 agents | `<agentsHome>/skills`（`$DSH_AGENTS_HOME` 或 `~/.agents`） |
 
-`projectRoot` 取最近含 `.git` 的祖先；没有时用当前工作目录。**项目内 `.agents/skills` 优先于本脚本安装的用户级副本**，因此在本仓库中运行 DSH 无需另行安装技能。
+`projectRoot` 取最近含 `.git` 的祖先；没有时用当前工作目录。**项目内 `.agents/skills` 优先于本脚本安装的用户级副本**；配置包目录名任意，不叫 `.agents` 时项目级发现不生效（如本工作区命名为 `AI规则仓库/`），此时用用户级安装，或用 `customSkillDirs` 指向配置包的 `skills` 目录。
 
 技能格式：`<name>/SKILL.md`；frontmatter 必填 `name`（`^[a-z0-9]+(?:-[a-z0-9]+)*$`）与 `description`，可选 `disable-model-invocation`、`user-invocable`、`metadata`、`whenToUse`。目录描述上限 500 字符。`disable-model-invocation: true` 的技能不出现在模型目录中，只能由用户 `/name` 调用（本包中为 `cad-structure-layout-debug`、`setup-matt-pocock-skills`、`wpf-python-mvvm-builder`、`zoom-out`）。
 
@@ -148,8 +148,8 @@ DSH 的 profile patch 受 HMR 监视；写入后通常无需重启，若新会�
 
 ## 验证清单
 
-- [ ] `.agents\tests\dsh-adapter.Tests.ps1` 通过
-- [ ] `.agents\tests\retired-mcp-cleanup.Tests.ps1` 通过
+- [ ] `<配置包根目录>\tests\dsh-adapter.Tests.ps1` 通过
+- [ ] `<配置包根目录>\tests\retired-mcp-cleanup.Tests.ps1` 通过
 - [ ] `-WhatIf` 不产生文件
 - [ ] `%USERPROFILE%\.dsh\skills` 含 manifest 托管技能
 - [ ] `%USERPROFILE%\.dsh\AGENTS.md` 含托管块；`%USERPROFILE%\.dsh\rules` 含 14 条规则

@@ -1,6 +1,6 @@
 # ZCode 安装说明
 
-本文记录 `.agents` 包面向 ZCode 的适配方式。ZCode 通过 `~/.zcode`（默认 `%USERPROFILE%\.zcode`）承载用户级技能与指令，通过 `~/.zcode/cli/config.json` 承载 MCP 注册。Cursor 见 [`PORTABLE.md`](PORTABLE.md)，Codex 见 [`CODEX.md`](CODEX.md)，Antigravity 见 [`ANTIGRAVITY.md`](ANTIGRAVITY.md)，DSH 见 [`DSH.md`](DSH.md)。
+本文记录本包面向 ZCode 的适配方式。ZCode 通过 `~/.zcode`（默认 `%USERPROFILE%\.zcode`）承载用户级技能与指令，通过 `~/.zcode/cli/config.json` 承载 MCP 注册。Cursor 见 [`PORTABLE.md`](PORTABLE.md)，Codex 见 [`CODEX.md`](CODEX.md)，Antigravity 见 [`ANTIGRAVITY.md`](ANTIGRAVITY.md)，DSH 见 [`DSH.md`](DSH.md)。
 
 ## 前置
 
@@ -11,10 +11,10 @@
 
 ## 一键安装
 
-进入 `.agents` 目录，在 PowerShell 中执行：
+进入配置包根目录，在 PowerShell 中执行：
 
 ```powershell
-cd D:\你的项目路径\.agents
+cd <本项目目录>
 powershell -ExecutionPolicy Bypass -File ".\scripts\setup-zcode-agents.ps1"
 ```
 
@@ -52,10 +52,10 @@ ZCode 按以下顺序扫描技能目录（数字越小越优先，**同名技能
 | 2 | 用户 ZCode | `~/.zcode/skills` |
 | 3 | 用户共享 | `~/.agents/skills` |
 | 4 | 工作区 `.zcode` | `<repo>/.zcode/skills`（自 cwd 向上每层都算） |
-| 5 | 工作区 `.agents` | `<repo>/.agents/skills` |
+| 5 | 工作区 `<配置包根目录>` | `<repo>/<配置包根目录>/skills` |
 | 6 | 插件 | 已启用插件的技能根 |
 
-与 DSH 相反，**用户级 `~/.zcode/skills/` 会遮蔽项目内 `.agents/skills/`**：安装本包后，同名技能从用户级副本加载。用户级副本中的 Cursor 路径已被安装器改写为 `%USERPROFILE%\.zcode\skills\`；更新 `.agents/skills/` 源后需重跑安装器同步，或临时用 `-SkipSkillUpdate` 后手动删除 `~/.zcode/skills/<name>` 让项目副本生效。
+与 DSH 相反，**用户级 `~/.zcode/skills/` 会遮蔽项目内 `.agents/skills/`**：安装本包后，同名技能从用户级副本加载。用户级副本中的 Cursor 路径已被安装器改写为 `%USERPROFILE%\.zcode\skills\`；更新 `<配置包根目录>/skills/` 源后需重跑安装器同步，或临时用 `-SkipSkillUpdate` 后手动删除 `~/.zcode/skills/<name>` 让项目副本生效。
 
 技能格式：`<skill>/SKILL.md`；frontmatter 必填 `name` 与 `description`（超过 1024 字符会被丢弃），可选 `when_to_use`；触发语应落在 `description` 前 250 字符内。frontmatter 中的 `disable-model-invocation` 是 DSH 专属键，ZCode **不识别**——带 description 的技能既可被模型按需调用，也可由用户 `/name` 显式调用。以 `.` 开头的目录（除 `.system`）与 `node_modules` 会被跳过。
 
@@ -110,7 +110,7 @@ ZCode 加载：
 
 ## 排错
 
-1. 新会话看不到技能：确认技能目录在 `~/.zcode/skills/<name>/SKILL.md`，`name` 与目录同名且 frontmatter `name`/`description` 齐全；**Settings → Skills** 与 `/` 菜单可查。若本项目内 `.agents/skills/` 的改动未生效，多半是被用户级同名副本遮蔽——重跑安装器同步。
+1. 新会话看不到技能：确认技能目录在 `~/.zcode/skills/<name>/SKILL.md`，`name` 与目录同名且 frontmatter `name`/`description` 齐全；**Settings → Skills** 与 `/` 菜单可查。若项目内 `.agents/skills/` 的改动未生效，多半是被用户级同名副本遮蔽——重跑安装器同步（配置包目录名任意、不在 ZCode 扫描根内时，始终以用户级安装为准）。
 2. MCP 工具未出现：检查 `~/.zcode/cli/config.json` 是否为合法 JSON、`mcp.servers` 是否含 4 个托管条目；条目含未知键会被静默丢弃。修改后重启会话，再看 **Settings → MCP** 的内联错误。
 3. Python MCP 失败：进入对应目录后运行 `& ".\.venv\Scripts\python.exe" -c "import server; print('ok')"`（`academic-research` 的 `scholarly` 需要 `bibtexparser<2`，已写入随包 `requirements.txt`）。
 4. Node MCP 失败：确认安装器写入的 node 绝对路径仍有效（升级 Node 后重跑安装器刷新）；`zotero` 需 Zotero Desktop 运行。
@@ -127,8 +127,8 @@ ZCode 加载：
 
 ## 验证清单
 
-- [ ] `.agents\tests\zcode-adapter.Tests.ps1` 通过
-- [ ] `.agents\tests\dsh-adapter.Tests.ps1` 等既有测试不受影响
+- [ ] `<配置包根目录>\tests\zcode-adapter.Tests.ps1` 通过
+- [ ] `<配置包根目录>\tests\dsh-adapter.Tests.ps1` 等既有测试不受影响
 - [ ] `-WhatIf` 不产生文件
 - [ ] `%USERPROFILE%\.zcode\skills` 含 manifest 托管技能
 - [ ] `%USERPROFILE%\.zcode\AGENTS.md` 含托管块；`%USERPROFILE%\.zcode\rules` 含 14 条规则

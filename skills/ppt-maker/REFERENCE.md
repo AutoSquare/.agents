@@ -134,4 +134,4 @@
 - 预览外壳：[PREVIEW-CHROME.md](PREVIEW-CHROME.md)
 - 导出契约：[EXPORT.md](EXPORT.md)
 - 示例：[EXAMPLES.md](EXAMPLES.md)
-- academic 大纲映射：`.agents/output-templates.md`
+- academic 大纲映射：`<配置包根目录>/output-templates.md`

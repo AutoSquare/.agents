@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env pwsh
 # Cursor: install Skills and user-level MCP; rules are opt-in via -ProjectPath
-# Usage: cd path\to\.agents  then  powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
+# Usage: cd path\to\<package-root>  then  powershell -ExecutionPolicy Bypass -File ".\scripts\setup-cursor-agents.ps1"
 [CmdletBinding()]
 param(
     [string]$ProjectPath,

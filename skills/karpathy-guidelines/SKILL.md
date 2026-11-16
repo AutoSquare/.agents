@@ -78,5 +78,5 @@ license: MIT
 ## 附加资源
 
 - 四原则代码对比示例见 [examples.md](examples.md)
-- Cursor Project Rules 副本见 `.agents/rules/cursor/karpathy-guidelines.mdc`（可选 `setup-cursor-agents.ps1 -ProjectPath` 安装）
+- Cursor Project Rules 副本见 `<配置包根目录>/rules/cursor/karpathy-guidelines.mdc`（可选 `setup-cursor-agents.ps1 -ProjectPath` 安装）
 <!-- agents-skill-footer:end -->

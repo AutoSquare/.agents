@@ -131,10 +131,10 @@
 
 ## 同步与发布
 
-- **源文件**：仓库 `.agents/skills/grill-me/`（跨 Agent 真相源）
+- **源文件**：仓库 `<配置包根目录>/skills/grill-me/`（跨 Agent 真相源）
 - **Cursor 副本**：`~/.cursor/skills/grill-me/`
 - **Claude Code 副本**：`~/.claude/skills/grill-me/`（若使用）
-- **DSH 副本**：`~/.dsh/skills/grill-me/`（由 `.agents/scripts/setup-dsh-agents.ps1` 安装）
+- **DSH 副本**：`~/.dsh/skills/grill-me/`（由 `<配置包根目录>/scripts/setup-dsh-agents.ps1` 安装）
 - 修改 skill 时 **各宿主副本应保持一致**；禁止只改 Cursor 版导致 Trea / OpenCode 仍读旧「一次一问纯文本」。
 
 ---
