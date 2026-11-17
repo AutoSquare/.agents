@@ -42,6 +42,10 @@ DSH 调用方式：模型用 `skill` 工具按名称加载；用户可用 `/<nam
 
 - `wpf-python-mvvm-builder`：在已有 Visual Studio WPF 项目上增量补全 WPF + Python + MVVM 双栈结构，包含 PythonBridge、Themes/Resources/Properties 与 `memory` / `archive` 两类持久化路线；Cursor、Codex 与 DSH 安装脚本均托管该 Skill。
 
+## Android 开发
+
+- `android-emulator-network-fix`：修复 Android 模拟器（AVD）无法联网——gstatic 网络校验被墙导致网络缺 VALIDATED，App 判定无网络；含诊断决策树与一键修复脚本（换国内探测地址 + `svc` 重启网络栈），附带脚本自包含在 `scripts/`；ZCode 安装脚本托管该 Skill。
+
 ## Superpowers 软件开发方法
 
 以下 14 个技能来自 `obra/superpowers` 6.1.1，技能正文按上游原文发布，许可证见 `licenses/superpowers-LICENSE.txt`。
@@ -119,5 +123,6 @@ gstack 1.60.1.0 仅为 Codex、Cursor 安装宿主专用入口（Antigravity、Q
 - 用户要求“横幅、Banner 尺寸规范”时，应用 `banner-design`（生成步骤可能需外部 Skill）。
 - 用户要求“CAD 出图、DXF 排版、工程图布局、视图重叠、比例误跳、表格飞出、预览和 AutoCAD 不一致”时，应用 `cad-structure-layout-debug`。
 - 用户要求“WPF + Python、PythonBridge、MVVM 脚手架、已有 WPF 项目接 Python、memory/archive 持久化、`.gpdx` 式工程包”时，应用 `wpf-python-mvvm-builder`。
+- 用户报告“模拟器无网、AVD 联网失败、App 报网络不可用、上传失败、ERR_NETWORK_CHANGED、未连接到互联网”时，应用 `android-emulator-network-fix`。
 - 用户要求快速浏览器 QA、网页抓取、gstack 设计/PDF/基准/iOS 工作流时，选择对应的保留 gstack 入口；若需求落入上述排除映射，直接用现有技能，不再叠加同义 gstack 流程。
 - 用户要求编写、审查、重构代码，或需减少过度复杂、精准修改、定义可验证成功标准时，应用 `karpathy-guidelines`。

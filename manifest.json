@@ -181,6 +181,9 @@
     ],
     "cadEngineering": [
       "cad-structure-layout-debug"
+    ],
+    "androidDev": [
+      "android-emulator-network-fix"
     ]
   },
   "installManifest": {
@@ -713,7 +716,8 @@
       "receiving-code-review",
       "verification-before-completion",
       "finishing-a-development-branch",
-      "writing-skills"
+      "writing-skills",
+      "android-emulator-network-fix"
     ],
     "pathRewriteSkills": [
       "ui-ux-pro-max",
